@@ -33,6 +33,7 @@ interface DynamicTableProps {
   onChangeStatus?: (row: Record<string, any>, newStatus: number) => Promise<void> | void;
   defaultRowsPerPage?: number;
 }
+import Image from "next/image";
 
 export function DynamicTable({
   data,
@@ -53,7 +54,7 @@ export function DynamicTable({
     }
   }, [rowsPerPage, totalPages]);
 
-  // ✅ SweetAlert2 Delete Confirmation
+  // SweetAlert2 Delete Confirmation
   const handleDelete = async (row: any) => {
     const name = row.dvty_name || "this item";
 
@@ -155,7 +156,27 @@ export function DynamicTable({
 
                   {columns.map((col) => (
                     <td key={col.key} className="px-4 py-3">
-                      {row[col.key] ?? "-"}
+                      {col.isImage ? (
+                        row[col.key] ? (
+                          <div className="relative w-[70px] h-12">
+                            <Image
+                              src={row[col.key]}
+                              alt={col.label}
+                              fill
+                              className="object-cover rounded-md border border-gray-700"
+                              sizes="70px"
+                            />
+                          </div>
+                        ) : (
+                          <span className="text-gray-500 italic">No Image</span>
+                        )
+                      ) : col.isDate ? (
+                        row[col.key]
+                          ? new Date(row[col.key]).toLocaleDateString()
+                          : "-"
+                      ) : (
+                        row[col.key] ?? "-"
+                      )}
                     </td>
                   ))}
 

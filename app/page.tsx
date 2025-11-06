@@ -1,11 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ButtonColorful } from "@/components/ui/button-colorful";
 import MainLayout from "@/layout/MainLayout";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner"; // 👈 import toast
+import { useAuthStore } from "@/lib/auth-store";
 
 interface PostData {
   image: string;
@@ -16,6 +18,14 @@ interface PostData {
 export default function Home() {
   const router = useRouter();
   const [selected, setSelected] = useState<string | null>(null);
+  const { user } = useAuthStore();
+
+  useEffect(() => {
+    const token = user?.token || localStorage.getItem("token");
+    if (!token) {
+      router.replace("/login");
+    }
+  }, [user, router]);
 
   const posts: PostData[] = [
     {
@@ -40,7 +50,7 @@ export default function Home() {
       const selectedPost = posts.find((p) => p.title === selected);
       if (selectedPost) router.push(selectedPost.link);
     } else {
-      alert("Please select a website first!");
+      toast.error("Please select a website first!"); // 👈 replaces alert
     }
   };
 
@@ -76,7 +86,6 @@ export default function Home() {
                 visible: { opacity: 1, y: 0, scale: 1 },
               }}
               transition={{ duration: 0.6, ease: "easeOut" }}
-              // whileTap={{ scale: 0.98 }}
               className={`relative group size-[300px] rounded-xl p-[2px] cursor-pointer transition-all duration-300
                 ${
                   selected === post.title
