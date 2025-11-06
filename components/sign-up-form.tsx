@@ -1,0 +1,184 @@
+"use client"
+
+import React from "react"
+import { cn } from "@/lib/utils"
+import { Mail } from "lucide-react"
+import Link from "next/link"
+import { Input } from "./ui/input"
+import { ButtonColorful } from "./ui/button-colorful"
+import { useSignupStore } from "@/store/use-sign-up-store"
+
+export function SignupForm() {
+  const { formData, errors, setField, validate, reset } = useSignupStore()
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const isValid = validate()
+
+    if (!isValid) return
+    console.log("✅ Form Submitted:", formData)
+    reset()
+  }
+
+  return (
+    <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-black">
+      <div className="flex gap-1">
+        <h2 className="font-bold text-xl text-neutral-200">Welcome to </h2>
+        <Link href="/" className="flex items-center">
+          <span className="font-bold text-xl text-neutral-200">
+            Ad
+            <span className="bg-clip-text text-transparent bg-[linear-gradient(to_right,#9333ea_70%,#2563eb_100%)]">
+              Engine
+            </span>
+          </span>
+        </Link>
+      </div>
+
+      <p className="text-sm max-w-sm mt-2 text-neutral-300">
+        Create your account to access exclusive features and stay updated with our latest events
+      </p>
+
+      <form className="my-8" onSubmit={handleSubmit}>
+        {/* Name */}
+        <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
+          <LabelInputContainer>
+            <Label htmlFor="firstname">First name</Label>
+            <Input
+              id="firstname"
+              value={formData.firstname}
+              placeholder="Super"
+              onChange={(e) => setField("firstname", e.target.value)}
+            />
+            {errors.firstname && <ErrorText text={errors.firstname} />}
+          </LabelInputContainer>
+
+          <LabelInputContainer>
+            <Label htmlFor="lastname">Last name</Label>
+            <Input
+              id="lastname"
+              value={formData.lastname}
+              placeholder="Admin"
+              onChange={(e) => setField("lastname", e.target.value)}
+            />
+            {errors.lastname && <ErrorText text={errors.lastname} />}
+          </LabelInputContainer>
+        </div>
+
+        {/* Mobile */}
+        <LabelInputContainer className="mb-4">
+          <Label htmlFor="mobile_no">Mobile Number</Label>
+          <Input
+            id="mobile_no"
+            type="tel"
+            placeholder="e.g. 9876543210 or +11234567890"
+            value={formData.mobile_no}
+            onChange={(e) => setField("mobile_no", e.target.value)}
+          />
+          {errors.mobile_no && <ErrorText text={errors.mobile_no} />}
+        </LabelInputContainer>
+
+        {/* Email */}
+        <LabelInputContainer className="mb-4">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="admin@gmail.com"
+            value={formData.email}
+            onChange={(e) => setField("email", e.target.value)}
+          />
+          {errors.email && <ErrorText text={errors.email} />}
+        </LabelInputContainer>
+
+        {/* Password */}
+        <LabelInputContainer className="mb-4">
+          <Label htmlFor="password">Password</Label>
+          <Input
+            id="password"
+            type="password"
+            placeholder="••••••••"
+            value={formData.password}
+            onChange={(e) => setField("password", e.target.value)}
+          />
+          {errors.password && <ErrorText text={errors.password} />}
+        </LabelInputContainer>
+
+        {/* Confirm Password */}
+        <LabelInputContainer className="mb-8">
+          <Label htmlFor="c_password">Confirm Password</Label>
+          <Input
+            id="c_password"
+            type="password"
+            placeholder="••••••••"
+            value={formData.c_password}
+            onChange={(e) => setField("c_password", e.target.value)}
+          />
+          {errors.c_password && <ErrorText text={errors.c_password} />}
+        </LabelInputContainer>
+
+        {/* Project ID */}
+        {/* <LabelInputContainer className="mb-8">
+          <Label htmlFor="user_proj_id">Project ID (optional)</Label>
+          <Input
+            id="user_proj_id"
+            placeholder="Enter Project ID"
+            value={formData.user_proj_id}
+            onChange={(e) => setField("user_proj_id", e.target.value)}
+          />
+        </LabelInputContainer> */}
+
+        <div className="flex items-center justify-center">
+          <ButtonColorful isIcon={false} label="Sign Up" className="w-full" />
+        </div>
+
+        <div className="bg-gradient-to-r from-transparent via-neutral-700 to-transparent my-8 h-px w-full" />
+
+        <div className="flex flex-col space-y-4">
+          <button
+            type="button"
+            className="relative group/btn flex space-x-2 items-center justify-center px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-zinc-900 shadow-[0px_0px_1px_1px_var(--neutral-800)]"
+          >
+            <Mail className="h-4 w-4 text-neutral-300 mr-2" />
+            <span className="text-neutral-300 text-sm">Sign up with Google</span>
+            <BottomGradient />
+          </button>
+        </div>
+
+        <div className="text-center mt-6">
+          <p className="text-sm text-neutral-300">
+            Already have an account?{" "}
+            <Link href="/login" className="text-blue-400 hover:underline">
+              Log in
+            </Link>
+          </p>
+        </div>
+      </form>
+    </div>
+  )
+}
+
+// 🔹 Subcomponents
+const ErrorText = ({ text }: { text: string }) => (
+  <p className="text-red-400 text-xs mt-1">{text}</p>
+)
+
+const BottomGradient = () => (
+  <>
+    <span className="group-hover/btn:opacity-100 block transition duration-500 opacity-0 absolute h-px w-full -bottom-px inset-x-0 bg-gradient-to-r from-transparent via-cyan-500 to-transparent" />
+    <span className="group-hover/btn:opacity-100 blur-sm block transition duration-500 opacity-0 absolute h-px w-1/2 mx-auto -bottom-px inset-x-10 bg-gradient-to-r from-transparent via-indigo-500 to-transparent" />
+  </>
+)
+
+const Label = ({ htmlFor, children }: { htmlFor: string; children: React.ReactNode }) => (
+  <label htmlFor={htmlFor} className="text-sm font-medium leading-none text-neutral-200">
+    {children}
+  </label>
+)
+
+const LabelInputContainer = ({
+  children,
+  className,
+}: {
+  children: React.ReactNode
+  className?: string
+}) => <div className={cn("flex flex-col space-y-2 w-full", className)}>{children}</div>
