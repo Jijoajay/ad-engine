@@ -11,7 +11,7 @@ export interface ProjectFormData {
   proj_created?: string;
   proj_modified?: string | null;
   proj_status: number;
-  hash_id?: string;
+  hash_id?: string | null;
   file_url?: string | null;
 }
 

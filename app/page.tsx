@@ -6,107 +6,133 @@ import { ButtonColorful } from "@/components/ui/button-colorful";
 import MainLayout from "@/layout/MainLayout";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner"; // 👈 import toast
+import { toast } from "sonner";
 import { useAuthStore } from "@/lib/auth-store";
-
-interface PostData {
-  image: string;
-  title: string;
-  link: string;
-}
+import { useProjectStore } from "@/store/use-project-store";
+import { SkeletonCard } from "@/components/skeleton/card-skeleton";
 
 export default function Home() {
   const router = useRouter();
   const [selected, setSelected] = useState<string | null>(null);
-  const { user } = useAuthStore();
+  const { user, token } = useAuthStore();
+  const { projectList, fetchProjectList, loading } = useProjectStore();
+
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    const token = user?.token || localStorage.getItem("token");
-    if (!token) {
-      router.replace("/login");
-    }
-  }, [user, router]);
+    const unsub = useAuthStore.persist.onFinishHydration(() => {
+      setHydrated(true);
+    });
 
-  const posts: PostData[] = [
-    {
-      image: "/images/desination-kp.png",
-      title: "destination-kp",
-      link: "/ad-placement",
-    },
-    {
-      image: "/images/ysn.png",
-      title: "ysn",
-      link: "/ad-placement",
-    },
-    {
-      image: "/images/battle-lounge.png",
-      title: "battle-lounge",
-      link: "/ad-placement",
-    },
-  ];
+    if (useAuthStore.persist.hasHydrated()) {
+      setHydrated(true);
+    }
+
+    return () => unsub?.();
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+
+    const storedToken = token || user?.token || localStorage.getItem("token");
+
+    if (!storedToken) {
+      router.replace("/login");
+    } else {
+      fetchProjectList();
+    }
+  }, [hydrated, token, user, router, fetchProjectList]);
 
   const handleNext = () => {
     if (selected) {
-      const selectedPost = posts.find((p) => p.title === selected);
-      if (selectedPost) router.push(selectedPost.link);
+      const selectedProject = projectList.find(
+        (p) => p.proj_name === selected
+      );
+      if (selectedProject) {
+        if(selectedProject.hash_id){
+          sessionStorage.setItem("selected_project_hash", selectedProject.hash_id);
+        }
+        router.push(`/ad-placement?project=${selectedProject.proj_slug_name}`);
+      }
     } else {
-      toast.error("Please select a website first!"); // 👈 replaces alert
+      toast.error("Please select a project first!");
     }
   };
+
+  if (!hydrated) {
+    return (
+      <MainLayout>
+        <section className="min-h-screen flex items-center justify-center bg-[#17171a]">
+          <p className="text-gray-400">Loading...</p>
+        </section>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
       <section className="min-h-screen flex flex-col items-center justify-center gap-10 bg-[#17171a] overflow-hidden">
-        {/* Heading */}
         <motion.h2
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="text-3xl font-bold text-white"
         >
-          Choose website
+          Choose Website
         </motion.h2>
 
-        {/* Cards */}
-        <motion.div
-          className="flex gap-5 flex-wrap justify-center"
-          initial="hidden"
-          animate="visible"
-          variants={{
-            hidden: {},
-            visible: { transition: { staggerChildren: 0.15 } },
-          }}
-        >
-          {posts.map((post) => (
-            <motion.div
-              key={post.title}
-              onClick={() => setSelected(post.title)}
-              variants={{
-                hidden: { opacity: 0, y: 30, scale: 0.9 },
-                visible: { opacity: 1, y: 0, scale: 1 },
-              }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
-              className={`relative group size-[300px] rounded-xl p-[2px] cursor-pointer transition-all duration-300
-                ${
-                  selected === post.title
-                    ? "bg-[linear-gradient(to_right,#9333ea_70%,#2563eb_100%)]"
-                    : "bg-transparent border border-[#4C4C4C]"
-                }`}
-            >
-              <div className="flex h-full w-full flex-col items-center justify-center rounded-xl bg-[#231F29] transition-transform duration-300">
-                <Image
-                  src={post.image || "/placeholder.svg"}
-                  alt={post.title}
-                  width={200}
-                  height={150}
-                  className="transition duration-500 ease-in-out object-cover group-hover:scale-110 object-center"
-                />
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+        {loading ? (
+          <div className="flex items-center justify-center gap-5">
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+          </div>
+        ) : (
+          <motion.div
+            className="flex gap-5 flex-wrap justify-center"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: {},
+              visible: { transition: { staggerChildren: 0.15 } },
+            }}
+          >
+            {projectList.length > 0 ? (
+              projectList.map((project) => (
+                <motion.div
+                  key={project.proj_id}
+                  onClick={() => setSelected(project.proj_name)}
+                  variants={{
+                    hidden: { opacity: 0, y: 100, scale: 0.9 },
+                    visible: { opacity: 1, y: 0, scale: 1 },
+                  }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                  className={`relative group size-[300px] rounded-xl p-0.5 cursor-pointer transition-all duration-300
+                    ${selected === project.proj_name
+                      ? "bg-[linear-gradient(to_right,#9333ea_70%,#2563eb_100%)]"
+                      : "bg-transparent border border-[#4C4C4C]"
+                    }`}
+                >
+                  <div className="flex h-full w-full flex-col items-center justify-center rounded-xl bg-[#231F29] transition-transform duration-300">
+                    <Image
+                      src={project.file_url || "/images/placeholder.png"}
+                      alt={project.proj_name}
+                      width={200}
+                      height={150}
+                      className="transition rounded-xl duration-500 ease-in-out object-cover group-hover:scale-110 object-center"
+                    />
+                    <p className="mt-3 text-white font-medium text-sm">
+                      {project.proj_name}
+                    </p>
+                  </div>
+                </motion.div>
+              ))
+            ) : (
+              <p className="text-gray-400">No projects found.</p>
+            )}
+          </motion.div>
+        )}
 
-        {/* Button */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -116,7 +142,7 @@ export default function Home() {
             label="Next"
             isIcon={false}
             onClick={handleNext}
-            className="w-full sm:w-auto h-10 sm:h-11 md:h-12 px-4 sm:px-6 md:px-8 text-sm sm:text-base bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 transition-all duration-300"
+            className="w-full sm:w-auto h-10 sm:h-11 md:h-12 px-4 sm:px-6 md:px-8 text-sm sm:text-base bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 transition-all duration-300"
           />
         </motion.div>
       </section>

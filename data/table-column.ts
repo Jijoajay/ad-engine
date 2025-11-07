@@ -6,6 +6,7 @@ export const deviceTypeColumns = [
 ];
 
 export const projectColumns = [
+  { key: "proj_file_url", label: "Project Image", isImage:true },
   { key: "proj_name", label: "Project Name" },
   { key: "proj_slug_name", label: "Slug Name" },
   { key: "proj_desc", label: "Description" },

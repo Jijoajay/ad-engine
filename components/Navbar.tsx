@@ -6,6 +6,7 @@ import { Handbag, Menu, User, X } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTheme } from "next-themes"
 import { ButtonColorful } from "@/components/ui/button-colorful"
+import { CartBadge } from "./cart-badge"
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -41,10 +42,10 @@ export default function Navbar() {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-black ${isScrolled
-          ? isLightTheme
-            ? "bg-white/70 backdrop-blur-md shadow-md"
-            : "bg-black/50 backdrop-blur-md shadow-md"
-          : "bg-transparent"
+        ? isLightTheme
+          ? "bg-white/70 backdrop-blur-md shadow-md"
+          : "bg-black/50 backdrop-blur-md shadow-md"
+        : "bg-transparent"
         }`}
     >
       <div className="px-[5%]">
@@ -57,9 +58,13 @@ export default function Navbar() {
           </Link>
 
           <div className="flex items-center gap-5">
-            <Link href="/cart" className="p-0.5 rounded-full bg-[linear-gradient(to_right,#9333ea_70%,#2563eb_100%)] bg-[#0A0A0A]">
-              <div className="p-2 bg-[#0A0A0A] rounded-full ">
-                <Handbag />
+            <Link
+              href="/cart"
+              className="relative p-0.5 rounded-full bg-[linear-gradient(to_right,#9333ea_70%,#2563eb_100%)]"
+            >
+              <div className="p-2 bg-[#0A0A0A] rounded-full relative">
+                <Handbag className="text-white" />
+                <CartBadge />
               </div>
             </Link>
 
@@ -70,20 +75,6 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Mobile Menu Button */}
-          {/* <div className="lg:hidden flex items-center">
-            <button
-              className={`p-2 rounded-full ${isLightTheme ? "bg-gray-200/70" : "bg-black/30"} backdrop-blur-sm focus:outline-none transition-colors`}
-              onClick={() => setIsOpen(!isOpen)}
-              aria-label="Toggle menu"
-            >
-              {isOpen ? (
-                <X className={`h-5 w-5 sm:h-6 sm:w-6 ${isLightTheme ? "text-gray-800" : "text-white"}`} />
-              ) : (
-                <Menu className={`h-5 w-5 sm:h-6 sm:w-6 ${isLightTheme ? "text-gray-800" : "text-white"}`} />
-              )}
-            </button>
-          </div> */}
         </div>
       </div>
 
@@ -103,8 +94,8 @@ export default function Navbar() {
                   key={link.name}
                   href={link.href}
                   className={`block ${isLightTheme
-                      ? "text-gray-700 hover:text-blue-600 hover:bg-gray-50"
-                      : "text-white/80 hover:text-blue-400 hover:bg-white/5"
+                    ? "text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                    : "text-white/80 hover:text-blue-400 hover:bg-white/5"
                     } py-3 px-4 rounded-lg transition-all duration-200 text-base font-medium`}
                   onClick={() => setIsOpen(false)}
                 >
