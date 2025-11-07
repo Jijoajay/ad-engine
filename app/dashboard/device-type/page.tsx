@@ -35,7 +35,7 @@ const Page = () => {
       <section>
         <Breadcrumb
           pageName="Device Types"
-          createPath="/dashboard/device-type/add-device-type/0"
+          createPath="/dashboard/device-type/add-device-type"
         />
         <Suspense fallback={<DynamicTableSkeleton columns={deviceTypeColumns} />}>
           {loading ? (

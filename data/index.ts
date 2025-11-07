@@ -46,12 +46,12 @@ export const NAV_DATA = [
         icon: Icons.Calendar,
         items: [],
       },
-      {
-        title: "Target Types",
-        url: "/dashboard/target-type",
-        icon: Icons.Calendar,
-        items: [],
-      },
+      // {
+      //   title: "Target Types",
+      //   url: "/dashboard/target-type",
+      //   icon: Icons.Calendar,
+      //   items: [],
+      // },
       // {
       //   title: "Profile",
       //   url: "/profile",

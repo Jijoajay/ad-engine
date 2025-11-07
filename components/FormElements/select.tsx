@@ -1,69 +1,61 @@
 "use client";
 
-import { ChevronUpIcon } from "@/assets/icons";
 import { cn } from "@/lib/utils";
-import { useId, useState } from "react";
+import { useId } from "react";
+import { ChevronUpIcon } from "@/assets/icons";
 
-type PropsType = {
-  label: string;
-  items: { value: string; label: string }[];
-  prefixIcon?: React.ReactNode;
+type SelectProps = {
   className?: string;
-  name?: string;
+  label: string;
+  name: string;
   placeholder?: string;
-  defaultValue?: string;
   required?: boolean;
-  error?: string; // 🔹 Added
+  value: string; // ✅ required for controlled component
+  items: { label: string; value: string }[];
+  handleChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  error?: string;
+  prefixIcon?: React.ReactNode;
 };
 
-export function Select({
-  items,
-  label,
-  defaultValue,
-  placeholder,
-  prefixIcon,
+const Select: React.FC<SelectProps> = ({
   className,
+  label,
   name,
+  placeholder,
   required,
+  value,
+  items,
+  handleChange,
   error,
-}: PropsType) {
+  prefixIcon,
+}) => {
   const id = useId();
-  const [isOptionSelected, setIsOptionSelected] = useState(
-    !!defaultValue && defaultValue !== ""
-  );
-
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setIsOptionSelected(e.target.value !== "");
-  };
 
   return (
     <div className={cn("space-y-3", className)}>
-      <label htmlFor={id} className="block text-body-sm font-medium text-white">
+      <label htmlFor={id} className="text-body-sm font-medium text-white">
         {label}
-        {required && <span className="ml-1 select-none text-red-500">*</span>}
+        {required && <span className="ml-1  select-none text-red-500">*</span>}
       </label>
 
       <div className="relative">
         {prefixIcon && (
-          <div className="absolute left-4 top-1/2 -translate-y-1/2">
-            {prefixIcon}
-          </div>
+          <div className="absolute left-4 top-1/2 -translate-y-1/2">{prefixIcon}</div>
         )}
 
         <select
           id={id}
           name={name}
-          defaultValue={defaultValue || ""}
+          value={value} // fully controlled
           onChange={handleChange}
           className={cn(
-            "w-full appearance-none rounded-lg border px-5.5 py-3 outline-none transition",
-            "bg-black text-white",
+            "w-full appearance-none rounded-lg mt-2 border px-5.5 py-3 outline-none transition bg-black text-white",
             prefixIcon && "pl-11.5",
             error
-              ? "border-red-500 focus:border-red-500"
-              : isOptionSelected
-              ? "border-purple-500"
-              : "border-gray-700 focus:border-purple-500"
+              ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500"
+              : value
+              ? "border-purple-500 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+              : "border-gray-700 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
           )}
         >
           {placeholder && (
@@ -84,4 +76,6 @@ export function Select({
       {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
     </div>
   );
-}
+};
+
+export default Select;

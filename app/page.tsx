@@ -103,8 +103,8 @@ export default function Home() {
                   key={project.proj_id}
                   onClick={() => setSelected(project.proj_name)}
                   variants={{
-                    hidden: { opacity: 0, y: 100, scale: 0.9 },
-                    visible: { opacity: 1, y: 0, scale: 1 },
+                    hidden: { opacity: 0, y: 50, scale: 0.9 },
+                    visible: { opacity: 1, y: -5, scale: 1 },
                   }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
                   className={`relative group size-[300px] rounded-xl p-0.5 cursor-pointer transition-all duration-300

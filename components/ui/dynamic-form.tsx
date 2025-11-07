@@ -3,9 +3,10 @@
 import React, { useState } from "react";
 import InputGroup from "@/components/FormElements/InputGroup";
 import { TextAreaGroup } from "@/components/FormElements/InputGroup/text-area";
-import { Select } from "@/components/FormElements/select";
 import { ShowcaseSection } from "./showcase-section";
 import { ButtonColorful } from "./button-colorful";
+import { FileUploadField } from "../FormElements/FileUploadField";
+import Select from "../FormElements/select";
 
 type FieldType =
   | "text"
@@ -14,6 +15,7 @@ type FieldType =
   | "date"
   | "select"
   | "textarea"
+  | "file"
   | string;
 
 interface FormField {
@@ -36,15 +38,19 @@ interface DynamicFormProps {
 export function DynamicForm({
   title = "Dynamic Form",
   fields,
-  loading=false,
+  loading = false,
   onSubmit,
 }: DynamicFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [data, setData] = useState<Record<string, any>>({});
+  const [filePreviews, setFilePreviews] = useState<Record<string, string>>({});
 
+  // Basic Validation
   const validateForm = (formData: Record<string, any>) => {
     const newErrors: Record<string, string> = {};
     fields.forEach((field) => {
-      if (field.required && !formData[field.name]?.trim()) {
+      const value = formData[field.name];
+      if (field.required && (!value || value.toString().trim() === "")) {
         newErrors[field.name] = `${field.label} is required`;
       }
     });
@@ -52,10 +58,15 @@ export function DynamicForm({
     return Object.keys(newErrors).length === 0;
   };
 
+  // Change handler for text/textarea/select
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
+    setData((prev) => ({ ...prev, [name]: value }));
+
     if (errors[name] && value.trim() !== "") {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -65,14 +76,18 @@ export function DynamicForm({
     }
   };
 
+  // Submit
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const formData = new FormData(e.currentTarget);
-    const data: Record<string, any> = {};
-    formData.forEach((value, key) => (data[key] = value));
-
     if (!validateForm(data)) return;
+
+    // Convert to FormData if file exists
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+
     await onSubmit?.(data);
   };
 
@@ -95,23 +110,54 @@ export function DynamicForm({
             handleChange,
           };
 
+          // Select Input
           if (field.type === "select") {
-            return <Select {...commonProps} items={field.options ?? []} />;
+            return <Select
+              {...commonProps}
+              items={field.options ?? []}
+              value={data[field.name] ?? ""}  
+              handleChange={(e) => {
+                handleChange(e);
+                setData((prev) => ({ ...prev, [field.name]: e.target.value }));
+              }}
+            />
           }
 
+          // File Upload
+          if (field.type === "file") {
+            return (
+              <FileUploadField
+                key={field.name}
+                field={field}
+                value={data[field.name]}
+                setData={(name, value) =>
+                  setData((prev) => ({ ...prev, [name]: value }))
+                }
+                preview={filePreviews[field.name]}
+                setPreview={(url) =>
+                  setFilePreviews((prev) => ({ ...prev, [field.name]: url || "" }))
+                }
+              />
+            );
+          }
+
+          // Textarea
           if (field.type === "textarea") {
             return <TextAreaGroup {...commonProps} />;
           }
 
+          // Input fields (text, number, date, etc.)
           return <InputGroup type={field.type} {...commonProps} />;
         })}
 
-        <ButtonColorful
-          type="submit"
-          isIcon={false}
-          label="Submit"
-          loading={loading} 
-        />
+        <div className="pt-4">
+          <ButtonColorful
+            type="submit"
+            isIcon={false}
+            label={loading ? "Submitting..." : "Submit"}
+            loading={loading}
+          />
+        </div>
       </form>
     </ShowcaseSection>
   );

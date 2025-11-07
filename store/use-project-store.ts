@@ -1,15 +1,15 @@
 import api from "@/lib/api";
 import { create } from "zustand";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export interface ProjectFormData {
-  proj_id: number;
+  proj_id: number | string;
   proj_name: string;
   proj_slug_name: string;
   proj_desc: string;
   proj_file_path: string;
   proj_url_path: string;
-  proj_created?: string;
-  proj_modified?: string | null;
   proj_status: number;
   hash_id?: string | null;
   file_url?: string | null;
@@ -18,15 +18,28 @@ export interface ProjectFormData {
 export interface ProjectState {
   formData: ProjectFormData;
   projectList: ProjectFormData[];
-  loading: boolean;
+
+  loadingFetch: boolean;
+  loadingSave: boolean;
+  loadingDelete: boolean;
+  loadingStatus: boolean;
+
   setFormData: (data: Partial<ProjectFormData>) => void;
   resetForm: () => void;
   fetchProjectList: () => Promise<void>;
+  saveProject: (
+    data: Partial<ProjectFormData>,
+    router?: ReturnType<typeof useRouter>
+  ) => Promise<void>;
+  deleteProject: (id: number) => Promise<void>;
+  changeStatus: (proj_id: string) => Promise<void>;
+  deleteStatus: (id: number) => Promise<void>;
+  setFormBySlug: (slug: string) => void;
 }
 
-export const useProjectStore = create<ProjectState>((set) => ({
+export const useProjectStore = create<ProjectState>((set, get) => ({
   formData: {
-    proj_id: 0,
+    proj_id: "",
     proj_name: "",
     proj_slug_name: "",
     proj_desc: "",
@@ -35,7 +48,11 @@ export const useProjectStore = create<ProjectState>((set) => ({
     proj_status: 1,
   },
   projectList: [],
-  loading: false,
+
+  loadingFetch: false,
+  loadingSave: false,
+  loadingDelete: false,
+  loadingStatus: false,
 
   setFormData: (data) =>
     set((state) => ({
@@ -45,7 +62,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
   resetForm: () =>
     set({
       formData: {
-        proj_id: 0,
+        proj_id: "",
         proj_name: "",
         proj_slug_name: "",
         proj_desc: "",
@@ -56,15 +73,125 @@ export const useProjectStore = create<ProjectState>((set) => ({
     }),
 
   fetchProjectList: async () => {
-    set({ loading: true });
+    set({ loadingFetch: true });
     try {
       const response = await api.get("/projects");
-      console.log("Projects Response:", response.data);
       set({ projectList: response.data.data });
     } catch (error) {
       console.error("Error fetching projects:", error);
+      toast.error("Error fetching projects!");
     } finally {
-      set({ loading: false });
+      set({ loadingFetch: false });
+    }
+  },
+
+  saveProject: async (data, router) => {
+    const { formData } = get();
+    set({ loadingSave: true });
+
+    try {
+      const formPayload = new FormData();
+      formPayload.append("proj_id", String(formData.proj_id || ""));
+      formPayload.append("proj_name", data.proj_name || formData.proj_name);
+      formPayload.append("proj_desc", data.proj_desc || formData.proj_desc);
+
+      if ((data as any).file) {
+        formPayload.append("file", (data as any).file);
+      }
+
+      const response = await api.post(
+        "/project/create-or-update",
+        formPayload,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
+      if (response?.data?.status === true) {
+        toast.success("Project saved successfully!");
+        await get().fetchProjectList();
+        if (router) router.push("/dashboard/project");
+      } else {
+        toast.error(response?.data?.message || "Failed to save project!");
+      }
+    } catch (error) {
+      console.error("Error saving project:", error);
+      toast.error("Error saving project!");
+    } finally {
+      set({ loadingSave: false });
+    }
+  },
+
+  deleteProject: async (id: number) => {
+    set({ loadingDelete: true });
+    try {
+      const response = await api.delete(`/project/delete`, {
+        data: { deletedId: id },
+      });
+
+      if (response?.data?.status === true) {
+        toast.success("Project deleted successfully!");
+        await get().fetchProjectList();
+      } else {
+        toast.error(response?.data?.message || "Failed to delete project!");
+      }
+    } catch (error) {
+      console.error("Error deleting project:", error);
+      toast.error("Error deleting project!");
+    } finally {
+      set({ loadingDelete: false });
+    }
+  },
+
+  changeStatus: async (proj_id: string) => {
+    set({ loadingStatus: true });
+    try {
+      const response = await api.put("/project/toggle-status", { proj_id });
+
+      if (response?.data?.status === true) {
+        toast.success("Project status updated successfully!");
+        await get().fetchProjectList();
+      } else {
+        toast.error(response?.data?.message || "Failed to update status!");
+      }
+    } catch (error) {
+      console.error("Error updating project status:", error);
+      toast.error("Error updating project status!");
+    } finally {
+      set({ loadingStatus: false });
+    }
+  },
+
+  deleteStatus: async (id: number) => {
+    set({ loadingDelete: true });
+    try {
+      const response = await api.delete(`/project/delete`, {
+        data: { deletedId: id },
+      });
+
+      if (response?.data?.status === true) {
+        toast.success("Project deleted successfully!");
+        await get().fetchProjectList();
+      } else {
+        toast.error(response?.data?.message || "Failed to delete project!");
+      }
+    } catch (error) {
+      console.error("Error deleting project:", error);
+      toast.error("Error deleting project!");
+    } finally {
+      set({ loadingDelete: false });
+    }
+  },
+
+  setFormBySlug: (slug: string) => {
+    const { projectList, setFormData, resetForm } = get();
+    const existing = projectList.find(
+      (item) => item.proj_slug_name?.toLowerCase() === slug.toLowerCase()
+    );
+    if (existing) {
+      setFormData(existing);
+    } else {
+      resetForm();
     }
   },
 }));

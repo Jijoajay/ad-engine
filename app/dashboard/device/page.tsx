@@ -9,24 +9,51 @@ import { useDeviceStore } from "@/store/use-device-store";
 import { Suspense, useEffect } from "react";
 
 const Page = () => {
-  const { deviceList, loading, fetchDeviceList } = useDeviceStore();
+  const {
+    deviceList,
+    loadingFetch,
+    loadingDelete,
+    loadingStatus,
+    fetchDeviceList,
+    deleteDevice,
+    changeStatus,
+  } = useDeviceStore();
 
   useEffect(() => {
     fetchDeviceList();
   }, [fetchDeviceList]);
 
+  const handleEdit = (row: any) => {
+    console.log("Edit device:", row);
+    // e.g., navigate(`/dashboard/device/form/${row.hash_id}`)
+  };
+
+  const handleDelete = async (row: any) => {
+    await deleteDevice(row.hash_id);
+  };
+
+  const handleChangeStatus = async (row: any) => {
+    await changeStatus(row.hash_id);
+  };
+
   return (
     <AdminLayout>
       <section>
-        <Breadcrumb
-          pageName="Devices"
-          createPath="/dashboard/devices/add-device"
-        />
+        <Breadcrumb pageName="Devices" createPath="/dashboard/device/form/0" />
         <Suspense fallback={<DynamicTableSkeleton columns={deviceColumns} />}>
-          {loading ? (
+          {loadingFetch ? (
             <DynamicTableSkeleton columns={deviceColumns} />
           ) : (
-            <DynamicTable columns={deviceColumns} data={deviceList} />
+            <DynamicTable
+              columns={deviceColumns}
+              data={deviceList}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onChangeStatus={handleChangeStatus}
+              // you can pass loadingDelete and loadingStatus if your DynamicTable supports it
+              // loadingDelete={loadingDelete}
+              // loadingStatus={loadingStatus}
+            />
           )}
         </Suspense>
       </section>

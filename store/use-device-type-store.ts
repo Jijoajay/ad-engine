@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 export interface DeviceTypeFormData {
-  dvty_id: number;
+  dvty_id: number | string;
   dvty_name: string;
   dvty_desc: string;
   dvty_status: number;
@@ -30,7 +30,7 @@ export interface DeviceTypeState {
 
 export const useDeviceTypeStore = create<DeviceTypeState>((set, get) => ({
   formData: {
-    dvty_id: 0,
+    dvty_id: "",
     dvty_name: "",
     dvty_desc: "",
     dvty_status: 1,
@@ -47,7 +47,7 @@ export const useDeviceTypeStore = create<DeviceTypeState>((set, get) => ({
   resetForm: () =>
     set({
       formData: {
-        dvty_id: 0,
+        dvty_id: "",
         dvty_name: "",
         dvty_desc: "",
         dvty_status: 1,

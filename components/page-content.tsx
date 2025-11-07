@@ -16,13 +16,13 @@ type TabKey = string;
 const PageContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { addToCart, cart, hydrated } = useCartStore();
+  const { addToCart, cart, loading } = useCartStore();
   const [hashId, setHashId] = useState<string | null>(null);
+  const [loadingId, setLoadingId] = useState<string | null>(null);
   const initialTab = searchParams.get("tab")?.replace(/-/g, " ") as TabKey;
   const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
   const { fetchAdSettings, loadingAdSettings, adSettings } = useAdSettingsStore();
   const { projectPageListByHash, fetchProjectPageByHashId, loadingHash } = useProjectPageStore();
-
   const slugify = (text: string) => text.toLowerCase().replace(/\s+/g, "-");
 
   useEffect(() => {
@@ -94,8 +94,8 @@ const PageContent = () => {
           Array.from({ length: 2 }).map((_, i) => <AdCardSkeleton key={i} />)
         ) : adSettings && adSettings.length > 0 ? (
           adSettings.map((ad, index) => {
-            const isInCart = cart.some((item) => item.hash_id === ad.hash_id); // ✅ moved here
-
+            const isInCart = cart.some((item) => item.cart_odr_setg_id === ad.setg_id);
+            const isLoading = loadingId === ad.hash_id;
             return (
               <motion.div
                 key={ad.hash_id || index}
@@ -121,36 +121,43 @@ const PageContent = () => {
                         <p className="text-gray-300">{ad.setg_ad_size}</p>
                       </div>
                     </div>
-                    <p className="text-2xl sm:text-3xl font-bold">${ad.setg_ad_charges}</p>
+                    <div className="flex items-start justify-start h-full">
+                      <p className="text-2xl sm:text-3xl text-start font-bold">${ad.setg_ad_charges}</p>
+                    </div>
                   </div>
-
-                  <motion.div
-                    whileTap={{ scale: 0.9 }}
-                    animate={
-                      isInCart
-                        ? {
-                          scale: [1, 1.05, 1],
-                          boxShadow: "0 0 10px rgba(147,51,234,0.6)",
-                        }
-                        : {}
-                    }
-                    transition={{ duration: 0.4 }}
-                  >
-                    <ButtonColorful
-                      isIcon={false}
-                      label={isInCart ? "Added to Cart" : "Add to Cart"}
-                      onClick={() => {
-                        if (!isInCart) {
-                          addToCart({
-                            ...ad,
-                            setg_ad_charges: Number(ad.setg_ad_charges),
-                          });
-                        }
-                      }}
-                      className={`text-white h-10 text-sm sm:text-base font-medium ${isInCart ? "opacity-80 cursor-not-allowed" : ""
-                        }`}
-                    />
-                  </motion.div>
+                  <div className="flex justify-end">
+                    <motion.div
+                      whileTap={{ scale: 0.9 }}
+                      animate={
+                        isInCart
+                          ? {
+                            scale: [1, 1.05, 1],
+                            boxShadow: "0 0 10px rgba(147,51,234,0.6)",
+                          }
+                          : {}
+                      }
+                      className="w-40"
+                      transition={{ duration: 0.4 }}
+                    >
+                      <ButtonColorful
+                        isIcon={false}
+                        loading={isLoading}
+                        label={isInCart ? "Added to Cart" : "Add to Cart"}
+                        onClick={async () => {
+                          if (!isInCart) {
+                            setLoadingId(ad.hash_id); 
+                            await addToCart({
+                              ...ad,
+                              setg_ad_charges: Number(ad.setg_ad_charges),
+                            });
+                            setLoadingId(null); // stop loading
+                          }
+                        }}
+                        className={`text-white h-10 w-40 text-sm sm:text-base font-medium ${isInCart ? "opacity-80 cursor-not-allowed" : ""
+                          }`}
+                      />
+                    </motion.div>
+                  </div>
                 </div>
 
                 <motion.div

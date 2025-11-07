@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import { MoreHorizontal, Edit, Trash2, RefreshCcw } from "lucide-react";
+import { Edit, Trash2, RefreshCcw, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Image from "next/image";
 
 interface DynamicTableProps {
   title?: string;
@@ -33,7 +34,6 @@ interface DynamicTableProps {
   onChangeStatus?: (row: Record<string, any>, newStatus: number) => Promise<void> | void;
   defaultRowsPerPage?: number;
 }
-import Image from "next/image";
 
 export function DynamicTable({
   data,
@@ -63,8 +63,8 @@ export function DynamicTable({
       text: "This action cannot be undone!",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#7e22ce", // purple
-      cancelButtonColor: "#374151", // gray
+      confirmButtonColor: "#7e22ce",
+      cancelButtonColor: "#374151",
       confirmButtonText: "Yes, delete it!",
       cancelButtonText: "Cancel",
       background: "#000000",
@@ -157,19 +157,24 @@ export function DynamicTable({
                   {columns.map((col) => (
                     <td key={col.key} className="px-4 py-3">
                       {col.isImage ? (
-                        row[col.key] ? (
-                          <div className="relative w-[70px] h-12">
-                            <Image
-                              src={row[col.key]}
-                              alt={col.label}
-                              fill
-                              className="object-cover rounded-md border border-gray-700"
-                              sizes="70px"
-                            />
-                          </div>
-                        ) : (
-                          <span className="text-gray-500 italic">No Image</span>
-                        )
+                        <div className="relative w-[70px] h-12">
+                          <Image
+                            src={row[col.key] || "/images/placeholder.png"}
+                            alt={col.label}
+                            fill
+                            className="object-cover rounded-md border border-gray-700"
+                            sizes="70px"
+                          />
+                        </div>
+                      ) : col.label === "Status" ? (
+                        <span
+                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${row[col.key] === 1
+                              ? "bg-green-500/20 text-green-400 border border-green-600"
+                              : "bg-red-500/20 text-red-400 border border-red-600"
+                            }`}
+                        >
+                          {row[col.key] === 1 ? "Active" : "Inactive"}
+                        </span>
                       ) : col.isDate ? (
                         row[col.key]
                           ? new Date(row[col.key]).toLocaleDateString()
@@ -180,7 +185,8 @@ export function DynamicTable({
                     </td>
                   ))}
 
-                  <td className="text-center">
+                  {/* Actions Dropdown */}
+                  <td className="text-center px-4 py-3">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <button className="p-2 rounded-full hover:bg-gray-800 transition">
@@ -199,19 +205,29 @@ export function DynamicTable({
                             <Edit className="h-4 w-4 text-blue-400" /> Edit
                           </DropdownMenuItem>
                         )}
-                        {onChangeStatus && (
+
+                        {onChangeStatus && columns.some(c => c.label === "Status") && (
                           <DropdownMenuItem
                             className="flex items-center gap-2 hover:bg-gray-800 cursor-pointer"
-                            onClick={() =>
-                              onChangeStatus(row, row.dvty_status === 1 ? 0 : 1)
-                            }
+                            onClick={() => {
+                              const statusCol = columns.find(c => c.label === "Status");
+                              if (!statusCol) return;
+                              const currentStatus = row[statusCol.key];
+                              onChangeStatus(row, currentStatus === 1 ? 0 : 1);
+                            }}
                           >
-                            <RefreshCcw className="h-4 w-4 text-yellow-400" />{" "}
-                            {row.dvty_status === 1
+                            <RefreshCcw
+                              className={`h-4 w-4 ${row[columns.find(c => c.label === "Status")!.key] === 1
+                                  ? "text-yellow-400"
+                                  : "text-green-400"
+                                }`}
+                            />
+                            {row[columns.find(c => c.label === "Status")!.key] === 1
                               ? "Deactivate"
                               : "Activate"}
                           </DropdownMenuItem>
                         )}
+
                         {onDelete && (
                           <DropdownMenuItem
                             className="flex items-center gap-2 hover:bg-gray-800 cursor-pointer"
