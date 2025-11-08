@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Handbag, Menu, User, X } from "lucide-react"
+import { Handbag, Menu, Upload, User, X } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTheme } from "next-themes"
 import { ButtonColorful } from "@/components/ui/button-colorful"
@@ -58,6 +58,15 @@ export default function Navbar() {
           </Link>
 
           <div className="flex items-center gap-5">
+            <Link
+              href="/ad-upload"
+              className="relative p-0.5 rounded-full bg-[linear-gradient(to_right,#9333ea_70%,#2563eb_100%)]"
+            >
+              <div className="p-2 bg-[#0A0A0A] rounded-full relative">
+                <Upload className="text-white" />
+              </div>
+            </Link>
+
             <Link
               href="/cart"
               className="relative p-0.5 rounded-full bg-[linear-gradient(to_right,#9333ea_70%,#2563eb_100%)]"

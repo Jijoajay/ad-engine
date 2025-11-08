@@ -3,33 +3,34 @@
 import Breadcrumb from "@/components/breadcrumbs/bread-crumbs";
 import { DynamicTableSkeleton } from "@/components/skeleton/dynamic-table-skeleton";
 import { DynamicTable } from "@/components/ui/dynamic-table";
-import { targetTypeColumns } from "@/data/table-column";
+import { adSettingColumns } from "@/data/table-column";
 import AdminLayout from "@/layout/AdminLayout";
-import { useTargetTypeStore } from "@/store/use-target-type-store";
+import { useAdSettingStore } from "@/store/use-ad-setting-store";
 import { Suspense, useEffect } from "react";
 
 const Page = () => {
   const {
-    targetTypeList,
+    adSettingList,
     loadingFetch,
     loadingDelete,
     loadingStatus,
-    fetchTargetTypeList,
-    deleteTargetType,
+    fetchAdSettingList,
+    deleteAdSetting,
     changeStatus,
-  } = useTargetTypeStore();
+  } = useAdSettingStore();
 
   useEffect(() => {
-    fetchTargetTypeList();
-  }, [fetchTargetTypeList]);
+    fetchAdSettingList();
+  }, [fetchAdSettingList]);
 
   const handleEdit = (row: any) => {
     console.log("Edit row:", row);
-    // e.g., navigate(`/dashboard/target-types/edit/${row.trgt_id}`)
+    // Example:
+    // router.push(`/dashboard/ad-setting/form/${row.hash_id}`)
   };
 
   const handleDelete = async (row: any) => {
-    await deleteTargetType(row.hash_id);
+    await deleteAdSetting(row.hash_id);
   };
 
   const handleChangeStatus = async (row: any) => {
@@ -40,16 +41,16 @@ const Page = () => {
     <AdminLayout>
       <section>
         <Breadcrumb
-          pageName="Target Types"
-          createPath="/dashboard/target-type/form/0"
+          pageName="Ad Settings"
+          createPath="/dashboard/ad-setting/form/0"
         />
-        <Suspense fallback={<DynamicTableSkeleton columns={targetTypeColumns} />}>
+        <Suspense fallback={<DynamicTableSkeleton columns={adSettingColumns} />}>
           {loadingFetch ? (
-            <DynamicTableSkeleton columns={targetTypeColumns} />
+            <DynamicTableSkeleton columns={adSettingColumns} />
           ) : (
             <DynamicTable
-              columns={targetTypeColumns}
-              data={targetTypeList}
+              columns={adSettingColumns}
+              data={adSettingList}
               onEdit={handleEdit}
               onDelete={handleDelete}
               onChangeStatus={handleChangeStatus}

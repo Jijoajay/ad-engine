@@ -21,6 +21,8 @@ export interface CartItem {
   project_page_name?: string;
   file_url?: string;
   total_charges: number | string;
+  setg_view_count: number | string;
+  setg_click_count: number | string;
 }
 
 interface CartStore {
@@ -154,8 +156,8 @@ export const useCartStore = create<CartStore>((set, get) => ({
         ),
         order_details: cart.map((item) => ({
           advt_setg_id: item.cart_odr_setg_id,
-          advt_view_count: 0,
-          advt_click_count: 0,
+          advt_view_count: item.setg_view_count || 0,
+          advt_click_count: item.setg_click_count || 0,
           advt_charges:
             Number(item.setg_ad_charges || 0) * (item.cart_odr_quantity || 1),
         })),

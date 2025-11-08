@@ -49,5 +49,16 @@ export const targetTypeColumns = [
   { key: "trgt_created_date", label: "Created On", isDate: true },
 ];
 
+export const adSettingColumns = [
+  { key: "setg_ad_position", label: "Ad Position" },
+  { key: "setg_ad_desc", label: "Description" },
+  { key: "setg_ad_size", label: "Ad Size" },
+  { key: "setg_view_count", label: "Views" },
+  { key: "setg_click_count", label: "Clicks" },
+  { key: "setg_ad_charges", label: "Charges (₹)" },
+  { key: "setg_status", label: "Status" },
+];
+
+
 
 
