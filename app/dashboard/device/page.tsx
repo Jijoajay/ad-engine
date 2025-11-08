@@ -17,6 +17,7 @@ const Page = () => {
     fetchDeviceList,
     deleteDevice,
     changeStatus,
+    fetchDeviceByHash
   } = useDeviceStore();
 
   useEffect(() => {
@@ -27,6 +28,11 @@ const Page = () => {
     console.log("Edit device:", row);
     // e.g., navigate(`/dashboard/device/form/${row.hash_id}`)
   };
+
+  useEffect(() => {
+    const hashId = "MV8xNzYyNjA3OTMx"; // example hash_id
+    fetchDeviceByHash(hashId);
+  }, []);
 
   const handleDelete = async (row: any) => {
     await deleteDevice(row.hash_id);
@@ -50,9 +56,9 @@ const Page = () => {
               onEdit={handleEdit}
               onDelete={handleDelete}
               onChangeStatus={handleChangeStatus}
-              // you can pass loadingDelete and loadingStatus if your DynamicTable supports it
-              // loadingDelete={loadingDelete}
-              // loadingStatus={loadingStatus}
+            // you can pass loadingDelete and loadingStatus if your DynamicTable supports it
+            // loadingDelete={loadingDelete}
+            // loadingStatus={loadingStatus}
             />
           )}
         </Suspense>

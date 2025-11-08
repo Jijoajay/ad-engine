@@ -12,8 +12,6 @@ const Page = () => {
   const {
     projectList,
     loadingFetch,
-    loadingDelete,
-    loadingStatus,
     fetchProjectList,
     deleteProject,
     changeStatus,
@@ -50,8 +48,6 @@ const Page = () => {
               onEdit={handleEdit}
               onDelete={handleDelete}
               onChangeStatus={handleChangeStatus}
-              // loadingDelete={loadingDelete} 
-              // loadingStatus={loadingStatus} 
             />
           )}
         </Suspense>

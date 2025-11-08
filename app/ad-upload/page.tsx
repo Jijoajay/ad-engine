@@ -1,3 +1,5 @@
+"use client";
+
 import MainLayout from "@/layout/MainLayout";
 import { UploadContent } from "@/components/upload-content";
 import { useAdStore } from "@/store/use-ad-store";

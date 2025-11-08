@@ -1,5 +1,5 @@
-"use client";
 
+"use client";
 import { UploadContent } from "@/components/upload-content";
 import AdminLayout from "@/layout/AdminLayout";
 import { useEffect } from "react";

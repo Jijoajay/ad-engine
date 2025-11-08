@@ -1,3 +1,5 @@
+"use client"
+
 import api from "@/lib/api";
 import { create } from "zustand";
 import { toast } from "sonner";

@@ -22,6 +22,7 @@ interface DeviceState {
   loadingDelete: boolean;
   loadingStatus: boolean;
   fetchDeviceList: () => Promise<void>;
+  fetchDeviceByHash: (hash_id: string) => Promise<void>; 
   setFormByHash: (hash_id: string) => void;
   saveDevice: (
     data: Partial<Device>,
@@ -57,6 +58,24 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
   setFormByHash: (hash_id: string) => {
     const device = get().deviceList.find((d) => d.hash_id === hash_id);
     set({ formData: device || {} });
+  },
+
+  fetchDeviceByHash: async (hash_id: string) => {
+    set({ loadingFetch: true });
+    try {
+      const response = await api.get(`/device/${hash_id}`);
+      if (response.data?.status) {
+        set({ formData: response.data.data });
+        toast.success("Device data loaded successfully!");
+      } else {
+        toast.error(response.data?.message || "Failed to load device data!");
+      }
+    } catch (error) {
+      console.error("Error fetching device by hash:", error);
+      toast.error("Error fetching device data!");
+    } finally {
+      set({ loadingFetch: false });
+    }
   },
 
   saveDevice: async (data: Partial<Device>, router) => {
