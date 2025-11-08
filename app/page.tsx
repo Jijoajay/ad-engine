@@ -15,7 +15,7 @@ export default function Home() {
   const router = useRouter();
   const [selected, setSelected] = useState<string | null>(null);
   const { user, token } = useAuthStore();
-  const { projectList, fetchProjectList, loading } = useProjectStore();
+  const { projectList, fetchProjectList, loadingFetch } = useProjectStore();
 
   const [hydrated, setHydrated] = useState(false);
 
@@ -59,6 +59,8 @@ export default function Home() {
     }
   };
 
+  console.log("projectList", projectList)
+
   if (!hydrated) {
     return (
       <MainLayout>
@@ -81,7 +83,7 @@ export default function Home() {
           Choose Website
         </motion.h2>
 
-        {loading ? (
+        {loadingFetch ? (
           <div className="flex items-center justify-center gap-5">
             <SkeletonCard />
             <SkeletonCard />

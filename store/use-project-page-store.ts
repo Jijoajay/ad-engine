@@ -14,11 +14,14 @@ export interface ProjectPageFormData {
 export interface ProjectPageState {
   formData: ProjectPageFormData;
   projectPageList: ProjectPageFormData[];
+  projectPageListByHash: ProjectPageFormData[];
+
 
   loadingFetch: boolean;
   loadingSave: boolean;
   loadingDelete: boolean;
   loadingStatus: boolean;
+  loadingHash: boolean;
 
   setFormData: (data: Partial<ProjectPageFormData>) => void;
   resetForm: () => void;
@@ -31,6 +34,8 @@ export interface ProjectPageState {
   changeStatus: (page_id: string) => Promise<void>;
   deleteStatus: (id: number) => Promise<void>;
   setFormByHash: (hash: string) => void;
+  fetchProjectPageByHashId: (hashId: string) => Promise<void>;
+
 }
 
 export const useProjectPageStore = create<ProjectPageState>((set, get) => ({
@@ -41,11 +46,13 @@ export const useProjectPageStore = create<ProjectPageState>((set, get) => ({
     page_status: 1,
   },
   projectPageList: [],
+   projectPageListByHash: [],
 
   loadingFetch: false,
   loadingSave: false,
   loadingDelete: false,
   loadingStatus: false,
+  loadingHash: false,
 
   setFormData: (data) =>
     set((state) => ({
@@ -72,6 +79,21 @@ export const useProjectPageStore = create<ProjectPageState>((set, get) => ({
       toast.error("Error fetching project pages!");
     } finally {
       set({ loadingFetch: false });
+    }
+  },
+
+    // new: fetch pages for a particular project by hash_id
+  fetchProjectPageByHashId: async (hashId: string) => {
+    set({ loadingHash: true });
+    try {
+      const response = await api.get(`/get-project-pages/${hashId}`);
+      console.log("Fetched Project Pages by Hash ID:", response.data);
+      set({ projectPageListByHash: response.data.data || [] });
+    } catch (error) {
+      console.error("Error fetching project pages by hash id:", error);
+      set({ projectPageListByHash: [] });
+    } finally {
+      set({ loadingHash: false });
     }
   },
 
