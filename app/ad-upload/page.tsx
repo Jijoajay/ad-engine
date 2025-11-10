@@ -20,7 +20,7 @@ const Page = () => {
   return (
     <MainLayout>
       <UploadContent
-        isAdmin={true}
+        isAdmin={false}
         projectList={projectList}
         pagesByProject={pagesByProject}
         adPositionsByPage={adPositionsByPage}

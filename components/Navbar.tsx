@@ -7,11 +7,14 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useTheme } from "next-themes"
 import { ButtonColorful } from "@/components/ui/button-colorful"
 import { CartBadge } from "./cart-badge"
+import { useAdStore } from "@/store/use-ad-store"
 
 export default function Navbar() {
+
+  const { theme } = useTheme()
+  const { advertisements } = useAdStore();
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
-  const { theme } = useTheme()
   const isLightTheme = theme === "light"
 
   useEffect(() => {
@@ -27,7 +30,6 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  // Updated navigation links with new order
   const navLinks = [
     { name: "Facilities", href: "/facilities" },
     { name: "Events", href: "/events" },
@@ -41,49 +43,54 @@ export default function Navbar() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-black ${isScrolled
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-[#18181C] ${isScrolled
         ? isLightTheme
           ? "bg-white/70 backdrop-blur-md shadow-md"
           : "bg-black/50 backdrop-blur-md shadow-md"
         : "bg-transparent"
         }`}
     >
-      <div className="px-[5%]">
-        <div className="flex items-center justify-between h-14 sm:h-16 md:h-20">
-          <Link href="/" className="flex items-center">
-            <span className={`text-2xl sm:text-3xl font-bold ${isLightTheme ? "text-gray-800" : "text-white"}`}>
-              Ad
-              <span className="bg-clip-text text-transparent bg-[linear-gradient(to_right,#9333ea_70%,#2563eb_100%)]">Engine</span>
-            </span>
-          </Link>
-
-          <div className="flex items-center gap-5">
-            <Link
-              href="/ad-upload"
-              className="relative p-0.5 rounded-full bg-[linear-gradient(to_right,#9333ea_70%,#2563eb_100%)]"
-            >
-              <div className="p-2 bg-[#0A0A0A] rounded-full relative">
-                <Upload className="text-white" />
-              </div>
+      <div className="px-[5%] w-full flex justify-center">
+        <div className="container">
+          <div className="flex items-center justify-between h-14 sm:h-16 md:h-20">
+            <Link href="/" className="flex items-center">
+              <span className={`text-2xl sm:text-3xl font-bold ${isLightTheme ? "text-gray-800" : "text-white"}`}>
+                Ad
+                <span className="bg-clip-text text-transparent bg-[linear-gradient(to_right,#9333ea_70%,#2563eb_100%)]">Engine</span>
+              </span>
             </Link>
 
-            <Link
-              href="/cart"
-              className="relative p-0.5 rounded-full bg-[linear-gradient(to_right,#9333ea_70%,#2563eb_100%)]"
-            >
-              <div className="p-2 bg-[#0A0A0A] rounded-full relative">
-                <Handbag className="text-white" />
-                <CartBadge />
-              </div>
-            </Link>
+            <div className="flex items-center gap-5">
+              {
+                advertisements.length > 0 &&
+                <Link
+                  href="/ad-upload"
+                  className="relative p-0.5 rounded-full bg-[linear-gradient(to_right,#9333ea_70%,#2563eb_100%)]"
+                >
+                  <div className="p-2 bg-[#0A0A0A] rounded-full relative">
+                    <Upload className="text-white" />
+                  </div>
+                </Link>
+              }
 
-            <div className="p-0.5 rounded-full bg-[linear-gradient(to_right,#9333ea_70%,#2563eb_100%)]">
-              <div className="p-2 bg-[#0A0A0A] rounded-full">
-                <User />
+              <Link
+                href="/cart"
+                className="relative p-0.5 rounded-full bg-[linear-gradient(to_right,#9333ea_70%,#2563eb_100%)]"
+              >
+                <div className="p-2 bg-[#0A0A0A] rounded-full relative">
+                  <Handbag className="text-white" />
+                  <CartBadge />
+                </div>
+              </Link>
+
+              <div className="p-0.5 rounded-full bg-[linear-gradient(to_right,#9333ea_70%,#2563eb_100%)]">
+                <div className="p-2 bg-[#0A0A0A] rounded-full">
+                  <User />
+                </div>
               </div>
             </div>
-          </div>
 
+          </div>
         </div>
       </div>
 

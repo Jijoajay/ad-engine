@@ -204,7 +204,7 @@ const BackButton: React.FC = () => (
       className="flex items-center text-sm font-medium text-zinc-400 hover:text-blue-400 transition-colors"
     >
       <ChevronLeft size={16} className="mr-1" />
-      Back to home
+      Back to login
     </motion.div>
   </Link>
 )

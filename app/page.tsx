@@ -73,7 +73,7 @@ export default function Home() {
 
   return (
     <MainLayout>
-      <section className="min-h-screen flex flex-col items-center justify-center gap-10 bg-[#17171a] overflow-hidden">
+      <section className="min-h-screen flex flex-col items-center justify-center gap-10 bg-[#18181C] overflow-hidden">
         <motion.h2
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}

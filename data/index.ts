@@ -1,4 +1,5 @@
 import * as Icons from "@/assets/icons";
+import { Label } from "@radix-ui/react-dropdown-menu";
 
 export const NAV_DATA = [
   {
@@ -8,47 +9,55 @@ export const NAV_DATA = [
         title: "Dashboard",
         icon: Icons.HomeIcon,
         items: [],
+        label: "dashboard",
         url:"/dashboard"
       },
       {
         title: "Project",
         url: "/dashboard/project",
         icon: Icons.Calendar,
+        label: "project",
         items: [],
       },
       {
         title: "Device",
         url: "/dashboard/device",
         icon: Icons.Calendar,
+        label: "device",
         items: [],
       },
       {
         title: "Device Type",
         url: "/dashboard/device-type",
         icon: Icons.Calendar,
+        label: "device-type",
         items: [],
       },
       {
         title: "Media Detail",
         url: "/dashboard/media-detail",
         icon: Icons.Calendar,
+        label: "media-detail",
         items: [],
       },
       {
         title: "Media Type",
         url: "/dashboard/media-type",
         icon: Icons.Calendar,
+        label: "media-type",
         items: [],
       },
       {
         title: "Project Pages",
         url: "/dashboard/project-page",
         icon: Icons.Calendar,
+        label: "project-page",
         items: [],
       },
       {
         title: "Target Types",
         url: "/dashboard/target-type",
+        label: "target-type",
         icon: Icons.Calendar,
         items: [],
       },
@@ -56,12 +65,14 @@ export const NAV_DATA = [
         title: "AD Settings",
         url: "/dashboard/ad-setting",
         icon: Icons.Calendar,
+        label: "ad-setting",
         items: [],
       },
       {
         title: "AD Upload",
         url: "/dashboard/ad-upload",
         icon: Icons.Calendar,
+        label: "ad-upload",
         items: [],
       },
       // {
