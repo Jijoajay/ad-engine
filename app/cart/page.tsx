@@ -35,7 +35,7 @@ export default function CartPage() {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="min-h-screen bg-[#0B0B10] text-white py-10 sm:py-20 px-[5%] flex flex-col justify-center lg:flex-row gap-8 pt-[100px]"
+        className="min-h-screen bg-[#18181C]  text-white py-10 sm:py-20 px-[5%] flex flex-col justify-center lg:flex-row gap-8 pt-[100px]"
       >
         <div className="container pt-[50px]">
           {/* ---- Left Side: Cart Items ---- */}

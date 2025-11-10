@@ -24,9 +24,7 @@ export function UserInfo() {
 
   const handleLogout = async()=>{
     const success = await logout();
-    if(success){
-      router.push("/login")
-    }
+    if(success)router.push("/login")
   }
 
   return (

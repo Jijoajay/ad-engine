@@ -62,7 +62,7 @@ const PageContent = () => {
 
   return (
     <MainLayout>
-      <section className="flex flex-col justify-start items-center gap-10 pt-[150px] px-[5%] bg-black min-h-screen text-white ">
+      <section className="flex flex-col justify-start items-center gap-10 pt-[150px] px-[5%] bg-[#18181C]  min-h-screen text-white ">
         <div className="container flex flex-col gap-10 ">
           {/* Tabs */}
           <div className="w-full items-start">

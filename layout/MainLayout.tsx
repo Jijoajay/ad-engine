@@ -21,7 +21,7 @@ const MainLayout : React.FC<MainLayoutProps> = ({children}) => {
     },[])
     
     return (
-        <main className='bg-black'>
+        <main>
             <Suspense fallback={<Loading />}>
             <Navbar />
             {children}

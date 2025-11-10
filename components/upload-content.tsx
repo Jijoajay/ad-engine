@@ -160,7 +160,7 @@ export const UploadContent = ({
 
     return (
         <div
-            className="bg-[#0B0B10] text-white p-6 md:p-10 flex justify-center"
+            className="bg-[#18181C]  text-white p-6 md:p-10 flex justify-center"
             style={{ paddingTop: !isAdmin ? "150px" : "10px" }}
         >
             <div className={("container")}>
