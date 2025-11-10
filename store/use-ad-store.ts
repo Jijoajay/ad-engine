@@ -63,10 +63,12 @@ export interface AdState {
   fetchAdData: () => Promise<void>;
   fetchAllAdminAd: () => Promise<void>;
   saveAd: (payload: FormData) => Promise<boolean>;
+  toggleAdStatus: (advt_id: string) => Promise<boolean>;
+  deleteAd: (deletedId: string) => Promise<boolean>; // New method
 }
 
 // Store Implementation
-export const useAdStore = create<AdState>((set) => ({
+export const useAdStore = create<AdState>((set, get) => ({
   projects: [],
   projectPages: [],
   advertisements: [],
@@ -161,6 +163,66 @@ export const useAdStore = create<AdState>((set) => ({
     } catch (error: any) {
       console.error("❌ Save error:", error);
       toast.error("Something went wrong while saving ad details");
+      set({ loading: false, error: error.message });
+      return false;
+    }
+  },
+
+  // Toggle Advertisement Status
+  toggleAdStatus: async (advt_id) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await api.put("/user-advertisement/toggle-status", { advt_id });
+
+      if (res.data?.status) {
+        toast.success("Advertisement status updated successfully!");
+
+        const updatedAds = get().adminAdvertisements.map((ad) =>
+          ad.hash_id === advt_id
+            ? { ...ad, advt_status: ad.advt_status === 1 ? 0 : 1 }
+            : ad
+        );
+
+        set({ adminAdvertisements: updatedAds, loading: false });
+        return true;
+      } else {
+        toast.error(res.data?.message || "Failed to change ad status");
+        set({ loading: false });
+        return false;
+      }
+    } catch (error: any) {
+      console.error("❌ Toggle status error:", error);
+      toast.error("Something went wrong while changing ad status");
+      set({ loading: false, error: error.message });
+      return false;
+    }
+  },
+
+  // Delete Advertisement
+  deleteAd: async (deletedId) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await api.delete("/user-advertisement/delete", {
+        data: { deletedId },
+      });
+
+      if (res.data?.status) {
+        toast.success("Advertisement deleted successfully!");
+
+        const updatedAds = get().adminAdvertisements.filter(
+          (ad) => ad.hash_id !== deletedId
+        );
+
+        set({ adminAdvertisements: updatedAds, loading: false });
+        return true;
+      } else {
+        toast.error(res.data?.message || "Failed to delete advertisement");
+        set({ loading: false });
+        return false;
+      }
+    } catch (error: any) {
+      console.error("❌ Delete error:", error);
+      toast.error("Something went wrong while deleting advertisement");
       set({ loading: false, error: error.message });
       return false;
     }

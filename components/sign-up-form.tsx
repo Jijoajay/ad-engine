@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useEffect } from "react"
 import { cn } from "@/lib/utils"
 import { ChevronLeft, Mail } from "lucide-react"
 import Link from "next/link"
@@ -10,11 +10,17 @@ import { useSignupStore } from "@/store/use-sign-up-store"
 import { useAuthStore } from "@/lib/auth-store"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
+import { useProjectStore } from "@/store/use-project-store"
 
 export function SignupForm() {
   const router = useRouter();
-  const { register, loading, error } = useAuthStore();
-  const { formData, errors, setField, validate, reset } = useSignupStore()
+  const { register, registerError, loading } = useAuthStore();
+  const { formData, errors, setField, validate, reset } = useSignupStore();
+  const { projectList, fetchProjectList } = useProjectStore();
+
+  useEffect(() => {
+    fetchProjectList();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -25,11 +31,12 @@ export function SignupForm() {
     if (success) {
       console.log("Registration successful!");
       reset();
-      router.push("/ogin") 
+      router.push("/login");
     } else {
       console.error("Registration failed");
     }
   };
+
   return (
     <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-black">
       <BackButton />
@@ -127,23 +134,53 @@ export function SignupForm() {
           {errors.c_password && <ErrorText text={errors.c_password} />}
         </LabelInputContainer>
 
-        {/* Project ID */}
-        {/* <LabelInputContainer className="mb-8">
-          <Label htmlFor="user_proj_id">Project ID (optional)</Label>
-          <Input
-            id="user_proj_id"
-            placeholder="Enter Project ID"
-            value={formData.user_proj_id}
-            onChange={(e) => setField("user_proj_id", e.target.value)}
-          />
-        </LabelInputContainer> */}
+        {/* ✅ Project Selection Dropdown */}
+        <LabelInputContainer className="mb-8">
+          <Label htmlFor="user_proj_id">Select Project</Label>
+          <div className="relative">
+            <select
+              id="user_proj_id"
+              className={cn(
+                "w-full appearance-none bg-zinc-900 text-neutral-200 border border-neutral-800 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              )}
+              value={formData.user_proj_id || ""}
+              onChange={(e) => setField("user_proj_id", e.target.value)}
+            >
+              <option value="">Select a project</option>
+              {projectList.map((proj: any) => (
+                <option key={proj.proj_id} value={proj.proj_id}>
+                  {proj.proj_name}
+                </option>
+              ))}
+            </select>
+
+            {/* Custom dropdown arrow */}
+            <svg
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 pointer-events-none"
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+          {errors.user_proj_id && <ErrorText text={errors.user_proj_id} />}
+        </LabelInputContainer>
+
+        {/* Sign Up Button */}
+        {registerError && <p className="text-center mb-3 text-sm text-red-500">{registerError}</p>}
 
         <div className="flex items-center justify-center">
           <ButtonColorful isIcon={false} label="Sign Up" className="w-full" loading={loading} />
         </div>
 
-        <div className="bg-gradient-to-r from-transparent via-neutral-700 to-transparent my-8 h-px w-full" />
+        <div className="bg-linear-to-r from-transparent via-neutral-700 to-transparent my-8 h-px w-full" />
 
+        {/* Google Signup */}
         <div className="flex flex-col space-y-4">
           <button
             type="button"
@@ -171,29 +208,28 @@ export function SignupForm() {
 // 🔹 Subcomponents
 const ErrorText = ({ text }: { text: string }) => (
   <p className="text-red-400 text-xs mt-1">{text}</p>
-)
+);
 
 const BottomGradient = () => (
   <>
     <span className="group-hover/btn:opacity-100 block transition duration-500 opacity-0 absolute h-px w-full -bottom-px inset-x-0 bg-gradient-to-r from-transparent via-cyan-500 to-transparent" />
     <span className="group-hover/btn:opacity-100 blur-sm block transition duration-500 opacity-0 absolute h-px w-1/2 mx-auto -bottom-px inset-x-10 bg-gradient-to-r from-transparent via-indigo-500 to-transparent" />
   </>
-)
+);
 
 const Label = ({ htmlFor, children }: { htmlFor: string; children: React.ReactNode }) => (
   <label htmlFor={htmlFor} className="text-sm font-medium leading-none text-neutral-200">
     {children}
   </label>
-)
+);
 
 const LabelInputContainer = ({
   children,
   className,
 }: {
-  children: React.ReactNode
-  className?: string
-}) => <div className={cn("flex flex-col space-y-2 w-full", className)}>{children}</div>
-
+  children: React.ReactNode;
+  className?: string;
+}) => <div className={cn("flex flex-col space-y-2 w-full", className)}>{children}</div>;
 
 const BackButton: React.FC = () => (
   <Link href="/login" className="inline-block mb-6">
@@ -207,4 +243,4 @@ const BackButton: React.FC = () => (
       Back to login
     </motion.div>
   </Link>
-)
+);

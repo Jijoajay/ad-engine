@@ -18,6 +18,7 @@ interface AuthState {
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
+  registerError : string | null;
 
   // Actions
   login: (email: string, password: string) => Promise<boolean>;
@@ -37,6 +38,7 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       loading: false,
       error: null,
+      registerError:null,
 
       // 🟢 Register
       register: async (formData) => {
@@ -44,8 +46,8 @@ export const useAuthStore = create<AuthState>()(
         try {
           const payload = {
             ...formData,
-            user_type: 1, // Default user type
-            first_login: null, // Default
+            user_type: 1,
+            first_login: 2, 
           };
 
           const { data } = await api.post("/register", payload);
@@ -54,17 +56,17 @@ export const useAuthStore = create<AuthState>()(
             throw new Error(data.message || "Registration failed");
 
           set({ loading: false });
-          return true; // ✅ success
+          return true; 
         } catch (err) {
           const error = err as AxiosError<{ message?: string }>;
           set({
             loading: false,
-            error:
+            registerError:
               error.response?.data?.message ||
               error.message ||
               "Registration failed. Try again.",
           });
-          return false; // ❌ failure
+          return false; 
         }
       },
 
