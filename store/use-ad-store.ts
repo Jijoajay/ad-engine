@@ -117,7 +117,8 @@ export const useAdStore = create<AdState>((set, get) => ({
           loading: false,
         });
       } else {
-        toast.error(res.data?.message || "Failed to fetch advertisements");
+        // toast.error(res.data?.message || "Failed to fetch advertisements");
+        console.log("error", res.data?.message)
         set({ loading: false });
       }
     } catch (error: any) {

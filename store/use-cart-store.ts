@@ -54,7 +54,8 @@ export const useCartStore = create<CartStore>((set, get) => ({
       const response = await api.get("/cart-order-details");
       set({ cart: response.data.data || [] });
     } catch (error) {
-      toast.error("Failed to fetch cart.");
+      console.log("error", error)
+      // toast.error("Failed to fetch cart.");
     } finally {
       set({ loading: false });
     }
