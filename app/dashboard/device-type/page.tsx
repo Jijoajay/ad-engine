@@ -6,9 +6,11 @@ import { DynamicTable } from "@/components/ui/dynamic-table";
 import { deviceTypeColumns } from "@/data/table-column";
 import AdminLayout from "@/layout/AdminLayout";
 import { useDeviceTypeStore } from "@/store/use-device-type-store";
+import { useRouter } from "next/navigation";
 import { Suspense, useEffect } from "react";
 
 const Page = () => {
+  const router = useRouter();
   const { deviceTypeList, loading, fetchDeviceTypeList, deleteDeviceType } = useDeviceTypeStore();
 
   useEffect(() => {
@@ -16,18 +18,17 @@ const Page = () => {
   }, [fetchDeviceTypeList]);
 
   const handleEdit = (row: any) => {
-    console.log("Edit row:", row);
-    // e.g., navigate(`/dashboard/device-type/edit/${row.dvty_id}`)
+    router.push(`/dashboard/device-type/form/${row.hash_id}`)
   };
 
   const handleDelete = async (row: any) => {
     await deleteDeviceType(row.hash_id);
-    fetchDeviceTypeList(); 
+    fetchDeviceTypeList();
   };
 
   const handleChangeStatus = async (row: any, newStatus: number) => {
     // await updateDeviceStatus(row.dvty_id, newStatus);
-    fetchDeviceTypeList(); 
+    fetchDeviceTypeList();
   };
 
   return (
@@ -35,7 +36,7 @@ const Page = () => {
       <section>
         <Breadcrumb
           pageName="Device Types"
-          createPath="/dashboard/device-type/add-device-type"
+          createPath="/dashboard/device-type/form/0"
         />
         <Suspense fallback={<DynamicTableSkeleton columns={deviceTypeColumns} />}>
           {loading ? (

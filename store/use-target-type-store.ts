@@ -20,10 +20,12 @@ export interface TargetTypeState {
   loadingSave: boolean;
   loadingDelete: boolean;
   loadingStatus: boolean;
+  loadingHash: boolean;
 
   setFormData: (data: Partial<TargetTypeFormData>) => void;
   resetForm: () => void;
   fetchTargetTypeList: () => Promise<void>;
+  fetchTargetTypeByHashId: (hashId: string) => Promise<void>;
   saveTargetType: (
     data: Partial<TargetTypeFormData>,
     router?: ReturnType<typeof useRouter>
@@ -47,6 +49,7 @@ export const useTargetTypeStore = create<TargetTypeState>((set, get) => ({
   loadingSave: false,
   loadingDelete: false,
   loadingStatus: false,
+  loadingHash: false,
 
   setFormData: (data) =>
     set((state) => ({
@@ -77,6 +80,24 @@ export const useTargetTypeStore = create<TargetTypeState>((set, get) => ({
       toast.error("Error fetching target types!");
     } finally {
       set({ loadingFetch: false });
+    }
+  },
+
+  // ✅ Fetch Target Type by Hash ID and set formData
+  fetchTargetTypeByHashId: async (hashId: string) => {
+    set({ loadingHash: true });
+    try {
+      const response = await api.get(`/target-type/${hashId}`);
+      if (response?.data?.status && response.data.data) {
+        set({ formData: response.data.data });
+      } else {
+        toast.error(response.data?.message || "Failed to load target type!");
+      }
+    } catch (error) {
+      console.error("Error fetching target type by hash id:", error);
+      toast.error("Error fetching target type by hash id!");
+    } finally {
+      set({ loadingHash: false });
     }
   },
 

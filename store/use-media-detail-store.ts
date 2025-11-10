@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import api from "@/lib/api";
 import { create } from "zustand";
@@ -32,7 +32,7 @@ export interface MediaDetailState {
   ) => Promise<void>;
   deleteMediaDetail: (id: number) => Promise<void>;
   changeStatus: (id: string) => Promise<void>;
-  setFormByHash: (hash: string) => void;
+  setFormByHash: (hash: string) => Promise<void>;
 }
 
 export const useMediaDetailStore = create<MediaDetailState>((set, get) => ({
@@ -47,7 +47,7 @@ export const useMediaDetailStore = create<MediaDetailState>((set, get) => ({
   loadingFetch: false,
   loadingSave: false,
   loadingDelete: false,
-  loadingStatus: false, 
+  loadingStatus: false,
 
   setFormData: (data) =>
     set((state) => ({
@@ -95,8 +95,11 @@ export const useMediaDetailStore = create<MediaDetailState>((set, get) => ({
         data.mddt_desc || formData.mddt_desc || ""
       );
 
-      if ((data as any).file) {
-        formPayload.append("file", (data as any).file);
+      const file = (data as any).file;
+      if (file && file instanceof File) {
+        formPayload.append("file", file);
+      } else {
+        formPayload.append("file", "null");
       }
 
       const response = await api.post(
@@ -146,7 +149,7 @@ export const useMediaDetailStore = create<MediaDetailState>((set, get) => ({
     set({ loadingStatus: true });
     try {
       const response = await api.put("/media-details/toggle-status", {
-        mddt_id:hash_id,
+        mddt_id: hash_id,
       });
 
       if (response?.data?.status === true) {
@@ -163,15 +166,32 @@ export const useMediaDetailStore = create<MediaDetailState>((set, get) => ({
     }
   },
 
-  setFormByHash: (hash: string) => {
-    const { mediaDetailList, setFormData, resetForm } = get();
-    const existing = mediaDetailList.find(
-      (item) => item.hash_id?.toLowerCase() === hash.toLowerCase()
-    );
-    if (existing) {
-      setFormData(existing);
-    } else {
+  // Updated function: Fetch by hash and set formData
+  setFormByHash: async (hash: string) => {
+    const { setFormData, resetForm } = get();
+    set({ loadingFetch: true });
+
+    try {
+      const response = await api.get(`/media-details/${hash}`);
+      if (response?.data?.status && response.data?.data) {
+        const data = response.data.data;
+        console.log("data", data);
+        setFormData({
+          mddt_id: data.mddt_id,
+          mddt_mdty_id: data.mddt_mdty_id,
+          mddt_desc: data.mddt_desc,
+          file: data.file_url,
+        });
+      } else {
+        resetForm();
+        toast.error("No media detail found!");
+      }
+    } catch (error) {
+      console.error("Error fetching media detail by hash:", error);
+      toast.error("Error fetching media detail!");
       resetForm();
+    } finally {
+      set({ loadingFetch: false });
     }
   },
 }));

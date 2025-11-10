@@ -27,7 +27,7 @@ export interface DeviceTypeState {
     router?: ReturnType<typeof useRouter>
   ) => Promise<void>;
   deleteDeviceType: (id: number) => Promise<void>;
-  setFormBySlug: (slug: string) => void;
+  setFormBySlug: (slug: string) => Promise<void>;
 }
 
 export const useDeviceTypeStore = create<DeviceTypeState>((set, get) => ({
@@ -115,17 +115,26 @@ export const useDeviceTypeStore = create<DeviceTypeState>((set, get) => ({
       set({ loading: false });
     }
   },
-  setFormBySlug: (slug: string) => {
-    const { deviceTypeList, setFormData, resetForm } = get();
-    const existing = deviceTypeList.find(
-      (item) => item.dvty_name.toLowerCase() === slug.toLowerCase()
-    );
-    if (existing) {
-      setFormData(existing);
-    } else {
+
+  // Updated to fetch and set form data from API
+  setFormBySlug: async (slug: string) => {
+    const { setFormData, resetForm } = get();
+    set({ formLoading: true });
+
+    try {
+      const response = await api.get(`/device-type/${slug}`);
+      if (response?.data?.data) {
+        setFormData(response.data.data);
+      } else {
+        resetForm();
+        toast.error("No data found for this device type");
+      }
+    } catch (error) {
+      console.error("Error fetching device type by slug:", error);
+      toast.error("Error fetching device type details");
       resetForm();
+    } finally {
+      set({ formLoading: false });
     }
   },
 }));
-
-

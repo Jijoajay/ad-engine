@@ -6,9 +6,11 @@ import { DynamicTable } from "@/components/ui/dynamic-table";
 import { projectColumns } from "@/data/table-column";
 import AdminLayout from "@/layout/AdminLayout";
 import { useProjectStore } from "@/store/use-project-store";
+import { useRouter } from "next/navigation";
 import { Suspense, useEffect } from "react";
 
 const Page = () => {
+  const router = useRouter();
   const {
     projectList,
     loadingFetch,
@@ -23,7 +25,7 @@ const Page = () => {
 
   const handleEdit = (row: any) => {
     console.log("Edit row:", row);
-    // e.g., navigate(`/dashboard/project/edit/${row.proj_id}`)
+    router.push(`/dashboard/project/form/${row.hash_id}`)
   };
 
   const handleDelete = async (row: any) => {
@@ -37,7 +39,7 @@ const Page = () => {
   return (
     <AdminLayout>
       <section>
-        <Breadcrumb pageName="Projects" createPath="/dashboard/project/add-project" />
+        <Breadcrumb pageName="Projects" createPath="/dashboard/project/form/0" />
         <Suspense fallback={<DynamicTableSkeleton columns={projectColumns} />}>
           {loadingFetch ? (
             <DynamicTableSkeleton columns={projectColumns} />

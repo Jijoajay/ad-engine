@@ -6,14 +6,14 @@ import { DynamicTable } from "@/components/ui/dynamic-table";
 import { adSettingColumns } from "@/data/table-column";
 import AdminLayout from "@/layout/AdminLayout";
 import { useAdSettingStore } from "@/store/use-ad-setting-store";
+import { useRouter } from "next/navigation";
 import { Suspense, useEffect } from "react";
 
 const Page = () => {
+  const router = useRouter();
   const {
     adSettingList,
     loadingFetch,
-    loadingDelete,
-    loadingStatus,
     fetchAdSettingList,
     deleteAdSetting,
     changeStatus,
@@ -24,9 +24,7 @@ const Page = () => {
   }, [fetchAdSettingList]);
 
   const handleEdit = (row: any) => {
-    console.log("Edit row:", row);
-    // Example:
-    // router.push(`/dashboard/ad-setting/form/${row.hash_id}`)
+    router.push(`/dashboard/ad-setting/form/${row.hash_id}`)
   };
 
   const handleDelete = async (row: any) => {

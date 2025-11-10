@@ -9,13 +9,15 @@ import { DynamicForm } from "@/components/ui/dynamic-form";
 
 const Page = () => {
   const router = useRouter();
-  const { slug_name } = useParams<{ slug_name: string }>();
-  const { formData, formLoading, fetchDeviceTypeList, saveDeviceType, setFormBySlug } =
+  const { slug_id } = useParams<{ slug_id: string }>();
+  const { formData, formLoading, setFormBySlug, saveDeviceType } =
     useDeviceTypeStore();
 
   useEffect(() => {
-    fetchDeviceTypeList().then(() => setFormBySlug(slug_name));
-  }, [fetchDeviceTypeList, setFormBySlug, slug_name]);
+    if (slug_id !== "0") {
+      setFormBySlug(slug_id)
+    }
+  }, [slug_id, setFormBySlug])
 
   const handleSubmit = (data: Record<string, any>) => {
     saveDeviceType(data, router);
@@ -28,6 +30,7 @@ const Page = () => {
       type: "text",
       placeholder: "Enter device type name",
       required: true,
+      value:formData.dvty_name
     },
     {
       label: "Description",
@@ -35,6 +38,7 @@ const Page = () => {
       type: "textarea",
       placeholder: "Enter description",
       required: true,
+      value:formData.dvty_desc
     },
   ];
 

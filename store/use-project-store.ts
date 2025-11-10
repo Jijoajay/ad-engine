@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import api from "@/lib/api";
 import { create } from "zustand";
@@ -15,6 +15,7 @@ export interface ProjectFormData {
   proj_status: number;
   hash_id?: string | null;
   file_url?: string | null;
+  file?: File | string | null;
 }
 
 export interface ProjectState {
@@ -29,6 +30,7 @@ export interface ProjectState {
   setFormData: (data: Partial<ProjectFormData>) => void;
   resetForm: () => void;
   fetchProjectList: () => Promise<void>;
+  fetchProjectByHash: (hash: string) => Promise<void>;
   saveProject: (
     data: Partial<ProjectFormData>,
     router?: ReturnType<typeof useRouter>
@@ -48,6 +50,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     proj_file_path: "",
     proj_url_path: "",
     proj_status: 1,
+    file: null,
   },
   projectList: [],
 
@@ -71,6 +74,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         proj_file_path: "",
         proj_url_path: "",
         proj_status: 1,
+        file: "",
       },
     }),
 
@@ -82,6 +86,35 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     } catch (error) {
       console.error("Error fetching projects:", error);
       toast.error("Error fetching projects!");
+    } finally {
+      set({ loadingFetch: false });
+    }
+  },
+
+  fetchProjectByHash: async (hash: string) => {
+    set({ loadingFetch: true });
+
+    try {
+      const response = await api.get(`/project/${hash}`);
+
+      if (response.data?.status && response.data?.data) {
+        const data = response.data.data;
+
+        set((state) => ({
+          formData: {
+            ...state.formData,
+            proj_id: data.proj_id || "",
+            proj_name: data.proj_name || "",
+            proj_desc: data.proj_desc || "",
+            file: data.file_url || null, 
+          },
+        }));
+      } else {
+        toast.error("Failed to fetch project details!");
+      }
+    } catch (error) {
+      console.error("Error fetching project by hash:", error);
+      toast.error("Error fetching project details!");
     } finally {
       set({ loadingFetch: false });
     }

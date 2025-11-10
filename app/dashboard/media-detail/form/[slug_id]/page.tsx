@@ -9,12 +9,11 @@ import { DynamicForm } from "@/components/ui/dynamic-form";
 
 const MediaDetailPage = () => {
   const router = useRouter();
-  const { hash_id } = useParams<{ hash_id: string }>();
+  const { slug_id } = useParams<{ slug_id: string }>();
 
   const {
     formData,
     loadingSave,
-    fetchMediaDetailList,
     setFormByHash,
     saveMediaDetail,
   } = useMediaDetailStore();
@@ -25,12 +24,12 @@ const MediaDetailPage = () => {
 
   // Fetch media detail list and set current form if editing
   useEffect(() => {
-    fetchMediaDetailList().then(() => {
-      if (hash_id && setFormByHash) setFormByHash(hash_id);
-    });
+     if (slug_id !== "0") {
+      setFormByHash(slug_id)
+    }
 
     fetchMediaTypeList();
-  }, [fetchMediaDetailList, setFormByHash, fetchMediaTypeList, hash_id]);
+  }, [setFormByHash, fetchMediaTypeList, slug_id]);
 
   useEffect(() => {
     if (mediaTypeList?.length) {
@@ -63,6 +62,7 @@ const MediaDetailPage = () => {
       type: "text",
       placeholder: "Enter description",
       required: false,
+      value: formData?.mddt_desc,
     },
     {
       label: "Media File",
@@ -70,6 +70,7 @@ const MediaDetailPage = () => {
       type: "file",
       placeholder: "Upload media file",
       required: true,
+      value: formData?.file,
     },
   ];
 

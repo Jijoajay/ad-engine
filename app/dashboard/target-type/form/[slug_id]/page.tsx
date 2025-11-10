@@ -8,22 +8,20 @@ import { DynamicForm } from "@/components/ui/dynamic-form";
 
 const TargetTypeForm = () => {
   const router = useRouter();
-  const { hash_id } = useParams<{ hash_id: string }>();
+  const { slug_id } = useParams<{ slug_id: string }>();
 
   const {
     formData,
     loadingSave,
-    fetchTargetTypeList,
-    setFormByHash,
+    fetchTargetTypeByHashId,
     saveTargetType,
   } = useTargetTypeStore();
 
-  // Fetch existing target types and set form if editing
   useEffect(() => {
-    fetchTargetTypeList().then(() => {
-      if (hash_id) setFormByHash(hash_id);
-    });
-  }, [fetchTargetTypeList, setFormByHash, hash_id]);
+    if (slug_id !== "0") {
+      fetchTargetTypeByHashId(slug_id)
+    }
+  }, [slug_id, fetchTargetTypeByHashId])
 
   const handleSubmit = (data: Record<string, any>) => {
     saveTargetType(data, router);

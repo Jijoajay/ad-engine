@@ -9,18 +9,20 @@ import { useProjectStore } from "@/store/use-project-store";
 import { useProjectPageStore } from "@/store/use-project-page-store";
 import { useTargetTypeStore } from "@/store/use-target-type-store";
 import { useDeviceTypeStore } from "@/store/use-device-type-store";
+import { Value } from "@radix-ui/react-select";
 
 const AdSettingPage = () => {
   const router = useRouter();
-  const { hash_id } = useParams<{ hash_id: string }>();
+  const { slug_id } = useParams<{ slug_id: string }>();
 
-  const { loadingSave, fetchAdSettingList, setFormByHash, saveAdSetting } =
+  const { loadingSave, formData, fetchAdSettingByHashId, fetchAdSettingList, setFormByHash, saveAdSetting } =
     useAdSettingStore();
 
   const { projectList, fetchProjectList } = useProjectStore();
   const { projectPageList, fetchProjectPageList, loadingHash } =
     useProjectPageStore();
   const { targetTypeList, fetchTargetTypeList } = useTargetTypeStore();
+
   const {
     fetchDeviceTypeList,
     deviceTypeList,
@@ -42,12 +44,12 @@ const AdSettingPage = () => {
     fetchAdSettingList,
   ]);
 
-  // 🧱 Set form when hash is present
   useEffect(() => {
-    if (hash_id) setFormByHash(hash_id);
-  }, [hash_id, setFormByHash]);
+    if (slug_id !== "0" ){
+      fetchAdSettingByHashId(slug_id)
+    }
+  }, [slug_id, fetchAdSettingByHashId]);
 
-  // 🧾 Options for dropdowns
   const projectOptions = useMemo(
     () =>
       projectList.map((p) => ({
@@ -84,12 +86,10 @@ const AdSettingPage = () => {
     [deviceTypeList]
   );
 
-  // 🟨 Handle form submit
   const handleSubmit = (data: Record<string, any>) => {
     saveAdSetting(data, router);
   };
 
-  // 🧱 Dynamic Form Fields (complete)
   const fields = [
     {
       label: "Ad Setting ID",
@@ -103,16 +103,18 @@ const AdSettingPage = () => {
       options: projectOptions,
       placeholder: "Select project",
       required: true,
+      value:formData.setg_proj_id
     },
     {
       label: "Page",
       name: "setg_page_id",
       type: "select",
       options: loadingHash
-        ? [{ label: "Loading pages...", value: "" }]
-        : pageOptions,
+      ? [{ label: "Loading pages...", value: "" }]
+      : pageOptions,
       placeholder: "Select page",
       required: true,
+      value:formData.setg_page_id.toString()
     },
     {
       label: "Target Type",
@@ -121,16 +123,18 @@ const AdSettingPage = () => {
       options: targetTypeOptions,
       placeholder: "Select target type",
       required: true,
+      value:formData.setg_trgt_id.toString()
     },
     {
       label: "Device Type",
       name: "setg_dvty_id",
       type: "select",
       options: deviceTypeLoading
-        ? [{ label: "Loading device types...", value: "" }]
-        : deviceTypeOptions,
+      ? [{ label: "Loading device types...", value: "" }]
+      : deviceTypeOptions,
       placeholder: "Select device type",
       required: true,
+      value:formData.setg_dvty_id.toString()
     },
     {
       label: "Media Type",
@@ -142,6 +146,7 @@ const AdSettingPage = () => {
       ],
       placeholder: "Select media type",
       required: true,
+      value:formData.setg_mddt_id.toString()
     },
     {
       label: "Ad Position",
@@ -149,12 +154,7 @@ const AdSettingPage = () => {
       type: "text",
       placeholder: "Enter ad position",
       required: true,
-    },
-    {
-      label: "Ad Description",
-      name: "setg_ad_desc",
-      type: "textarea",
-      placeholder: "Enter ad description",
+      value:formData.setg_ad_position
     },
     {
       label: "Ad Size",
@@ -162,6 +162,7 @@ const AdSettingPage = () => {
       type: "text",
       placeholder: "e.g. 10 X 10",
       required: true,
+      value:formData.setg_ad_size
     },
     {
       label: "View Count",
@@ -169,6 +170,7 @@ const AdSettingPage = () => {
       type: "number",
       placeholder: "Enter view count",
       required: true,
+      value:formData.setg_view_count
     },
     {
       label: "Click Count",
@@ -176,6 +178,7 @@ const AdSettingPage = () => {
       type: "number",
       placeholder: "Enter click count",
       required: true,
+      value:formData.setg_click_count
     },
     {
       label: "Ad Charges ($)",
@@ -183,6 +186,14 @@ const AdSettingPage = () => {
       type: "number",
       placeholder: "Enter ad charges",
       required: true,
+      value:formData.setg_ad_charges
+    },
+     {
+      label: "Ad Description",
+      name: "setg_ad_desc",
+      type: "textarea",
+      placeholder: "Enter ad description",
+      value:formData.setg_ad_desc
     },
   ];
 
@@ -190,7 +201,7 @@ const AdSettingPage = () => {
     <AdminLayout>
       <section className="mt-6">
         <DynamicForm
-          title="Add Ad Setting"
+          title={formData.setg_id ? "Edit AD Setting" :"Add AD Setting"}
           fields={fields}
           loading={loadingSave}
           onSubmit={handleSubmit}

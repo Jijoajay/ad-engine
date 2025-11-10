@@ -1,34 +1,52 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { Handbag, Menu, Upload, User, X } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
-import { useTheme } from "next-themes"
-import { ButtonColorful } from "@/components/ui/button-colorful"
-import { CartBadge } from "./cart-badge"
-import { useAdStore } from "@/store/use-ad-store"
+import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
+import { Handbag, Menu, Upload, User, X, LogOut, UserCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useTheme } from "next-themes";
+import { ButtonColorful } from "@/components/ui/button-colorful";
+import { CartBadge } from "./cart-badge";
+import { useAdStore } from "@/store/use-ad-store";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/lib/auth-store";
 
 export default function Navbar() {
+  const { theme } = useTheme();
+  const router = useRouter();
 
-  const { theme } = useTheme()
   const { advertisements } = useAdStore();
-  const [isOpen, setIsOpen] = useState(false)
-  const [isScrolled, setIsScrolled] = useState(false)
-  const isLightTheme = theme === "light"
+  const { user, logout, isAuthenticated } = useAuthStore();
 
+  const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+
+  const userModalRef = useRef<HTMLDivElement | null>(null);
+  const isLightTheme = theme === "light";
+
+  // 🧭 Close user modal on outside click
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true)
-      } else {
-        setIsScrolled(false)
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userModalRef.current && !userModalRef.current.contains(event.target as Node)) {
+        setIsUserModalOpen(false);
       }
-    }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+  // 🧭 Navbar scroll
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const handleLogout = async () => {
+    const success = await logout();
+    if (success) router.push("/login");
+  };
 
   const navLinks = [
     { name: "Facilities", href: "/facilities" },
@@ -39,30 +57,38 @@ export default function Navbar() {
     { name: "Careers", href: "/careers" },
     { name: "Press", href: "/press" },
     { name: "Contact Us", href: "/#contact" },
-  ]
+  ];
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-[#18181C] ${isScrolled
-        ? isLightTheme
-          ? "bg-white/70 backdrop-blur-md shadow-md"
-          : "bg-black/50 backdrop-blur-md shadow-md"
-        : "bg-transparent"
-        }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-[#0A0A0A] ${
+        isScrolled
+          ? isLightTheme
+            ? "bg-white/70 backdrop-blur-md shadow-md"
+            : "bg-black/50 backdrop-blur-md shadow-md"
+          : "bg-transparent"
+      }`}
     >
       <div className="px-[5%] w-full flex justify-center">
         <div className="container">
           <div className="flex items-center justify-between h-14 sm:h-16 md:h-20">
+            {/* Logo */}
             <Link href="/" className="flex items-center">
-              <span className={`text-2xl sm:text-3xl font-bold ${isLightTheme ? "text-gray-800" : "text-white"}`}>
+              <span
+                className={`text-2xl sm:text-3xl font-bold ${
+                  isLightTheme ? "text-gray-800" : "text-white"
+                }`}
+              >
                 Ad
-                <span className="bg-clip-text text-transparent bg-[linear-gradient(to_right,#9333ea_70%,#2563eb_100%)]">Engine</span>
+                <span className="bg-clip-text text-transparent bg-[linear-gradient(to_right,#9333ea_70%,#2563eb_100%)]">
+                  Engine
+                </span>
               </span>
             </Link>
 
-            <div className="flex items-center gap-5">
-              {
-                advertisements.length > 0 &&
+            {/* Right Icons */}
+            <div className="flex items-center gap-5 relative">
+              {advertisements.length > 0 && (
                 <Link
                   href="/ad-upload"
                   className="relative p-0.5 rounded-full bg-[linear-gradient(to_right,#9333ea_70%,#2563eb_100%)]"
@@ -71,7 +97,7 @@ export default function Navbar() {
                     <Upload className="text-white" />
                   </div>
                 </Link>
-              }
+              )}
 
               <Link
                 href="/cart"
@@ -83,13 +109,60 @@ export default function Navbar() {
                 </div>
               </Link>
 
-              <div className="p-0.5 rounded-full bg-[linear-gradient(to_right,#9333ea_70%,#2563eb_100%)]">
+              {/* 👤 User Icon with Modal */}
+              <div
+                className="p-0.5 rounded-full bg-[linear-gradient(to_right,#9333ea_70%,#2563eb_100%)] cursor-pointer relative"
+                onClick={() => setIsUserModalOpen(!isUserModalOpen)}
+                ref={userModalRef}
+              >
                 <div className="p-2 bg-[#0A0A0A] rounded-full">
-                  <User />
+                  <User className="text-white" />
                 </div>
+
+                {/* 🧭 User Modal */}
+                <AnimatePresence>
+                  {isUserModalOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-0 mt-2 w-52 bg-[#1a1a1a] text-white rounded-2xl shadow-lg border border-gray-700 p-3 z-[100]"
+                    >
+                      {isAuthenticated ? (
+                        <>
+                          <p className="text-sm px-3 py-2 border-b border-gray-700">
+                            {user?.name || "User"}
+                          </p>
+                          <Link
+                            href="/profile"
+                            className="flex items-center gap-2 px-3 py-2 mt-2 hover:bg-white/10 rounded-lg transition"
+                            onClick={() => setIsUserModalOpen(false)}
+                          >
+                            <UserCircle className="w-4 h-4" /> Profile
+                          </Link>
+
+                          <button
+                            onClick={handleLogout}
+                            className="flex items-center gap-2 px-3 py-2 hover:bg-red-600/20 rounded-lg transition w-full text-left"
+                          >
+                            <LogOut className="w-4 h-4 text-red-400" /> Logout
+                          </button>
+                        </>
+                      ) : (
+                        <Link
+                          href="/login"
+                          className="flex items-center gap-2 px-3 py-2 hover:bg-white/10 rounded-lg transition"
+                          onClick={() => setIsUserModalOpen(false)}
+                        >
+                          <UserCircle className="w-4 h-4" /> Login
+                        </Link>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
-
           </div>
         </div>
       </div>
@@ -102,17 +175,22 @@ export default function Navbar() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className={`lg:hidden ${isLightTheme ? "bg-white/95" : "bg-black/95"} backdrop-blur-md border-t ${isLightTheme ? "border-gray-200" : "border-gray-800"}`}
+            className={`lg:hidden ${
+              isLightTheme ? "bg-white/95" : "bg-black/95"
+            } backdrop-blur-md border-t ${
+              isLightTheme ? "border-gray-200" : "border-gray-800"
+            }`}
           >
             <div className="container mx-auto px-4 py-6 space-y-1">
               {navLinks.map((link) => (
                 <Link
                   key={link.name}
                   href={link.href}
-                  className={`block ${isLightTheme
-                    ? "text-gray-700 hover:text-blue-600 hover:bg-gray-50"
-                    : "text-white/80 hover:text-blue-400 hover:bg-white/5"
-                    } py-3 px-4 rounded-lg transition-all duration-200 text-base font-medium`}
+                  className={`block ${
+                    isLightTheme
+                      ? "text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                      : "text-white/80 hover:text-blue-400 hover:bg-white/5"
+                  } py-3 px-4 rounded-lg transition-all duration-200 text-base font-medium`}
                   onClick={() => setIsOpen(false)}
                 >
                   {link.name}
@@ -120,7 +198,10 @@ export default function Navbar() {
               ))}
               <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                 <Link href="/login" onClick={() => setIsOpen(false)}>
-                  <ButtonColorful label="Login" className="w-full text-white h-12 text-base font-medium" />
+                  <ButtonColorful
+                    label="Login"
+                    className="w-full text-white h-12 text-base font-medium"
+                  />
                 </Link>
               </div>
             </div>
@@ -128,5 +209,5 @@ export default function Navbar() {
         )}
       </AnimatePresence>
     </header>
-  )
+  );
 }

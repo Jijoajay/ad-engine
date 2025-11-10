@@ -31,7 +31,7 @@ export interface MediaTypeState {
   ) => Promise<void>;
   deleteMediaType: (id: number) => Promise<void>;
   changeStatus: (hash_id: string) => Promise<void>;
-  setFormByHash: (hash: string) => void;
+  setFormByHash: (hash: string) => Promise<void>;
 }
 
 export const useMediaTypeStore = create<MediaTypeState>((set, get) => ({
@@ -133,7 +133,9 @@ export const useMediaTypeStore = create<MediaTypeState>((set, get) => ({
   changeStatus: async (hash_id: string) => {
     set({ loadingStatus: true });
     try {
-      const response = await api.put("/media-type/toggle-status", { mdty_id: hash_id });
+      const response = await api.put("/media-type/toggle-status", {
+        mdty_id: hash_id,
+      });
       if (response?.data?.status === true) {
         toast.success("Media type status updated successfully!");
         await get().fetchMediaTypeList();
@@ -148,15 +150,29 @@ export const useMediaTypeStore = create<MediaTypeState>((set, get) => ({
     }
   },
 
-  setFormByHash: (hash: string) => {
-    const { mediaTypeList, setFormData, resetForm } = get();
-    const existing = mediaTypeList.find(
-      (item) => item.hash_id?.toLowerCase() === hash.toLowerCase()
-    );
-    if (existing) {
-      setFormData(existing);
-    } else {
+  setFormByHash: async (hash: string) => {
+    const { setFormData, resetForm } = get();
+    set({ loadingFetch: true });
+
+    try {
+      const response = await api.get(`/media-type/${hash}`);
+      if (response?.data?.status && response.data?.data) {
+        const data = response.data.data;
+        setFormData({
+          mdty_id: data.mdty_id,
+          mdty_name: data.mdty_name,
+          mdty_status: data.mdty_status,
+        });
+      } else {
+        resetForm();
+        toast.error("No media type found!");
+      }
+    } catch (error) {
+      console.error("Error fetching media type by hash:", error);
+      toast.error("Error fetching media type!");
       resetForm();
+    } finally {
+      set({ loadingFetch: false });
     }
   },
 }));

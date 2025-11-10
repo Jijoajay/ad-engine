@@ -8,17 +8,21 @@ import { DynamicForm } from "@/components/ui/dynamic-form";
 
 const Page = () => {
   const router = useRouter();
-  const { slug_name } = useParams<{ slug_name: string }>();
-  const { formData, loadingSave, fetchProjectList, saveProject, setFormBySlug } =
+  const { slug_id } = useParams<{ slug_id: string }>();
+  const { formData, loadingSave, saveProject, fetchProjectByHash } =
     useProjectStore();
 
-  useEffect(() => {
-    fetchProjectList().then(() => setFormBySlug(slug_name));
-  }, [fetchProjectList, setFormBySlug, slug_name]);
+    useEffect(()=>{
+        if(slug_id !== "0" ){
+            fetchProjectByHash(slug_id)
+        }
+    },[slug_id, fetchProjectByHash])
 
   const handleSubmit = (data: Record<string, any>) => {
     saveProject(data, router);
   };
+
+  console.log("formData", formData)
 
   const fields = [
     {
@@ -27,19 +31,22 @@ const Page = () => {
       type: "text",
       placeholder: "Enter project name",
       required: true,
+      value:formData.proj_name
     },
     {
-      label: "Description",
-      name: "proj_desc",
-      type: "textarea",
-      placeholder: "Enter project description",
-      required: true,
+        label: "Description",
+        name: "proj_desc",
+        type: "textarea",
+        placeholder: "Enter project description",
+        required: true,
+        value:formData.proj_desc
     },
     {
-      label: "File Upload",
-      name: "file",
-      type: "file",
-      required: formData.proj_id ? false : true,
+        label: "File Upload",
+        name: "file",
+        type: "file",
+        required: formData.proj_id ? false : true,
+        value:formData.file
     },
   ];
 

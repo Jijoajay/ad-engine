@@ -14,8 +14,6 @@ const Page = () => {
   const {
     mediaTypeList,
     loadingFetch,
-    loadingDelete,
-    loadingStatus,
     fetchMediaTypeList,
     deleteMediaType,
     changeStatus,
@@ -26,7 +24,7 @@ const Page = () => {
   }, [fetchMediaTypeList]);
 
   const handleEdit = (row: any) => {
-    router.push(`/dashboard/media-types/form/${row.hash_id}`);
+    router.push(`/dashboard/media-type/form/${row.hash_id}`);
   };
 
   const handleDelete = async (row: any) => {

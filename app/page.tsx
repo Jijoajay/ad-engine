@@ -123,9 +123,9 @@ export default function Home() {
                       height={150}
                       className="transition rounded-xl duration-500 ease-in-out object-cover group-hover:scale-110 object-center"
                     />
-                    <p className="mt-3 text-white font-medium text-sm">
+                    {/* <p className="mt-3 text-white font-medium text-sm">
                       {project.proj_name}
-                    </p>
+                    </p> */}
                   </div>
                 </motion.div>
               ))

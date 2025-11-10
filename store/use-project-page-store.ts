@@ -18,7 +18,6 @@ export interface ProjectPageState {
   projectPageList: ProjectPageFormData[];
   projectPageListByHash: ProjectPageFormData[];
 
-
   loadingFetch: boolean;
   loadingSave: boolean;
   loadingDelete: boolean;
@@ -28,6 +27,8 @@ export interface ProjectPageState {
   setFormData: (data: Partial<ProjectPageFormData>) => void;
   resetForm: () => void;
   fetchProjectPageList: () => Promise<void>;
+  fetchProjectPageByHashId: (hashId: string) => Promise<void>;
+  fetchProjectPageByHash: (hash: string) => Promise<void>;
   saveProjectPage: (
     data: Partial<ProjectPageFormData>,
     router?: ReturnType<typeof useRouter>
@@ -36,8 +37,6 @@ export interface ProjectPageState {
   changeStatus: (page_id: string) => Promise<void>;
   deleteStatus: (id: number) => Promise<void>;
   setFormByHash: (hash: string) => void;
-  fetchProjectPageByHashId: (hashId: string) => Promise<void>;
-
 }
 
 export const useProjectPageStore = create<ProjectPageState>((set, get) => ({
@@ -48,7 +47,7 @@ export const useProjectPageStore = create<ProjectPageState>((set, get) => ({
     page_status: 1,
   },
   projectPageList: [],
-   projectPageListByHash: [],
+  projectPageListByHash: [],
 
   loadingFetch: false,
   loadingSave: false,
@@ -84,7 +83,7 @@ export const useProjectPageStore = create<ProjectPageState>((set, get) => ({
     }
   },
 
-    // new: fetch pages for a particular project by hash_id
+  // ✅ Fetch all pages for a project by hash_id
   fetchProjectPageByHashId: async (hashId: string) => {
     set({ loadingHash: true });
     try {
@@ -96,6 +95,24 @@ export const useProjectPageStore = create<ProjectPageState>((set, get) => ({
       set({ projectPageListByHash: [] });
     } finally {
       set({ loadingHash: false });
+    }
+  },
+
+  // ✅ New: Fetch a single project page and set formData
+  fetchProjectPageByHash: async (hash: string) => {
+    set({ loadingFetch: true });
+    try {
+      const response = await api.get(`/get-project-page/${hash}`);
+      if (response.data?.status && response.data?.data) {
+        set({ formData: response.data.data });
+      } else {
+        toast.error("Failed to fetch project page!");
+      }
+    } catch (error) {
+      console.error("Error fetching project page:", error);
+      toast.error("Error fetching project page!");
+    } finally {
+      set({ loadingFetch: false });
     }
   },
 

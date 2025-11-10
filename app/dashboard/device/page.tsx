@@ -6,9 +6,11 @@ import { DynamicTable } from "@/components/ui/dynamic-table";
 import { deviceColumns } from "@/data/table-column";
 import AdminLayout from "@/layout/AdminLayout";
 import { useDeviceStore } from "@/store/use-device-store";
+import { useRouter } from "next/navigation";
 import { Suspense, useEffect } from "react";
 
 const Page = () => {
+  const router = useRouter();
   const {
     deviceList,
     loadingFetch,
@@ -25,8 +27,7 @@ const Page = () => {
   }, [fetchDeviceList]);
 
   const handleEdit = (row: any) => {
-    console.log("Edit device:", row);
-    // e.g., navigate(`/dashboard/device/form/${row.hash_id}`)
+    router.push(`/dashboard/device/form/${row.hash_id}`)
   };
 
   useEffect(() => {

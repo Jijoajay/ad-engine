@@ -6,9 +6,11 @@ import { DynamicTable } from "@/components/ui/dynamic-table";
 import { targetTypeColumns } from "@/data/table-column";
 import AdminLayout from "@/layout/AdminLayout";
 import { useTargetTypeStore } from "@/store/use-target-type-store";
+import { useRouter } from "next/navigation";
 import { Suspense, useEffect } from "react";
 
 const Page = () => {
+  const router = useRouter();
   const {
     targetTypeList,
     loadingFetch,
@@ -24,8 +26,7 @@ const Page = () => {
   }, [fetchTargetTypeList]);
 
   const handleEdit = (row: any) => {
-    console.log("Edit row:", row);
-    // e.g., navigate(`/dashboard/target-types/edit/${row.trgt_id}`)
+    router.push(`/dashboard/target-type/form/${row.hash_id}`)
   };
 
   const handleDelete = async (row: any) => {

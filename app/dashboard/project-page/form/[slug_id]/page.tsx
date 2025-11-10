@@ -9,25 +9,23 @@ import { DynamicForm } from "@/components/ui/dynamic-form";
 
 const ProjectPageForm = () => {
   const router = useRouter();
-  const { hash_id } = useParams<{ hash_id: string }>();
+  const { slug_id } = useParams<{ slug_id: string }>();
 
   const {
     formData,
     loadingSave,
-    fetchProjectPageList,
     setFormByHash,
     saveProjectPage,
   } = useProjectPageStore();
 
   const { projectList, fetchProjectList } = useProjectStore();
 
-  // Fetch project pages and set form if editing
   useEffect(() => {
-    fetchProjectPageList().then(() => {
-      if (hash_id && setFormByHash) setFormByHash(hash_id);
-    });
-    fetchProjectList(); // fetch all projects for the dropdown
-  }, [fetchProjectPageList, setFormByHash, hash_id, fetchProjectList]);
+    if (slug_id !== "0") {
+      setFormByHash(slug_id)
+    }
+    fetchProjectList(); 
+  }, [setFormByHash, slug_id, fetchProjectList]);
 
   const handleSubmit = (data: Record<string, any>) => {
     saveProjectPage(data, router);

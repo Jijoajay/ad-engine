@@ -8,22 +8,22 @@ import { DynamicForm } from "@/components/ui/dynamic-form";
 
 const MediaTypePage = () => {
   const router = useRouter();
-  const { hash_id } = useParams<{ hash_id: string }>();
+  const { slug_id } = useParams<{ slug_id: string }>();
 
   const {
     formData,
     loadingSave,
-    fetchMediaTypeList,
     setFormByHash,
     saveMediaType,
   } = useMediaTypeStore();
 
-  // Fetch media type list and set current form if editing
-  useEffect(() => {
-    fetchMediaTypeList().then(() => {
-      if (hash_id && setFormByHash) setFormByHash(hash_id);
-    });
-  }, [fetchMediaTypeList, setFormByHash, hash_id]);
+    useEffect(()=>{
+        if(slug_id !== "0" ){
+          setFormByHash(slug_id)
+        }
+    },[slug_id])
+
+
 
   const handleSubmit = (data: Record<string, any>) => {
     saveMediaType(data, router);

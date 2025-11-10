@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import InputGroup from "@/components/FormElements/InputGroup";
 import { TextAreaGroup } from "@/components/FormElements/InputGroup/text-area";
 import { ShowcaseSection } from "./showcase-section";
@@ -26,6 +26,7 @@ interface FormField {
   required?: boolean;
   className?: string;
   options?: { label: string; value: string }[];
+  value?: any; 
 }
 
 interface DynamicFormProps {
@@ -45,7 +46,18 @@ export function DynamicForm({
   const [data, setData] = useState<Record<string, any>>({});
   const [filePreviews, setFilePreviews] = useState<Record<string, string>>({});
 
-  // Basic Validation
+  // ✅ Sync field values whenever they change (e.g., after fetch)
+  useEffect(() => {
+    const initialData: Record<string, any> = {};
+    fields.forEach((field) => {
+      if (field.value !== undefined) {
+        initialData[field.name] = field.value;
+      }
+    });
+    setData(initialData);
+  }, [fields]);
+
+  // ✅ Basic Validation
   const validateForm = (formData: Record<string, any>) => {
     const newErrors: Record<string, string> = {};
     fields.forEach((field) => {
@@ -58,7 +70,7 @@ export function DynamicForm({
     return Object.keys(newErrors).length === 0;
   };
 
-  // Change handler for text/textarea/select
+  // ✅ Change handler for text/textarea/select
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -76,17 +88,11 @@ export function DynamicForm({
     }
   };
 
-  // Submit
+  // ✅ Submit
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!validateForm(data)) return;
-
-    // Convert to FormData if file exists
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-      formData.append(key, value);
-    });
 
     await onSubmit?.(data);
   };
@@ -112,15 +118,20 @@ export function DynamicForm({
 
           // Select Input
           if (field.type === "select") {
-            return <Select
-              {...commonProps}
-              items={field.options ?? []}
-              value={data[field.name] ?? ""}  
-              handleChange={(e) => {
-                handleChange(e);
-                setData((prev) => ({ ...prev, [field.name]: e.target.value }));
-              }}
-            />
+            return (
+              <Select
+                {...commonProps}
+                items={field.options ?? []}
+                value={data[field.name] ?? ""}
+                handleChange={(e) => {
+                  handleChange(e);
+                  setData((prev) => ({
+                    ...prev,
+                    [field.name]: e.target.value,
+                  }));
+                }}
+              />
+            );
           }
 
           // File Upload
@@ -135,7 +146,10 @@ export function DynamicForm({
                 }
                 preview={filePreviews[field.name]}
                 setPreview={(url) =>
-                  setFilePreviews((prev) => ({ ...prev, [field.name]: url || "" }))
+                  setFilePreviews((prev) => ({
+                    ...prev,
+                    [field.name]: url || "",
+                  }))
                 }
               />
             );
@@ -143,11 +157,23 @@ export function DynamicForm({
 
           // Textarea
           if (field.type === "textarea") {
-            return <TextAreaGroup {...commonProps} />;
+            return (
+              <TextAreaGroup
+                {...commonProps}
+                value={data[field.name] ?? ""}
+                handleChange={handleChange}
+              />
+            );
           }
 
           // Input fields (text, number, date, etc.)
-          return <InputGroup type={field.type} {...commonProps} />;
+          return (
+            <InputGroup
+              type={field.type}
+              {...commonProps}
+              value={data[field.name] ?? ""}
+            />
+          );
         })}
 
         <div className="pt-4">

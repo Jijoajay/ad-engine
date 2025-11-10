@@ -30,10 +30,12 @@ export interface AdSettingState {
   loadingSave: boolean;
   loadingDelete: boolean;
   loadingStatus: boolean;
+  loadingHash: boolean;
 
   setFormData: (data: Partial<AdSettingFormData>) => void;
   resetForm: () => void;
   fetchAdSettingList: () => Promise<void>;
+  fetchAdSettingByHashId: (hashId: string) => Promise<void>;
   saveAdSetting: (
     data: Partial<AdSettingFormData>,
     router?: ReturnType<typeof useRouter>
@@ -66,6 +68,7 @@ export const useAdSettingStore = create<AdSettingState>((set, get) => ({
   loadingSave: false,
   loadingDelete: false,
   loadingStatus: false,
+  loadingHash: false,
 
   setFormData: (data) =>
     set((state) => ({
@@ -106,6 +109,24 @@ export const useAdSettingStore = create<AdSettingState>((set, get) => ({
       toast.error("Error fetching ad settings!");
     } finally {
       set({ loadingFetch: false });
+    }
+  },
+
+  // ✅ NEW FUNCTION: Fetch ad setting by hashId and populate formData
+  fetchAdSettingByHashId: async (hashId: string) => {
+    set({ loadingHash: true });
+    try {
+      const response = await api.get(`/ad-settings/${hashId}`);
+      if (response?.data?.status && response.data.data) {
+        set({ formData: response.data.data });
+      } else {
+        toast.error(response.data?.message || "Failed to load ad setting!");
+      }
+    } catch (error) {
+      console.error("Error fetching ad setting by hash id:", error);
+      toast.error("Error fetching ad setting by hash id!");
+    } finally {
+      set({ loadingHash: false });
     }
   },
 

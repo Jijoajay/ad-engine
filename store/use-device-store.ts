@@ -21,8 +21,10 @@ interface DeviceState {
   loadingSave: boolean;
   loadingDelete: boolean;
   loadingStatus: boolean;
+
+  // Actions
   fetchDeviceList: () => Promise<void>;
-  fetchDeviceByHash: (hash_id: string) => Promise<void>; 
+  fetchDeviceByHash: (hash_id: string) => Promise<void>;
   setFormByHash: (hash_id: string) => void;
   saveDevice: (
     data: Partial<Device>,
@@ -40,12 +42,15 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
   loadingDelete: false,
   loadingStatus: false,
 
+  // Fetch all devices
   fetchDeviceList: async () => {
     set({ loadingFetch: true });
     try {
       const response = await api.get("/devices/list");
       if (response.data?.status) {
         set({ deviceList: response.data.data });
+      } else {
+        toast.error(response.data?.message || "Failed to load devices!");
       }
     } catch (error) {
       console.error("Error fetching devices:", error);
@@ -55,19 +60,30 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
     }
   },
 
+  // Set formData from deviceList by hash (local)
   setFormByHash: (hash_id: string) => {
     const device = get().deviceList.find((d) => d.hash_id === hash_id);
-    set({ formData: device || {} });
+    if (device) {
+      set({ formData: device });
+    } else {
+      toast.error("Device not found in local list!");
+    }
   },
 
+  // Fetch single device by hash and set formData
   fetchDeviceByHash: async (hash_id: string) => {
     set({ loadingFetch: true });
     try {
       const response = await api.get(`/device/${hash_id}`);
-      if (response.data?.status) {
-        set({ formData: response.data.data });
+
+      if (response.data?.status && response.data?.data) {
+        const device: Device = response.data.data;
+
+        // Update formData with API response
+        set({ formData: { ...device } });
+
       } else {
-        toast.error(response.data?.message || "Failed to load device data!");
+        toast.error(response.data?.message || "Failed to load device!");
       }
     } catch (error) {
       console.error("Error fetching device by hash:", error);
@@ -77,6 +93,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
     }
   },
 
+  // Save device (create or update)
   saveDevice: async (data: Partial<Device>, router) => {
     const { formData } = get();
     set({ loadingSave: true });
@@ -124,12 +141,13 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
     }
   },
 
+  // Change device status
   changeStatus: async (device_id: number) => {
     set({ loadingStatus: true });
     try {
       const response = await api.put("/device/toggle-status", { device_id });
       if (response.data?.status) {
-        toast.success("Device status updated successfully!");
+        toast.success("Device status updated!");
         await get().fetchDeviceList();
       } else {
         toast.error(response.data?.message || "Failed to update status!");
@@ -142,6 +160,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
     }
   },
 
+  // Delete device
   deleteDevice: async (device_id: number) => {
     set({ loadingDelete: true });
     try {
