@@ -1,13 +1,14 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { AxiosError } from "axios";
-import api from "./api"
+import api from "./api";
 
 export interface User {
   id: number;
   name: string;
   email: string;
   role: string;
+  user_type: number | string;
   token?: string;
 }
 
@@ -20,7 +21,8 @@ interface AuthState {
 
   // Actions
   login: (email: string, password: string) => Promise<boolean>;
-  logout: () => Promise<void>;
+  register: (formData: Record<string, any>) => Promise<boolean>;
+  logout: () => Promise<boolean>;
   setUser: (user: User | null) => void;
   clearError: () => void;
 }
@@ -31,9 +33,40 @@ export const useAuthStore = create<AuthState>()(
     (set, get) => ({
       user: null,
       token: null,
+      user_type: null,
       isAuthenticated: false,
       loading: false,
       error: null,
+
+      // 🟢 Register
+      register: async (formData) => {
+        set({ loading: true, error: null });
+        try {
+          const payload = {
+            ...formData,
+            user_type: 1, // Default user type
+            first_login: null, // Default
+          };
+
+          const { data } = await api.post("/register", payload);
+
+          if (!data.status)
+            throw new Error(data.message || "Registration failed");
+
+          set({ loading: false });
+          return true; // ✅ success
+        } catch (err) {
+          const error = err as AxiosError<{ message?: string }>;
+          set({
+            loading: false,
+            error:
+              error.response?.data?.message ||
+              error.message ||
+              "Registration failed. Try again.",
+          });
+          return false; // ❌ failure
+        }
+      },
 
       // Login
       login: async (email: string, password: string) => {
@@ -83,19 +116,34 @@ export const useAuthStore = create<AuthState>()(
               { headers: { Authorization: `Bearer ${token}` } }
             );
           }
+
+          // ✅ Reset state on success
+          set({
+            user: null,
+            token: null,
+            isAuthenticated: false,
+            loading: false,
+            error: null,
+          });
+
+          return true; // ✅ logout success
         } catch (e) {
           console.warn("Logout request failed:", e);
-        }
 
-        set({
-          user: null,
-          token: null,
-          isAuthenticated: false,
-          loading: false,
-          error: null,
-        });
+          // ❌ Even if API fails, still clear locally
+          set({
+            user: null,
+            token: null,
+            isAuthenticated: false,
+            loading: false,
+            error: "Logout failed. Try again.",
+          });
+
+          return false; // ❌ logout failed
+        }
       },
 
+      // 👤 Set user
       setUser: (user) => {
         set({
           user,
@@ -103,12 +151,13 @@ export const useAuthStore = create<AuthState>()(
         });
       },
 
+      // 🧹 Clear error
       clearError: () => set({ error: null }),
     }),
 
     {
       name: "auth-storage",
-      storage: createJSONStorage(() => localStorage), 
+      storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         user: state.user,
         token: state.token,

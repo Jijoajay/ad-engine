@@ -61,7 +61,7 @@ const PageContent = () => {
 
   return (
     <MainLayout>
-      <section className="flex flex-col gap-10 items-start mt-[120px] px-[5%] ">
+      <section className="flex flex-col gap-10 items-start mt-[120px] px-[5%] bg-black">
         {/* Tabs */}
         <div className="w-full items-start">
           <div className="flex flex-wrap justify-start gap-4">

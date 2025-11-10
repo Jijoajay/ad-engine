@@ -1,18 +1,17 @@
 "use client"
 
 import * as React from "react"
-import { ChevronLeft, Mail, User } from "lucide-react"
+import { ChevronLeft, Mail, User, Eye, EyeOff } from "lucide-react"
 import { motion } from "framer-motion"
 import { useTheme } from "next-themes"
 import Link from "next/link"
 import { useAuthStore } from "@/lib/auth-store"
 import { useRouter } from "next/navigation"
 import { ButtonColorful } from "./ui/button-colorful"
-import { Eye, EyeOff } from "lucide-react"
 
 const AuthForm: React.FC = () => {
   return (
-    <div className="bg-white dark:bg-zinc-950 py-20 text-zinc-800 dark:text-zinc-200 selection:bg-zinc-300 dark:selection:bg-zinc-600">
+    <div className="bg-black py-20 text-white selection:bg-zinc-300">
       <motion.div
         initial={{ opacity: 0, y: 25 }}
         animate={{ opacity: 1, y: 0 }}
@@ -38,7 +37,7 @@ const BackButton: React.FC = () => (
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
-      className="flex items-center text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+      className="flex items-center text-sm font-medium text-zinc-400 hover:text-blue-400 transition-colors"
     >
       <ChevronLeft size={16} className="mr-1" />
       Back to home
@@ -52,8 +51,8 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const Button: React.FC<ButtonProps> = ({ children, className, ...props }) => (
   <button
-    className={`rounded-md bg-gradient-to-br from-blue-400 to-blue-700 px-4 py-2 text-lg text-zinc-50 
-    ring-2 ring-blue-500/50 ring-offset-2 ring-offset-white dark:ring-offset-zinc-950 
+    className={`rounded-md bg-gradient-to-br from-blue-400 to-blue-700 px-4 py-2 text-lg text-white 
+    ring-2 ring-blue-500/50 ring-offset-2 ring-offset-black 
     transition-all hover:scale-[1.02] hover:ring-transparent active:scale-[0.98] active:ring-blue-500/70 ${className}`}
     {...props}
   >
@@ -63,7 +62,7 @@ const Button: React.FC<ButtonProps> = ({ children, className, ...props }) => (
 
 const Logo: React.FC = () => (
   <div className="flex items-center justify-center mb-3">
-    <span className="font-bold text-3xl text-neutral-200">
+    <span className="font-bold text-3xl text-white">
       Ad
       <span className="bg-clip-text text-transparent bg-[linear-gradient(to_right,#9333ea_70%,#2563eb_100%)]">
         Engine
@@ -74,10 +73,10 @@ const Logo: React.FC = () => (
 
 const Header: React.FC = () => (
   <div className="mb-6 text-center">
-    <h1 className="text-2xl font-semibold">Sign in to your account</h1>
-    <p className="mt-2 text-zinc-500 dark:text-zinc-400">
+    <h1 className="text-2xl font-semibold text-white">Sign in to your account</h1>
+    <p className="mt-2 text-zinc-400">
       Don't have an account?{" "}
-      <Link href="/sign-up" className="text-blue-600 dark:text-blue-400 hover:underline">
+      <Link href="/sign-up" className="text-blue-400 hover:underline">
         Create one.
       </Link>
     </p>
@@ -102,11 +101,11 @@ const SocialButton: React.FC<{
 }> = ({ icon, fullWidth, children }) => (
   <button
     className={`relative z-0 flex items-center justify-center gap-2 overflow-hidden rounded-md 
-    border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 
-    px-4 py-2 font-semibold text-zinc-800 dark:text-zinc-200 transition-all duration-500
+    border border-zinc-700 bg-zinc-900 
+    px-4 py-2 font-semibold text-white transition-all duration-500
     before:absolute before:inset-0 before:-z-10 before:translate-x-[150%] before:translate-y-[150%] before:scale-[2.5]
-    before:rounded-[100%] before:bg-zinc-800 dark:before:bg-zinc-200 before:transition-transform before:duration-1000 before:content-[""]
-    hover:scale-105 hover:text-zinc-100 dark:hover:text-zinc-900 hover:before:translate-x-[0%] hover:before:translate-y-[0%] active:scale-95
+    before:rounded-[100%] before:bg-white before:transition-transform before:duration-1000 before:content-[""]
+    hover:scale-105 hover:text-black hover:before:translate-x-[0%] hover:before:translate-y-[0%] active:scale-95
     ${fullWidth ? "col-span-2" : ""} w-full`}
   >
     {icon}
@@ -116,31 +115,19 @@ const SocialButton: React.FC<{
 
 const Divider: React.FC = () => (
   <div className="my-6 flex items-center gap-3">
-    <div className="h-[1px] w-full bg-zinc-300 dark:bg-zinc-700" />
-    <span className="text-zinc-500 dark:text-zinc-400">OR</span>
-    <div className="h-[1px] w-full bg-zinc-300 dark:bg-zinc-700" />
+    <div className="h-px w-full bg-zinc-700" />
+    <span className="text-zinc-400">OR</span>
+    <div className="h-px w-full bg-zinc-700" />
   </div>
 )
 
 const LoginForm: React.FC = () => {
   const router = useRouter()
-
-  const [formData, setFormData] = React.useState({
-    email: "",
-    password: "",
-  })
-
-  const [errors, setErrors] = React.useState({
-    email: "",
-    password: "",
-  })
-
-  const [showPassword, setShowPassword] = React.useState(false) // 👁️ toggle state
-
-  // Zustand store
+  const [formData, setFormData] = React.useState({ email: "", password: "" })
+  const [errors, setErrors] = React.useState({ email: "", password: "" })
+  const [showPassword, setShowPassword] = React.useState(false)
   const { login, loading, error, clearError } = useAuthStore()
 
-  // Handle input
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target
     setFormData((prev) => ({ ...prev, [id]: value }))
@@ -148,7 +135,6 @@ const LoginForm: React.FC = () => {
     if (error) clearError()
   }
 
-  // Validate inputs
   const validateForm = () => {
     let valid = true
     const newErrors = { email: "", password: "" }
@@ -173,20 +159,29 @@ const LoginForm: React.FC = () => {
     return valid
   }
 
-  // Submit
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!validateForm()) return
+    e.preventDefault();
+    if (!validateForm()) return;
 
-    const success = await login(formData.email, formData.password)
-    if (success) router.push("/")
-  }
+    const success = await login(formData.email, formData.password);
+    console.log("success", success);
+
+    if (success) {
+      const user = useAuthStore.getState().user; 
+
+      if (user?.user_type === 0) {
+        router.push("/dashboard");
+      } else {
+        router.push("/");
+      }
+    }
+  };
 
   return (
     <form onSubmit={handleSubmit}>
       {/* Email */}
       <div className="mb-3">
-        <label htmlFor="email" className="mb-1.5 block text-zinc-500 dark:text-zinc-400">
+        <label htmlFor="email" className="mb-1.5 block text-zinc-400">
           Email
         </label>
         <input
@@ -195,10 +190,9 @@ const LoginForm: React.FC = () => {
           value={formData.email}
           onChange={handleChange}
           placeholder="your.email@provider.com"
-          className="w-full rounded-md border border-zinc-300 dark:border-zinc-700 
-          bg-white dark:bg-zinc-900 px-3 py-2 text-zinc-800 dark:text-zinc-200
-          placeholder-zinc-400 dark:placeholder-zinc-500 
-          ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-purple-500"
+          className="w-full rounded-md border border-zinc-700 
+          bg-black px-3 py-2 text-white
+          placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-purple-500"
         />
         {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email}</p>}
       </div>
@@ -206,30 +200,28 @@ const LoginForm: React.FC = () => {
       {/* Password */}
       <div className="mb-6 relative">
         <div className="mb-1.5 flex items-end justify-between">
-          <label htmlFor="password" className="block text-zinc-500 dark:text-zinc-400">
+          <label htmlFor="password" className="block text-zinc-400">
             Password
           </label>
-          <a href="#" className="text-sm text-purple-600 dark:text-purple-400">
+          <a href="#" className="text-sm text-purple-400">
             Forgot Password?
           </a>
         </div>
         <div className="relative">
           <input
             id="password"
-            type={showPassword ? "text" : "password"} // 👀 toggle type
+            type={showPassword ? "text" : "password"}
             value={formData.password}
             onChange={handleChange}
             placeholder="••••••••••••"
-            className="w-full rounded-md border border-zinc-300 dark:border-zinc-700 
-            bg-white dark:bg-zinc-900 px-3 py-2 pr-10 text-zinc-800 dark:text-zinc-200
-            placeholder-zinc-400 dark:placeholder-zinc-500 
-            ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-purple-500"
+            className="w-full rounded-md border border-zinc-700 
+            bg-black px-3 py-2 pr-10 text-white
+            placeholder-zinc-500 ring-1 ring-transparent transition-shadow focus:outline-0 focus:ring-purple-500"
           />
-          {/* 👁️ Toggle button */}
           <button
             type="button"
             onClick={() => setShowPassword((prev) => !prev)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 dark:text-zinc-400"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400"
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
@@ -237,7 +229,6 @@ const LoginForm: React.FC = () => {
         {errors.password && <p className="mt-1 text-sm text-red-500">{errors.password}</p>}
       </div>
 
-      {/* Global error */}
       {error && <p className="text-center mb-3 text-sm text-red-500">{error}</p>}
 
       <ButtonColorful
@@ -251,13 +242,13 @@ const LoginForm: React.FC = () => {
 }
 
 const TermsAndConditions: React.FC = () => (
-  <p className="mt-9 text-xs text-zinc-500 dark:text-zinc-400">
+  <p className="mt-9 text-xs text-zinc-400">
     By signing in, you agree to our{" "}
-    <a href="#" className="text-blue-600 dark:text-blue-400">
+    <a href="#" className="text-blue-400">
       Terms & Conditions
     </a>{" "}
     and{" "}
-    <a href="#" className="text-blue-600 dark:text-blue-400">
+    <a href="#" className="text-blue-400">
       Privacy Policy.
     </a>
   </p>
@@ -277,9 +268,8 @@ const BackgroundDecoration: React.FC = () => {
       <div
         className="absolute inset-0"
         style={{
-          backgroundImage: isDarkTheme
-            ? "radial-gradient(100% 100% at 100% 0%, rgba(9,9,11,0), rgba(9,9,11,1))"
-            : "radial-gradient(100% 100% at 100% 0%, rgba(255,255,255,0), rgba(255,255,255,1))",
+          backgroundImage:
+            "radial-gradient(100% 100% at 100% 0%, rgba(0,0,0,0), rgba(0,0,0,1))",
         }}
       />
     </div>
@@ -287,4 +277,3 @@ const BackgroundDecoration: React.FC = () => {
 }
 
 export default AuthForm
-

@@ -5,8 +5,13 @@ import { Dropdown, DropdownContent, DropdownTrigger } from "./dropdown";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useState } from "react";
+import { Home } from "lucide-react";
+import Link from "next/link";
+import { useAuthStore } from "@/lib/auth-store";
+import { useRouter } from "next/navigation";
 
 export function UserInfo() {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
 
   const USER = {
@@ -14,6 +19,15 @@ export function UserInfo() {
     email: "admin@buts.io",
     img: "/images/user.png",
   };
+
+  const {logout} = useAuthStore();
+
+  const handleLogout = async()=>{
+    const success = await logout();
+    if(success){
+      router.push("/login")
+    }
+  }
 
   return (
     <Dropdown isOpen={isOpen} setIsOpen={setIsOpen}>
@@ -70,8 +84,21 @@ export function UserInfo() {
         <hr className="border-[#2A2A2A]" />
 
         <div className="p-2 text-base text-gray-400">
+          <Link
+            href={"/"}
+            className={cn(
+              "flex w-full items-center gap-2.5 rounded-lg px-2.5 py-[9px] font-medium text-gray-300 transition-all duration-500 ease-out",
+              "hover:bg-linear-to-r hover:from-purple-500 hover:to-blue-500 hover:text-white hover:shadow-[0_0_12px_rgba(147,51,234,0.6)] hover:scale-[1.03]",
+              "active:scale-[0.97]"
+            )}
+          >
+            <Home />
+            <span className="text-base font-medium">Go To Home</span>
+          </Link>
+        </div>
+        <div className="p-2 text-base text-gray-400">
           <button
-            onClick={() => setIsOpen(false)}
+            onClick={handleLogout}
             className={cn(
               "flex w-full items-center gap-2.5 rounded-lg px-2.5 py-[9px] font-medium text-gray-300 transition-all duration-500 ease-out",
               "hover:bg-linear-to-r hover:from-purple-500 hover:to-blue-500 hover:text-white hover:shadow-[0_0_12px_rgba(147,51,234,0.6)] hover:scale-[1.03]",

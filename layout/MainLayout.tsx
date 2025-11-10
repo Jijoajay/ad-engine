@@ -8,7 +8,7 @@ interface MainLayoutProps {
 
 const MainLayout : React.FC<MainLayoutProps> = ({children}) => {
     return (
-        <main>
+        <main className='bg-black'>
             <Suspense fallback={<Loading />}>
             <Navbar />
             {children}

@@ -66,7 +66,6 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
       const response = await api.get(`/device/${hash_id}`);
       if (response.data?.status) {
         set({ formData: response.data.data });
-        toast.success("Device data loaded successfully!");
       } else {
         toast.error(response.data?.message || "Failed to load device data!");
       }

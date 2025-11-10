@@ -2,26 +2,37 @@
 
 import React from "react"
 import { cn } from "@/lib/utils"
-import { Mail } from "lucide-react"
+import { ChevronLeft, Mail } from "lucide-react"
 import Link from "next/link"
 import { Input } from "./ui/input"
 import { ButtonColorful } from "./ui/button-colorful"
 import { useSignupStore } from "@/store/use-sign-up-store"
+import { useAuthStore } from "@/lib/auth-store"
+import { useRouter } from "next/navigation"
+import { motion } from "framer-motion"
 
 export function SignupForm() {
+  const router = useRouter();
+  const { register, loading, error } = useAuthStore();
   const { formData, errors, setField, validate, reset } = useSignupStore()
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const isValid = validate()
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const isValid = validate();
+    if (!isValid) return;
 
-    if (!isValid) return
-    console.log("✅ Form Submitted:", formData)
-    reset()
-  }
-
+    const success = await register(formData);
+    if (success) {
+      console.log("Registration successful!");
+      reset();
+      router.push("/ogin") 
+    } else {
+      console.error("Registration failed");
+    }
+  };
   return (
     <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-black">
+      <BackButton />
       <div className="flex gap-1">
         <h2 className="font-bold text-xl text-neutral-200">Welcome to </h2>
         <Link href="/" className="flex items-center">
@@ -128,7 +139,7 @@ export function SignupForm() {
         </LabelInputContainer> */}
 
         <div className="flex items-center justify-center">
-          <ButtonColorful isIcon={false} label="Sign Up" className="w-full" />
+          <ButtonColorful isIcon={false} label="Sign Up" className="w-full" loading={loading} />
         </div>
 
         <div className="bg-gradient-to-r from-transparent via-neutral-700 to-transparent my-8 h-px w-full" />
@@ -182,3 +193,18 @@ const LabelInputContainer = ({
   children: React.ReactNode
   className?: string
 }) => <div className={cn("flex flex-col space-y-2 w-full", className)}>{children}</div>
+
+
+const BackButton: React.FC = () => (
+  <Link href="/login" className="inline-block mb-6">
+    <motion.div
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+      className="flex items-center text-sm font-medium text-zinc-400 hover:text-blue-400 transition-colors"
+    >
+      <ChevronLeft size={16} className="mr-1" />
+      Back to home
+    </motion.div>
+  </Link>
+)
