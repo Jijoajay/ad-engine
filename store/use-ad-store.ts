@@ -4,7 +4,7 @@ import { create } from "zustand";
 import api from "@/lib/api";
 import { toast } from "sonner";
 
-// ✅ Interfaces
+// Interfaces
 export interface Project {
   proj_name: string;
   proj_id: number;
@@ -23,7 +23,7 @@ export interface Advertisement {
   advt_id: number;
   advt_user_id: number;
   advt_setg_id: number;
-  advt_ordt_id: number;
+  advt_ordt_id: number | null;
   advt_media_path: string | null;
   advt_view_count: number;
   advt_click_count: number;
@@ -32,6 +32,11 @@ export interface Advertisement {
   advt_created_date: string;
   advt_modified_date: string | null;
   advt_status: number;
+  proj_name?: string;
+  proj_id?: number;
+  page_id?: number;
+  page_name?: string;
+  page_proj_id?: number;
   hash_id: string;
   file_url: string | null;
 }
@@ -49,12 +54,14 @@ export interface AdState {
   projects: Project[];
   projectPages: ProjectPage[];
   advertisements: Advertisement[];
+  adminAdvertisements: Advertisement[];
   projectList: Project[];
   pagesByProject: Record<number, ProjectPage[]>;
   adPositionsByPage: Record<number, AdPosition[]>;
   loading: boolean;
   error: string | null;
   fetchAdData: () => Promise<void>;
+  fetchAllAdminAd: () => Promise<void>;
   saveAd: (payload: FormData) => Promise<boolean>;
 }
 
@@ -63,6 +70,7 @@ export const useAdStore = create<AdState>((set) => ({
   projects: [],
   projectPages: [],
   advertisements: [],
+  adminAdvertisements: [],
   projectList: [],
   pagesByProject: {},
   adPositionsByPage: {},
@@ -88,7 +96,6 @@ export const useAdStore = create<AdState>((set) => ({
         });
 
         // Group ad positions by page
-        console.log("ad_positions", adPositions);
         const adPositionsByPage: Record<number, AdPosition[]> = {};
         if (adPositions) {
           adPositions.forEach((pos: AdPosition) => {
@@ -118,6 +125,25 @@ export const useAdStore = create<AdState>((set) => ({
     }
   },
 
+  // Fetch All Admin Advertisements
+  fetchAllAdminAd: async () => {
+    set({ loading: true, error: null });
+    try {
+      const res = await api.get("/user-advertisements?isAdmin=1");
+
+      if (res.data?.status && Array.isArray(res.data.data)) {
+        set({ adminAdvertisements: res.data.data, loading: false });
+      } else {
+        toast.error(res.data?.message || "Failed to fetch admin advertisements");
+        set({ loading: false });
+      }
+    } catch (error: any) {
+      console.error("❌ Admin fetch error:", error);
+      toast.error("Something went wrong while fetching admin ads");
+      set({ loading: false, error: error.message });
+    }
+  },
+
   // Save Advertisement
   saveAd: async (payload) => {
     set({ loading: true, error: null });
@@ -126,17 +152,17 @@ export const useAdStore = create<AdState>((set) => ({
       if (res.data?.status) {
         toast.success("Advertisement saved successfully!");
         set({ loading: false });
-        return true; // Return true on success
+        return true;
       } else {
         toast.error(res.data?.message || "Failed to save advertisement");
         set({ loading: false });
-        return false; // Return false on failure
+        return false;
       }
     } catch (error: any) {
       console.error("❌ Save error:", error);
       toast.error("Something went wrong while saving ad details");
       set({ loading: false, error: error.message });
-      return false; // Return false on error
+      return false;
     }
   },
 }));

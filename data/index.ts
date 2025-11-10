@@ -1,5 +1,7 @@
 import * as Icons from "@/assets/icons";
 import { Label } from "@radix-ui/react-dropdown-menu";
+import { Settings, Target } from "lucide-react";
+import { FaAdversal } from "react-icons/fa";
 
 export const NAV_DATA = [
   {
@@ -58,20 +60,20 @@ export const NAV_DATA = [
         title: "Target Types",
         url: "/dashboard/target-type",
         label: "target-type",
-        icon: Icons.Calendar,
+        icon: Target,
         items: [],
       },
       {
         title: "AD Settings",
         url: "/dashboard/ad-setting",
-        icon: Icons.Calendar,
+        icon: Settings,
         label: "ad-setting",
         items: [],
       },
       {
-        title: "AD Upload",
-        url: "/dashboard/ad-upload",
-        icon: Icons.Calendar,
+        title: "Manage AD",
+        url: "/dashboard/manage-ad",
+        icon: FaAdversal,
         label: "ad-upload",
         items: [],
       },
