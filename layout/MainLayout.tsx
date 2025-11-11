@@ -18,10 +18,10 @@ const MainLayout : React.FC<MainLayoutProps> = ({children}) => {
     useEffect(()=>{
         fetchCart()
         fetchAdData()
-    },[])
+    },[fetchCart, fetchAdData])
     
     return (
-        <main>
+        <main className='bg-black'>
             <Suspense fallback={<Loading />}>
             <Navbar />
             {children}

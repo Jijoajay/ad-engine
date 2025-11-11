@@ -1,13 +1,15 @@
 "use client";
 
+import { useState, useEffect, Suspense } from "react";
+import { useRouter } from "next/navigation";
 import Breadcrumb from "@/components/breadcrumbs/bread-crumbs";
-import { DynamicTableSkeleton } from "@/components/skeleton/dynamic-table-skeleton";
-import { DynamicTable } from "@/components/ui/dynamic-table";
-import { projectColumns } from "@/data/table-column";
 import AdminLayout from "@/layout/AdminLayout";
 import { useProjectStore } from "@/store/use-project-store";
-import { useRouter } from "next/navigation";
-import { Suspense, useEffect } from "react";
+import { projectColumns } from "@/data/table-column";
+import { DynamicGrid } from "@/components/ui/dynamic-grid";
+import { DynamicTable } from "@/components/ui/dynamic-table";
+import { DynamicTableSkeleton } from "@/components/skeleton/dynamic-table-skeleton";
+import { AdGridSkeleton } from "@/components/skeleton/ad-grid-skeleton"; 
 
 const Page = () => {
   const router = useRouter();
@@ -19,13 +21,14 @@ const Page = () => {
     changeStatus,
   } = useProjectStore();
 
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+
   useEffect(() => {
     fetchProjectList();
   }, [fetchProjectList]);
 
   const handleEdit = (row: any) => {
-    console.log("Edit row:", row);
-    router.push(`/dashboard/project/form/${row.hash_id}`)
+    router.push(`/dashboard/project/form/${row.hash_id}`);
   };
 
   const handleDelete = async (row: any) => {
@@ -33,18 +36,46 @@ const Page = () => {
   };
 
   const handleChangeStatus = async (row: any) => {
-    await changeStatus(row.hash_id,);
+    await changeStatus(row.hash_id);
   };
+
+  if (loadingFetch) return <AdGridSkeleton />;
+
+  if (!projectList.length)
+    return (
+      <AdminLayout>
+        <div className="min-h-screen bg-black text-white flex items-center justify-center">
+          <p className="text-center text-gray-400">No projects found.</p>
+        </div>
+      </AdminLayout>
+    );
 
   return (
     <AdminLayout>
       <section>
-        <Breadcrumb pageName="Projects" createPath="/dashboard/project/form/0" />
-        <Suspense fallback={<DynamicTableSkeleton columns={projectColumns} />}>
-          {loadingFetch ? (
-            <DynamicTableSkeleton columns={projectColumns} />
-          ) : (
-            <DynamicTable
+        <Breadcrumb pageName="Projects" createPath="/dashboard/project/form/0" viewMode={viewMode} isIcon={true} setViewMode={setViewMode} />
+
+        {/* Content Section */}
+        <Suspense
+          fallback={
+            viewMode === "grid" ? (
+              <AdGridSkeleton />
+            ) : (
+              <DynamicTableSkeleton columns={projectColumns} />
+            )
+          }
+        >
+          {viewMode === "grid" ? (
+            <DynamicGrid
+              isContain={true}
+              data={projectList}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onToggle={handleChangeStatus}
+              />
+            ) : (
+              <DynamicTable
+              isContain={true}
               columns={projectColumns}
               data={projectList}
               onEdit={handleEdit}

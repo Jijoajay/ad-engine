@@ -2,18 +2,27 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { Handbag, Menu, Upload, User, X, LogOut, UserCircle } from "lucide-react";
+import {
+  Handbag,
+  Menu,
+  Upload,
+  User,
+  X,
+  LogOut,
+  UserCircle,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
 import { ButtonColorful } from "@/components/ui/button-colorful";
 import { CartBadge } from "./cart-badge";
 import { useAdStore } from "@/store/use-ad-store";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/lib/auth-store";
 
 export default function Navbar() {
   const { theme } = useTheme();
   const router = useRouter();
+  const pathname = usePathname();
 
   const { advertisements } = useAdStore();
   const { user, logout, isAuthenticated } = useAuthStore();
@@ -28,7 +37,10 @@ export default function Navbar() {
   // 🧭 Close user modal on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (userModalRef.current && !userModalRef.current.contains(event.target as Node)) {
+      if (
+        userModalRef.current &&
+        !userModalRef.current.contains(event.target as Node)
+      ) {
         setIsUserModalOpen(false);
       }
     };
@@ -57,6 +69,12 @@ export default function Navbar() {
     { name: "Careers", href: "/careers" },
     { name: "Press", href: "/press" },
     { name: "Contact Us", href: "/#contact" },
+  ];
+
+  const userMenuItems = [
+    { href: "#", label: "Profile", icon: UserCircle },
+    { href: "/my-ads", label: "My ADs", icon: UserCircle },
+    { href: "/change-password", label: "Change Password", icon: UserCircle },
   ];
 
   return (
@@ -126,33 +144,56 @@ export default function Navbar() {
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute right-0 mt-2 w-52 bg-[#1a1a1a] text-white rounded-2xl shadow-lg border border-gray-700 p-3 z-[100]"
+                      transition={{ duration: 0.25 }}
+                      className="absolute right-0 mt-2 w-60 bg-[#1a1a1a] text-white rounded-2xl shadow-lg border border-gray-700 p-3 z-50"
                     >
                       {isAuthenticated ? (
                         <>
                           <p className="text-sm px-3 py-2 border-b border-gray-700">
                             {user?.name || "User"}
                           </p>
-                          <Link
-                            href="#"
-                            className="flex items-center gap-2 px-3 py-2 mt-2 hover:bg-white/10 rounded-lg transition"
-                            onClick={() => setIsUserModalOpen(false)}
-                          >
-                            <UserCircle className="w-4 h-4" /> Profile
-                          </Link>
 
-                          <button
+                          {userMenuItems.map(({ href, label, icon: Icon }) => {
+                            const isActive = pathname === href;
+                            return (
+                              <motion.div
+                                key={href}
+                                initial={{ opacity: 0, y: -5 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.2 }}
+                              >
+                                <Link
+                                  href={href}
+                                  onClick={() => setIsUserModalOpen(false)}
+                                  className={`flex items-center gap-2 px-3 py-2 mt-2 rounded-lg transition-all duration-300 ${
+                                    isActive
+                                      ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-md hover:opacity-90 scale-[1.02]"
+                                      : "hover:bg-white/10"
+                                  }`}
+                                >
+                                  <Icon className="w-4 h-4" /> {label}
+                                </Link>
+                              </motion.div>
+                            );
+                          })}
+
+                          <motion.button
                             onClick={handleLogout}
-                            className="flex items-center gap-2 px-3 py-2 hover:bg-red-600/20 rounded-lg transition w-full text-left"
+                            className="flex items-center gap-2 px-3 py-2 mt-2 hover:bg-red-600/20 rounded-lg transition w-full text-left"
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
                           >
                             <LogOut className="w-4 h-4 text-red-400" /> Logout
-                          </button>
+                          </motion.button>
                         </>
                       ) : (
                         <Link
                           href="/login"
-                          className="flex items-center gap-2 px-3 py-2 hover:bg-white/10 rounded-lg transition"
+                          className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-300 ${
+                            pathname === "/login"
+                              ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-md hover:opacity-90 scale-[1.02]"
+                              : "hover:bg-white/10"
+                          }`}
                           onClick={() => setIsUserModalOpen(false)}
                         >
                           <UserCircle className="w-4 h-4" /> Login
@@ -162,12 +203,20 @@ export default function Navbar() {
                   )}
                 </AnimatePresence>
               </div>
+
+              {/* 🟣 Mobile Menu Toggle */}
+              <button
+                className="lg:hidden text-white focus:outline-none"
+                onClick={() => setIsOpen(!isOpen)}
+              >
+                {isOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Mobile Navigation */}
+      {/* 📱 Mobile Navigation */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -182,20 +231,25 @@ export default function Navbar() {
             }`}
           >
             <div className="container mx-auto px-4 py-6 space-y-1">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  className={`block ${
-                    isLightTheme
-                      ? "text-gray-700 hover:text-blue-600 hover:bg-gray-50"
-                      : "text-white/80 hover:text-blue-400 hover:bg-white/5"
-                  } py-3 px-4 rounded-lg transition-all duration-200 text-base font-medium`}
-                  onClick={() => setIsOpen(false)}
-                >
-                  {link.name}
-                </Link>
-              ))}
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href;
+                return (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    className={`block py-3 px-4 rounded-lg text-base font-medium transition-all duration-300 ${
+                      isActive
+                        ? "bg-linear-to-r from-purple-500 to-blue-500 text-white shadow-md hover:opacity-90 scale-[1.02]"
+                        : isLightTheme
+                        ? "text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                        : "text-white/80 hover:text-blue-400 hover:bg-white/5"
+                    }`}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {link.name}
+                  </Link>
+                );
+              })}
               <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                 <Link href="/login" onClick={() => setIsOpen(false)}>
                   <ButtonColorful

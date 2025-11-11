@@ -29,6 +29,7 @@ interface DynamicTableProps {
     isDate?: boolean;
     align?: "left" | "right" | "center";
   }[];
+  isContain?: boolean;
   onEdit?: (row: Record<string, any>) => void;
   onDelete?: (row: Record<string, any>) => Promise<void> | void;
   onChangeStatus?: (row: Record<string, any>, newStatus: number) => Promise<void> | void;
@@ -42,6 +43,7 @@ export function DynamicTable({
   onDelete,
   onChangeStatus,
   defaultRowsPerPage = 5,
+  isContain = false
 }: DynamicTableProps) {
   const [rowsPerPage, setRowsPerPage] = useState(defaultRowsPerPage);
   const [currentPage, setCurrentPage] = useState(1);
@@ -157,20 +159,30 @@ export function DynamicTable({
                   {columns.map((col) => (
                     <td key={col.key} className="px-4 py-3">
                       {col.isImage ? (
-                        <div className="relative w-[70px] h-12">
-                          <Image
-                            src={row[col.key] || "/images/placeholder.png"}
-                            alt={col.label}
-                            fill
-                            className="object-cover rounded-md border border-gray-700"
-                            sizes="70px"
-                          />
+                        <div className="relative w-[70px] h-12 flex items-center justify-center bg-[#2E2C36] rounded-md overflow-hidden">
+                          {isContain ? (
+                            <Image
+                              src={row[col.key] || "/images/placeholder.png"}
+                              alt={col.label}
+                              width={60}
+                              height={48}
+                              className="object-contain max-w-full max-h-full"
+                            />
+                          ) : (
+                            <Image
+                              src={row[col.key] || "/images/placeholder.png"}
+                              alt={col.label}
+                              fill
+                              className="object-cover rounded-md border border-gray-700"
+                              sizes="70px"
+                            />
+                          )}
                         </div>
                       ) : col.label === "Status" ? (
                         <span
                           className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${row[col.key] === 1
-                              ? "bg-green-500/20 text-green-400 border border-green-600"
-                              : "bg-red-500/20 text-red-400 border border-red-600"
+                            ? "bg-green-500/20 text-green-400 border border-green-600"
+                            : "bg-red-500/20 text-red-400 border border-red-600"
                             }`}
                         >
                           {row[col.key] === 1 ? "Active" : "Inactive"}
@@ -218,8 +230,8 @@ export function DynamicTable({
                           >
                             <RefreshCcw
                               className={`h-4 w-4 ${row[columns.find(c => c.label === "Status")!.key] === 1
-                                  ? "text-yellow-400"
-                                  : "text-green-400"
+                                ? "text-yellow-400"
+                                : "text-green-400"
                                 }`}
                             />
                             {row[columns.find(c => c.label === "Status")!.key] === 1

@@ -6,10 +6,9 @@ export const deviceTypeColumns = [
 ];
 
 export const projectColumns = [
-  { key: "file_url", label: "Project Image", isImage:true },
+  { key: "file_url", label: "Project Image", isImage: true },
   { key: "proj_name", label: "Project Name" },
   { key: "proj_slug_name", label: "Slug Name" },
-  { key: "proj_desc", label: "Description" },
   { key: "proj_status", label: "Status" },
   { key: "proj_created", label: "Created On", isDate: true },
 ];
@@ -27,12 +26,18 @@ export const projectPageColumns = [
   { key: "page_created", label: "Created On", isDate: true },
 ];
 
+export const adColumns = [
+  { key: "file_url", label: "Preview", isImage: true },
+  { key: "proj_name", label: "Project Name" },
+  { key: "page_name", label: "Project Page Name" },
+  { key: "advt_status", label: "Status" },
+];
+
 export const mediaDetailColumns = [
-    { key: "file_url", label: "Preview", isImage: true },
+  { key: "file_url", label: "Preview", isImage: true },
   { key: "mddt_name", label: "Media Name" },
   { key: "mddt_desc", label: "Description" },
   { key: "mddt_status", label: "Status" },
-  { key: "mddt_created_date", label: "Created On", isDate: true },
 ];
 
 export const deviceColumns = [
@@ -58,7 +63,3 @@ export const adSettingColumns = [
   { key: "setg_ad_charges", label: "Charges (₹)" },
   { key: "setg_status", label: "Status" },
 ];
-
-
-
-

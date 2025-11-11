@@ -17,8 +17,9 @@ interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   loading: boolean;
+  loadingChangePass: boolean;
   error: string | null;
-  registerError : string | null;
+  registerError: string | null;
 
   // Actions
   login: (email: string, password: string) => Promise<boolean>;
@@ -26,6 +27,11 @@ interface AuthState {
   logout: () => Promise<boolean>;
   setUser: (user: User | null) => void;
   clearError: () => void;
+  changePassword: (formData: {
+    current_password: string;
+    new_password: string;
+    confirm_password: string;
+  }) => Promise<boolean>;
 }
 
 // Auth Store
@@ -37,8 +43,9 @@ export const useAuthStore = create<AuthState>()(
       user_type: null,
       isAuthenticated: false,
       loading: false,
+      loadingChangePass: false,
       error: null,
-      registerError:null,
+      registerError: null,
 
       // 🟢 Register
       register: async (formData) => {
@@ -47,7 +54,7 @@ export const useAuthStore = create<AuthState>()(
           const payload = {
             ...formData,
             user_type: 1,
-            first_login: 2, 
+            first_login: 2,
           };
 
           const { data } = await api.post("/register", payload);
@@ -56,7 +63,7 @@ export const useAuthStore = create<AuthState>()(
             throw new Error(data.message || "Registration failed");
 
           set({ loading: false });
-          return true; 
+          return true;
         } catch (err) {
           const error = err as AxiosError<{ message?: string }>;
           set({
@@ -66,11 +73,11 @@ export const useAuthStore = create<AuthState>()(
               error.message ||
               "Registration failed. Try again.",
           });
-          return false; 
+          return false;
         }
       },
 
-      // Login
+      // 🔐 Login
       login: async (email: string, password: string) => {
         set({ loading: true, error: null });
 
@@ -119,7 +126,6 @@ export const useAuthStore = create<AuthState>()(
             );
           }
 
-          // ✅ Reset state on success
           set({
             user: null,
             token: null,
@@ -128,11 +134,10 @@ export const useAuthStore = create<AuthState>()(
             error: null,
           });
 
-          return true; // ✅ logout success
+          return true;
         } catch (e) {
           console.warn("Logout request failed:", e);
 
-          // ❌ Even if API fails, still clear locally
           set({
             user: null,
             token: null,
@@ -141,11 +146,40 @@ export const useAuthStore = create<AuthState>()(
             error: "Logout failed. Try again.",
           });
 
-          return false; // ❌ logout failed
+          return false;
         }
       },
 
-      // 👤 Set user
+      // Change Password
+      changePassword: async (formData) => {
+        const { token } = get();
+        set({ loadingChangePass: true, error: null });
+
+        try {
+          const { data } = await api.post("/change-password", formData, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (!data.status) throw new Error(data.message || "Password update failed");
+
+          set({ loadingChangePass: false });
+          return true;
+        } catch (err) {
+          const error = err as AxiosError<{ message?: string }>;
+          set({
+            loadingChangePass: false,
+            error:
+              error.response?.data?.message ||
+              error.message ||
+              "Failed to change password. Try again.",
+          });
+          return false;
+        }
+      },
+
+      // Set user
       setUser: (user) => {
         set({
           user,

@@ -62,9 +62,10 @@ export interface AdState {
   error: string | null;
   fetchAdData: () => Promise<void>;
   fetchAllAdminAd: () => Promise<void>;
+  fetchAllUserAd: () => Promise<void>;
   saveAd: (payload: FormData) => Promise<boolean>;
   toggleAdStatus: (advt_id: string) => Promise<boolean>;
-  deleteAd: (deletedId: string) => Promise<boolean>; // New method
+  deleteAd: (deletedId: string) => Promise<boolean>;
 }
 
 // Store Implementation
@@ -118,12 +119,30 @@ export const useAdStore = create<AdState>((set, get) => ({
         });
       } else {
         // toast.error(res.data?.message || "Failed to fetch advertisements");
-        console.log("error", res.data?.message)
+        console.log("error", res.data?.message);
         set({ loading: false });
       }
     } catch (error: any) {
       console.error("❌ Fetch error:", error);
       toast.error("Something went wrong while fetching ad data");
+      set({ loading: false, error: error.message });
+    }
+  },
+
+  fetchAllUserAd: async () => {
+    set({ loading: true, error: null });
+    try {
+      const res = await api.get("/user-advertisements");
+
+      if (res.data?.status && Array.isArray(res.data.data)) {
+        set({ adminAdvertisements: res.data.data, loading: false });
+      } else {
+        toast.error(res.data?.message || "Failed to fetch user advertisements");
+        set({ loading: false });
+      }
+    } catch (error: any) {
+      console.error("❌ User fetch error:", error);
+      toast.error("Something went wrong while fetching user ads");
       set({ loading: false, error: error.message });
     }
   },
@@ -137,7 +156,9 @@ export const useAdStore = create<AdState>((set, get) => ({
       if (res.data?.status && Array.isArray(res.data.data)) {
         set({ adminAdvertisements: res.data.data, loading: false });
       } else {
-        toast.error(res.data?.message || "Failed to fetch admin advertisements");
+        toast.error(
+          res.data?.message || "Failed to fetch admin advertisements"
+        );
         set({ loading: false });
       }
     } catch (error: any) {
@@ -173,7 +194,9 @@ export const useAdStore = create<AdState>((set, get) => ({
   toggleAdStatus: async (advt_id) => {
     set({ loading: true, error: null });
     try {
-      const res = await api.put("/user-advertisement/toggle-status", { advt_id });
+      const res = await api.put("/user-advertisement/toggle-status", {
+        advt_id,
+      });
 
       if (res.data?.status) {
         toast.success("Advertisement status updated successfully!");

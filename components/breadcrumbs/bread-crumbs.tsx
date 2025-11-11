@@ -1,13 +1,18 @@
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { LayoutGrid, List, Plus } from "lucide-react";
 import { ButtonColorful } from "../ui/button-colorful";
+import { Button } from "../ui/button";
 
 interface BreadcrumbProps {
   pageName: string;
-  createPath?: string; 
+  createPath?: string;
+  isIcon?: boolean
+  viewMode?:string;
+  setViewMode?:any
+  
 }
 
-const Breadcrumb = ({ pageName, createPath }: BreadcrumbProps) => {
+const Breadcrumb = ({ pageName, createPath, viewMode, setViewMode, isIcon = false  }: BreadcrumbProps) => {
   return (
     <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       {/* Left Section */}
@@ -19,16 +24,18 @@ const Breadcrumb = ({ pageName, createPath }: BreadcrumbProps) => {
 
       {/* Right Section */}
       <div className="flex items-center gap-4">
-        {/* <nav>
-          <ol className="flex items-center gap-2">
-            <li>
-              <Link className="font-medium text-gray-500 dark:text-gray-300" href="/">
-                Dashboard /
-              </Link>
-            </li>
-            <li className="font-medium text-primary">{pageName}</li>
-          </ol>
-        </nav> */}
+        {
+          isIcon &&
+          <Button
+            variant="outline"
+            size="icon"
+            className="cursor-pointer hover:text-purple-500 hover:border-purple-500 transition-all duration-500 ease-in-out"
+            onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
+            title={viewMode === "grid" ? "Switch to List View" : "Switch to Grid View"}
+          >
+            {viewMode === "grid" ? <List size={18} /> : <LayoutGrid size={18} />}
+          </Button>
+        }
 
         {/* Create Button */}
         {createPath && (
