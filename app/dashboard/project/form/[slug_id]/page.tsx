@@ -9,8 +9,7 @@ import { DynamicForm } from "@/components/ui/dynamic-form";
 const Page = () => {
   const router = useRouter();
   const { slug_id } = useParams<{ slug_id: string }>();
-  const { formData, loadingSave, saveProject, fetchProjectByHash } =
-    useProjectStore();
+  const { formData, loadingSave, saveProject, fetchProjectByHash } = useProjectStore();
 
     useEffect(()=>{
         if(slug_id !== "0" ){

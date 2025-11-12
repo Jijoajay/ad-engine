@@ -25,7 +25,8 @@ interface DynamicGridProps {
   data: Record<string, any>[];
   onToggle?: (row: Record<string, any>) => Promise<boolean | void> | void;
   onDelete?: (row: Record<string, any>) => Promise<boolean | void> | void;
-  onEdit?: (row: Record<string, any>) => void; // Added edit handler
+  onEdit?: (row: Record<string, any>) => void;
+  onView?: (row: Record<string, any>) => void;
   defaultRowsPerPage?: number;
 }
 
@@ -34,6 +35,7 @@ export function DynamicGrid({
   onToggle,
   onDelete,
   onEdit,
+  onView,
   isAds = false,
   isContain = false,
   defaultRowsPerPage = 8,
@@ -119,13 +121,26 @@ export function DynamicGrid({
                     align="end"
                     className="bg-gray-900 border border-gray-700 text-white rounded-md w-32"
                   >
+                    {/* View Option */}
+                    {onView && (
+                      <DropdownMenuItem
+                        onClick={() => onView(ad)}
+                        className="cursor-pointer hover:bg-gray-800 text-teal-400"
+                      >
+                        View
+                      </DropdownMenuItem>
+                    )}
+
                     {/* Edit Option */}
-                    <DropdownMenuItem
-                      onClick={() => onEdit?.(ad)}
-                      className="cursor-pointer hover:bg-gray-800 text-blue-400"
-                    >
-                      Edit
-                    </DropdownMenuItem>
+                    {
+                      onEdit &&
+                      <DropdownMenuItem
+                        onClick={() => onEdit?.(ad)}
+                        className="cursor-pointer hover:bg-gray-800 text-blue-400"
+                      >
+                        Edit
+                      </DropdownMenuItem>
+                    }
 
                     {/* Toggle Status */}
                     <DropdownMenuItem
@@ -208,15 +223,15 @@ export function DynamicGrid({
               )}
 
               {/* Status */}
-              {( ad.advt_status || ad.mddt_status || ad.proj_status ) !== undefined && (
+              {(ad.advt_status || ad.mddt_status || ad.proj_status) !== undefined && (
                 <div className="mt-3">
                   <span
-                    className={`inline-block text-xs font-medium px-3 py-1 rounded-full ${ ( ad.advt_status || ad.mddt_status || ad.proj_status ) === 1
+                    className={`inline-block text-xs font-medium px-3 py-1 rounded-full ${(ad.advt_status || ad.mddt_status || ad.proj_status) === 1
                       ? "bg-green-900 text-green-300"
                       : "bg-red-900 text-red-300"
                       }`}
                   >
-                    { ( ad.advt_status || ad.mddt_status || ad.proj_status )  === 1 ? "Active" : "Inactive"}
+                    {(ad.advt_status || ad.mddt_status || ad.proj_status) === 1 ? "Active" : "Inactive"}
                   </span>
                 </div>
               )}

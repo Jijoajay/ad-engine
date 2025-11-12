@@ -8,6 +8,7 @@ import { DynamicTable } from "@/components/ui/dynamic-table";
 import { adColumns } from "@/data/table-column";
 import { DynamicTableSkeleton } from "@/components/skeleton/dynamic-table-skeleton";
 import MainLayout from "@/layout/MainLayout";
+import { LayoutGrid, List } from "lucide-react";
 
 const Page = () => {
   const {
@@ -32,7 +33,7 @@ const Page = () => {
     await toggleAdStatus(ad.hash_id);
   };
 
-  // ✅ Loading state
+  // Loading state
   if (loading) {
     return (
       <MainLayout>
@@ -47,7 +48,7 @@ const Page = () => {
     );
   }
 
-  // ✅ Empty state
+  // Empty state
   if (!adminAdvertisements.length)
     return (
       <MainLayout>
@@ -59,7 +60,7 @@ const Page = () => {
       </MainLayout>
     );
 
-  // ✅ Main content
+  // Main content
   return (
     <MainLayout>
       <section className="pt-[100px] w-full flex items-center justify-center px-3 sm:px-6 md:px-8">
@@ -71,21 +72,21 @@ const Page = () => {
                 onClick={() => setViewMode("grid")}
                 className={`px-3 py-1 rounded-md text-sm sm:text-base transition-colors ${
                   viewMode === "grid"
-                    ? "bg-blue-600 text-white"
+                    ? "bg-purple-500 text-white"
                     : "bg-gray-200 text-gray-700"
                 }`}
               >
-                Grid
+                <LayoutGrid size={18} />
               </button>
               <button
                 onClick={() => setViewMode("list")}
                 className={`px-3 py-1 rounded-md text-sm sm:text-base transition-colors ${
                   viewMode === "list"
-                    ? "bg-blue-600 text-white"
+                    ? "bg-purple-500 text-white"
                     : "bg-gray-200 text-gray-700"
                 }`}
               >
-                List
+                <List size={18} />
               </button>
             </div>
           </div>
@@ -107,8 +108,9 @@ const Page = () => {
                 onDelete={handleDelete}
               />
             ) : (
-              <div className="overflow-x-auto rounded-lg shadow-sm border border-gray-800 bg-black">
+              <div className="overflow-x-auto rounded-lg shadow-sm border border-gray-800 bg-black p-4">
                 <DynamicTable
+                  isClientAds={true}
                   columns={adColumns}
                   data={adminAdvertisements}
                   onDelete={handleDelete}

@@ -29,7 +29,9 @@ interface DynamicTableProps {
     isDate?: boolean;
     align?: "left" | "right" | "center";
   }[];
+  isClientAds?: boolean;
   isContain?: boolean;
+  onView?: (row: Record<string, any>) => void;
   onEdit?: (row: Record<string, any>) => void;
   onDelete?: (row: Record<string, any>) => Promise<void> | void;
   onChangeStatus?: (row: Record<string, any>, newStatus: number) => Promise<void> | void;
@@ -40,10 +42,12 @@ export function DynamicTable({
   data,
   columns,
   onEdit,
+  onView,
   onDelete,
   onChangeStatus,
   defaultRowsPerPage = 5,
-  isContain = false
+  isContain = false,
+  isClientAds = false,
 }: DynamicTableProps) {
   const [rowsPerPage, setRowsPerPage] = useState(defaultRowsPerPage);
   const [currentPage, setCurrentPage] = useState(1);
@@ -209,6 +213,14 @@ export function DynamicTable({
                         align="end"
                         className="w-48 bg-gray-900 text-white border border-gray-700"
                       >
+                        {onView && (
+                          <DropdownMenuItem
+                            onClick={() => onView(row)}
+                            className="cursor-pointer hover:bg-gray-800 text-teal-400"
+                          >
+                            View
+                          </DropdownMenuItem>
+                        )}
                         {onEdit && (
                           <DropdownMenuItem
                             className="flex items-center gap-2 hover:bg-gray-800 cursor-pointer"
@@ -234,9 +246,13 @@ export function DynamicTable({
                                 : "text-green-400"
                                 }`}
                             />
-                            {row[columns.find(c => c.label === "Status")!.key] === 1
-                              ? "Deactivate"
-                              : "Activate"}
+                            {isClientAds
+                              ? row[columns.find(c => c.label === "Status")!.key] === 1
+                                ? "Stop"
+                                : "Start"
+                              : row[columns.find(c => c.label === "Status")!.key] === 1
+                                ? "Deactivate"
+                                : "Activate"}
                           </DropdownMenuItem>
                         )}
 

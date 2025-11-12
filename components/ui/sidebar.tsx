@@ -1,171 +1,136 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { ArrowLeftIcon, ChevronUpIcon } from "@/assets/icons";
+import { useState } from "react";
+import { Menu } from "lucide-react";
 import { NAV_DATA } from "@/data";
-import { MenuItem } from "./menu-items";
-import { useSidebarContext } from "@/context/SidebarProvider";
+import { cn } from "@/lib/utils";
 
-export function Sidebar() {
+const Sidebar = () => {
   const pathname = usePathname();
-  const { setIsOpen, isOpen, isMobile, toggleSidebar } = useSidebarContext();
-  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const toggleExpanded = (title: string) => {
-    setExpandedItems((prev) => (prev.includes(title) ? [] : [title]));
-  };
+  function handleNavigation() {
+    setIsMobileMenuOpen(false);
+  }
 
-  useEffect(() => {
-    // Keep collapsible open when its subpage is active
-    NAV_DATA.some((section) => {
-      return section.items.some((item) => {
-        return item.items.some((subItem) => {
-          if (subItem?.url === pathname) {
-            if (!expandedItems.includes(item.title)) {
-              toggleExpanded(item.title);
-            }
-            return true;
-          }
-        });
-      });
-    });
-  }, [pathname]);
+  function NavItem({
+    href,
+    icon: Icon,
+    title,
+    isActive,
+  }: {
+    href: string;
+    icon: any;
+    title: string;
+    isActive: boolean;
+  }) {
+    return (
+      <Link
+        href={href}
+        onClick={handleNavigation}
+        className={cn(
+          "flex items-center px-3 py-2 text-sm rounded-md transition-colors",
+          "text-muted-foreground hover:text-foreground hover:bg-accent",
+          isActive && "bg-accent text-foreground font-medium"
+        )}
+      >
+        {Icon && <Icon className="h-4 w-4 mr-3 shrink-0" />}
+        {title}
+      </Link>
+    );
+  }
 
   return (
     <>
-      {/* Mobile Overlay */}
-      {isMobile && isOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/50 transition-opacity duration-300"
-          onClick={() => setIsOpen(false)}
-          aria-hidden="true"
-        />
-      )}
-
-      <aside
-        className={cn(
-          "max-w-[290px]  overflow-hidden border-r border-gray-600 bg-black transition-[width] duration-200 ease-linear",
-          isMobile ? "fixed bottom-0 top-0 z-50" : "sticky top-0 h-screen",
-          isOpen ? "w-full" : "w-0",
-        )}
-        aria-label="Main navigation"
-        aria-hidden={!isOpen}
-        inert={!isOpen}
+      {/* Mobile Toggle Button */}
+      <button
+        type="button"
+        className="lg:hidden fixed top-4 left-4 z-[70] p-2 rounded-lg bg-background shadow-md"
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
       >
-        <div className="relative flex h-full flex-col py-10 pl-[25px] pr-[7px]">
-          <div className="relative pr-4.5">
-            <Link href="/" className="flex items-center">
-              <span className={`text-2xl sm:text-3xl font-bold text-white`}>
-                Ad
-                <span className="bg-clip-text text-transparent bg-[linear-gradient(to_right,#9333ea_70%,#2563eb_100%)]">Engine</span>
+        <Menu className="h-5 w-5 text-muted-foreground" />
+      </button>
+
+      {/* Sidebar */}
+      <nav
+        className={cn(
+          "fixed inset-y-0 left-0 z-[70] w-64 bg-background border-r border-gray-600",
+          "transform transition-transform duration-200 ease-in-out",
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full",
+          "lg:translate-x-0 lg:static lg:w-64"
+        )}
+      >
+        <div className="h-full flex flex-col">
+          {/* Header / Brand */}
+          <div className="h-15 px-6 flex items-center border-b border-gray-600">
+            <Link href="/" className="flex items-center gap-3">
+              <span className="text-lg font-semibold hover:cursor-pointer text-foreground">
+                Ad<span className="text-primary">Engine</span>
               </span>
             </Link>
-
-            {isMobile && (
-              <button
-                onClick={toggleSidebar}
-                className="absolute left-3/4 right-4.5 top-1/2 -translate-y-1/2 text-right"
-              >
-                <span className="sr-only">Close Menu</span>
-                <ArrowLeftIcon className="ml-auto size-7" />
-              </button>
-            )}
           </div>
-          <div className="absolute top-[90px] left-0 w-full h-px bg-gray-600" />
 
           {/* Navigation */}
-          <div className="custom-scrollbar mt-6 flex-1 overflow-y-auto pr-3 min-[850px]:mt-10">
-            {NAV_DATA.map((section) => (
-              <div key={section.label} className="mb-6">
-                <h2 className="mb-5 text-sm font-medium text-gray-400">
-                  {section.label}
-                </h2>
-
-                <nav role="navigation" aria-label={section.label}>
-                  <ul className="space-y-2">
+          <div className="flex-1 overflow-y-auto py-4 px-4">
+            <div className="space-y-6">
+              {NAV_DATA.map((section, sectionIdx) => (
+                <div key={sectionIdx}>
+                  {section.label && (
+                    <div className="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      {section.label}
+                    </div>
+                  )}
+                  <div className="space-y-1">
                     {section.items.map((item) => (
-                      <li key={item.title}>
-                        {item.items.length ? (
-                          <div>
-                            <MenuItem
-                              isActive={item.items.some(
-                                ({ url }) => url === pathname,
-                              )}
-                              onClick={() => toggleExpanded(item.title)}
-                            >
-                              <item.icon
-                                className="size-6 shrink-0"
-                                aria-hidden="true"
-                              />
-
-                              <span>{item.title}</span>
-
-                              <ChevronUpIcon
-                                className={cn(
-                                  "ml-auto rotate-180 transition-transform duration-200",
-                                  expandedItems.includes(item.title) &&
-                                  "rotate-0",
-                                )}
-                                aria-hidden="true"
-                              />
-                            </MenuItem>
-
-                            {expandedItems.includes(item.title) && (
-                              <ul
-                                className="ml-9 mr-0 space-y-1.5 pb-[15px] pr-0 pt-2"
-                                role="menu"
-                              >
-                                {item.items.map((subItem) => (
-                                  <li key={subItem.title} role="none">
-                                    <MenuItem
-                                      as="link"
-                                      href={subItem.url}
-                                      isActive={pathname === subItem.url}
-                                    >
-                                      <span>{subItem.title}</span>
-                                    </MenuItem>
-                                  </li>
-                                ))}
-                              </ul>
-                            )}
-                          </div>
-                        ) : (
-                          (() => {
-                            const href =
-                              "url" in item
-                                ? item.url + ""
-                                : "/" +
-                                item.title.toLowerCase().split(" ").join("-");
-
-                            return (
-                              <MenuItem
-                                className="flex items-center gap-3 py-3"
-                                as="link"
-                                href={href}
-                                isActive={pathname === href}
-                              >
-                                <item.icon
-                                  className="size-6 shrink-0"
-                                  aria-hidden="true"
-                                />
-
-                                <span>{item.title}</span>
-                              </MenuItem>
-                            );
-                          })()
-                        )}
-                      </li>
+                      <NavItem
+                        key={item.title}
+                        href={item.url}
+                        icon={item.icon}
+                        title={item.title}
+                        isActive={pathname === item.url}
+                      />
                     ))}
-                  </ul>
-                </nav>
-              </div>
-            ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
+
+          {/* Footer Section */}
+          {/* <div className="px-4 py-4 border-t border-gray-600">
+            <div className="space-y-1">
+              <NavItem
+                href="/dashboard/settings"
+                icon={NAV_DATA.find((d) =>
+                  d.items.find((i) => i.title === "AD Settings")
+                )?.items.find((i) => i.title === "AD Settings")?.icon}
+                title="Settings"
+                isActive={pathname === "/dashboard/settings"}
+              />
+              <NavItem
+                href="/help"
+                icon={NAV_DATA.find((d) =>
+                  d.items.find((i) => i.title === "Help")
+                )?.items.find((i) => i.title === "Help")?.icon}
+                title="Help"
+                isActive={pathname === "/help"}
+              />
+            </div>
+          </div> */}
         </div>
-      </aside>
+      </nav>
+
+      {/* Mobile Overlay */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-[65] lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
     </>
   );
 }
+
+export default Sidebar;

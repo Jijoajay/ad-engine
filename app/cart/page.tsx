@@ -26,7 +26,9 @@ export default function CartPage() {
   const handlePlaceOrder = async () => {
     const success = await makePayment();
     if (success) {
-      router.push("/ad-upload");
+      router.push("/payment-successful");
+    }else{
+      router.push("/payment-failed");
     }
   };
 

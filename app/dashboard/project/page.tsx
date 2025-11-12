@@ -72,6 +72,7 @@ const Page = () => {
               onEdit={handleEdit}
               onDelete={handleDelete}
               onToggle={handleChangeStatus}
+              onView={(row) => router.push(`/dashboard/project/view/${row.hash_id}`)}
               />
             ) : (
               <DynamicTable
@@ -81,6 +82,7 @@ const Page = () => {
               onEdit={handleEdit}
               onDelete={handleDelete}
               onChangeStatus={handleChangeStatus}
+              onView={(row) => router.push(`/dashboard/project/view/${row.hash_id}`)}
             />
           )}
         </Suspense>

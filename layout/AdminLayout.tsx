@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 import { Providers } from "@/app/providers";
 import Loading from "@/components/loading";
 import { Header } from "@/components/ui/Header";
-import { Sidebar } from "@/components/ui/sidebar";
 import NextTopLoader from "nextjs-toploader";
 import React from "react";
 import { useAuthStore } from "@/lib/auth-store";
+import Sidebar from "@/components/ui/sidebar";
 
 interface AdminLayoutProps {
   children: React.ReactNode;

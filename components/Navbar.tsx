@@ -34,7 +34,7 @@ export default function Navbar() {
   const userModalRef = useRef<HTMLDivElement | null>(null);
   const isLightTheme = theme === "light";
 
-  // 🧭 Close user modal on outside click
+  // Close user modal on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -48,7 +48,7 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // 🧭 Navbar scroll
+  // Navbar scroll
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
@@ -72,7 +72,7 @@ export default function Navbar() {
   ];
 
   const userMenuItems = [
-    { href: "#", label: "Profile", icon: UserCircle },
+    { href: "/profile", label: "Profile", icon: UserCircle },
     { href: "/my-ads", label: "My ADs", icon: UserCircle },
     { href: "/change-password", label: "Change Password", icon: UserCircle },
   ];
@@ -137,7 +137,7 @@ export default function Navbar() {
                   <User className="text-white" />
                 </div>
 
-                {/* 🧭 User Modal */}
+                {/* User Modal */}
                 <AnimatePresence>
                   {isUserModalOpen && (
                     <motion.div
