@@ -5,6 +5,7 @@ import { useDropzone } from "react-dropzone";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { ButtonColorful } from "@/components/ui/button-colorful";
+import { cn } from "@/lib/utils";
 
 interface UploadContentProps {
     isAdmin?: boolean;
@@ -160,8 +161,8 @@ export const UploadContent = ({
 
     return (
         <div
-            className="bg-[#18181C]  text-white p-6 md:p-10 flex justify-center"
-            style={{ paddingTop: !isAdmin ? "150px" : "10px" }}
+            className={cn("bg-[#18181C]  text-white p-6 md:p-10 flex justify-center", !isAdmin ? "min-h-screen" : "rounded-xl")}
+            style={{ paddingTop: !isAdmin ? "150px" : "30px", }}
         >
             <div className={("container")}>
                 <motion.div
