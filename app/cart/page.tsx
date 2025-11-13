@@ -3,6 +3,7 @@
 import CartSkeleton from "@/components/skeleton/ad-skeleton";
 import { ButtonColorful } from "@/components/ui/button-colorful";
 import { ColorlyText } from "@/components/ui/colory-text";
+import EmptyCart from "@/components/ui/empty-cart";
 import MainLayout from "@/layout/MainLayout";
 import { useCartStore } from "@/store/use-cart-store";
 import { motion, AnimatePresence } from "framer-motion";
@@ -27,7 +28,7 @@ export default function CartPage() {
     const success = await makePayment();
     if (success) {
       router.push("/payment-successful");
-    }else{
+    } else {
       router.push("/payment-failed");
     }
   };
@@ -54,9 +55,7 @@ export default function CartPage() {
               <CartSkeleton />
             </div>
           ) : cart.length === 0 ? (
-            <div className="text-center text-gray-400 py-20">
-              🛒 Your cart is empty.
-            </div>
+            <EmptyCart />
           ) : (
             <div className="flex flex-col lg:flex-row gap-10 mt-10">
               {/* ---- Left Section: Cart Items ---- */}

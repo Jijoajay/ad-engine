@@ -87,8 +87,8 @@ export default function Profile01({
 
   return (
     <div className="w-full max-w-sm mx-auto">
-      <div className="relative overflow-hidden rounded-2xl border border-gray-600">
-        <div className="relative px-6 pt- pb-6">
+      <div className="relative overflow-hidden rounded-2xl border border-[#33353A]">
+        <div className="relative px-6 pt-6 pb-6">
           {/* Profile Header */}
           <div className="flex items-center gap-4 mb-2">
             <div className="relative shrink-0">

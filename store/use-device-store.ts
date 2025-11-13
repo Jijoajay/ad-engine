@@ -32,6 +32,7 @@ interface DeviceState {
   ) => Promise<void>;
   changeStatus: (device_id: number) => Promise<void>;
   deleteDevice: (device_id: number) => Promise<void>;
+  resetForm: () => void; // ✅ added
 }
 
 export const useDeviceStore = create<DeviceState>((set, get) => ({
@@ -41,6 +42,15 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
   loadingSave: false,
   loadingDelete: false,
   loadingStatus: false,
+
+  // ✅ Reset form data
+  resetForm: () => {
+    set({
+      formData: {},
+      loadingFetch: false,
+      loadingSave: false,
+    });
+  },
 
   // Fetch all devices
   fetchDeviceList: async () => {
@@ -78,10 +88,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
 
       if (response.data?.status && response.data?.data) {
         const device: Device = response.data.data;
-
-        // Update formData with API response
         set({ formData: { ...device } });
-
       } else {
         toast.error(response.data?.message || "Failed to load device!");
       }

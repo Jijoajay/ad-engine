@@ -32,8 +32,8 @@ const Sidebar = () => {
         onClick={handleNavigation}
         className={cn(
           "flex items-center px-3 py-2 text-sm rounded-md transition-colors",
-          "text-muted-foreground hover:text-foreground hover:bg-accent",
-          isActive && "bg-accent text-foreground font-medium"
+          "text-[#A0A0A0] hover:text-[#F0F0F0] hover:bg-[#1E293B]",
+          isActive && "bg-accent text-[#F0F0F0] font-medium"
         )}
       >
         {Icon && <Icon className="h-4 w-4 mr-3 shrink-0" />}
@@ -47,7 +47,7 @@ const Sidebar = () => {
       {/* Mobile Toggle Button */}
       <button
         type="button"
-        className="lg:hidden fixed top-4 left-4 z-[70] p-2 rounded-lg bg-background shadow-md"
+        className="lg:hidden fixed top-4 left-4 z-70 p-2 rounded-lg bg-[#1A1B1E] shadow-md text-[#A0A0A0]"
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
       >
         <Menu className="h-5 w-5 text-muted-foreground" />
@@ -56,7 +56,7 @@ const Sidebar = () => {
       {/* Sidebar */}
       <nav
         className={cn(
-          "fixed inset-y-0 left-0 z-[70] w-64 bg-background border-r border-gray-600",
+          "fixed inset-y-0 left-0 z-70 w-64 bg-[#1A1B1E] border-r border-[#33353A]",
           "transform transition-transform duration-200 ease-in-out",
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full",
           "lg:translate-x-0 lg:static lg:w-64"
@@ -64,9 +64,9 @@ const Sidebar = () => {
       >
         <div className="h-full flex flex-col">
           {/* Header / Brand */}
-          <div className="h-15 px-6 flex items-center border-b border-gray-600">
+          <div className="h-15 px-6 flex items-center border-b border-[#33353A]">
             <Link href="/" className="flex items-center gap-3">
-              <span className="text-lg font-semibold hover:cursor-pointer text-foreground">
+              <span className="text-lg font-semibold hover:cursor-pointer text-[#F0F0F0]">
                 Ad<span className="text-primary">Engine</span>
               </span>
             </Link>
@@ -78,7 +78,7 @@ const Sidebar = () => {
               {NAV_DATA.map((section, sectionIdx) => (
                 <div key={sectionIdx}>
                   {section.label && (
-                    <div className="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    <div className="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-muted-[#A0A0A0]">
                       {section.label}
                     </div>
                   )}
@@ -99,7 +99,7 @@ const Sidebar = () => {
           </div>
 
           {/* Footer Section */}
-          {/* <div className="px-4 py-4 border-t border-gray-600">
+          {/* <div className="px-4 py-4 border-t border-[#33353A]">
             <div className="space-y-1">
               <NavItem
                 href="/dashboard/settings"
@@ -125,7 +125,7 @@ const Sidebar = () => {
       {/* Mobile Overlay */}
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-[65] lg:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-65 lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}

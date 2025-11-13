@@ -10,7 +10,7 @@ type SelectProps = {
   name: string;
   placeholder?: string;
   required?: boolean;
-  value: string; // ✅ required for controlled component
+  value: string;
   items: { label: string; value: string }[];
   handleChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   error?: string;
@@ -46,17 +46,16 @@ const Select: React.FC<SelectProps> = ({
         <select
           id={id}
           name={name}
-          value={value} // fully controlled
+          value={value}
           onChange={handleChange}
           className={cn(
-            "w-full appearance-none rounded-lg mt-2 border px-5.5 py-3 outline-none transition bg-black text-white",
+            "w-full appearance-none h-[50px] rounded-lg mt-2 border px-5.5 py-3 outline-none transition bg-black text-white",
             prefixIcon && "pl-11.5",
             error
               ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500"
-              : value
-              ? "border-purple-500 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
               : "border-gray-700 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
           )}
+
         >
           {placeholder && (
             <option value="" disabled hidden>

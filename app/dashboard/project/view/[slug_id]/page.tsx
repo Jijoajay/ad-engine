@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import Image from "next/image";
 import { ProjectViewSkeleton } from "@/components/skeleton/project-view-skeleton";
 import AdminLayout from "@/layout/AdminLayout";
+import BackButton from "@/components/ui/back-button";
 
 const ProjectViewPage = () => {
   const { slug_id } = useParams<{ slug_id: string }>();
@@ -30,6 +31,7 @@ const ProjectViewPage = () => {
 
   return (
     <AdminLayout>
+      <BackButton />
       <div className="p-6 max-w-4xl mx-auto bg-black min-h-screen text-white">
         <div className="bg-neutral-900 rounded-2xl shadow-lg border border-neutral-800 p-8 flex flex-col items-center text-center space-y-6">
           {/* Image */}

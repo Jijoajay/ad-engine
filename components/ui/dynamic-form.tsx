@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import InputGroup from "@/components/FormElements/InputGroup";
 import { TextAreaGroup } from "@/components/FormElements/InputGroup/text-area";
 import { ShowcaseSection } from "./showcase-section";
 import { ButtonColorful } from "./button-colorful";
 import { FileUploadField } from "../FormElements/FileUploadField";
 import Select from "../FormElements/select";
+import { useParams } from "next/navigation";
 
 type FieldType =
   | "text"
@@ -25,8 +26,9 @@ interface FormField {
   placeholder?: string;
   required?: boolean;
   className?: string;
+  isContain?: boolean
   options?: { label: string; value: string }[];
-  value?: any; 
+  value?: any;
 }
 
 interface DynamicFormProps {
@@ -42,11 +44,11 @@ export function DynamicForm({
   loading = false,
   onSubmit,
 }: DynamicFormProps) {
+  const { slug_id } = useParams<{ slug_id: string }>();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [data, setData] = useState<Record<string, any>>({});
   const [filePreviews, setFilePreviews] = useState<Record<string, string>>({});
 
-  // ✅ Sync field values whenever they change (e.g., after fetch)
   useEffect(() => {
     const initialData: Record<string, any> = {};
     fields.forEach((field) => {
@@ -57,7 +59,7 @@ export function DynamicForm({
     setData(initialData);
   }, [fields]);
 
-  // ✅ Basic Validation
+  // Basic Validation
   const validateForm = (formData: Record<string, any>) => {
     const newErrors: Record<string, string> = {};
     fields.forEach((field) => {
@@ -70,7 +72,7 @@ export function DynamicForm({
     return Object.keys(newErrors).length === 0;
   };
 
-  // ✅ Change handler for text/textarea/select
+  // Change handler
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -88,14 +90,20 @@ export function DynamicForm({
     }
   };
 
-  // ✅ Submit
+  // Submit
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     if (!validateForm(data)) return;
-
     await onSubmit?.(data);
   };
+
+  const setPreview = useCallback((fieldName: string, url: any) => {
+    setFilePreviews((prev) => {
+      if (prev[fieldName] === url) return prev; // ✅ prevent redundant updates
+      return { ...prev, [fieldName]: url || "" };
+    });
+  }, []);
+
 
   return (
     <ShowcaseSection
@@ -103,80 +111,83 @@ export function DynamicForm({
       className="p-6.5 rounded-xl bg-black text-white shadow-lg"
     >
       <form onSubmit={handleSubmit} noValidate>
-        {fields.map((field) => {
-          const error = errors[field.name];
-          const commonProps = {
-            key: field.name,
-            label: field.label,
-            placeholder: field.placeholder ?? "",
-            className: `mb-4.5 text-white ${field.className ?? ""}`,
-            name: field.name,
-            required: field.required,
-            error,
-            handleChange,
-          };
+        {/* Responsive Grid Layout */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {fields.map((field) => {
+            const error = errors[field.name];
+            const commonProps = {
+              key: field.name,
+              label: field.label,
+              placeholder: field.placeholder ?? "",
+              className: `text-white ${field.className ?? ""}`,
+              name: field.name,
+              required: field.required,
+              error,
+              handleChange,
+            };
 
-          // Select Input
-          if (field.type === "select") {
+            // Select Input
+            if (field.type === "select") {
+              return (
+                <Select
+                  {...commonProps}
+                  items={field.options ?? []}
+                  value={data[field.name] ?? ""}
+                  handleChange={(e) => {
+                    handleChange(e);
+                    setData((prev) => ({
+                      ...prev,
+                      [field.name]: e.target.value,
+                    }));
+                  }}
+                />
+              );
+            }
+
+            // File Upload
+            if (field.type === "file") {
+              return (
+                <FileUploadField
+                  key={field.name}
+                  field={field}
+                  value={data[field.name]}
+                  isContain={field?.isContain || false}
+                  setData={(name, value) =>
+                    setData((prev) => ({ ...prev, [name]: value }))
+                  }
+                  preview={filePreviews[field.name]}
+                  setPreview={(url) => setPreview(field.name, url)}
+                />
+              );
+            }
+
+
+            // Textarea
+            if (field.type === "textarea") {
+              return (
+                <div className="col-span-2" key={field.name}>
+                  <TextAreaGroup
+                    {...commonProps}
+                    value={data[field.name] ?? ""}
+                    handleChange={handleChange}
+                  />
+                </div>
+              );
+            }
+
+            // Input fields
             return (
-              <Select
+              <InputGroup
+                type={field.type}
                 {...commonProps}
-                items={field.options ?? []}
                 value={data[field.name] ?? ""}
-                handleChange={(e) => {
-                  handleChange(e);
-                  setData((prev) => ({
-                    ...prev,
-                    [field.name]: e.target.value,
-                  }));
-                }}
               />
             );
-          }
+          })}
+        </div>
 
-          // File Upload
-          if (field.type === "file") {
-            return (
-              <FileUploadField
-                key={field.name}
-                field={field}
-                value={data[field.name]}
-                setData={(name, value) =>
-                  setData((prev) => ({ ...prev, [name]: value }))
-                }
-                preview={filePreviews[field.name]}
-                setPreview={(url) =>
-                  setFilePreviews((prev) => ({
-                    ...prev,
-                    [field.name]: url || "",
-                  }))
-                }
-              />
-            );
-          }
-
-          // Textarea
-          if (field.type === "textarea") {
-            return (
-              <TextAreaGroup
-                {...commonProps}
-                value={data[field.name] ?? ""}
-                handleChange={handleChange}
-              />
-            );
-          }
-
-          // Input fields (text, number, date, etc.)
-          return (
-            <InputGroup
-              type={field.type}
-              {...commonProps}
-              value={data[field.name] ?? ""}
-            />
-          );
-        })}
-
-        <div className="pt-4">
+        {/* Submit Button */}
+        <div className="pt-6">
           <ButtonColorful
             type="submit"
             isIcon={false}

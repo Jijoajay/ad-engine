@@ -27,7 +27,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 
   if (!user || user.user_type !== 0) {
     return (
-      <div className="flex h-screen items-center justify-center bg-black text-white">
+      <div className="flex h-screen items-center justify-center text-white">
         <Loading />
       </div>
     );
@@ -39,10 +39,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         <NextTopLoader color="#5750F1" showSpinner={false} />
         <div className="flex h-screen overflow-hidden"> {/* prevent whole page scroll */}
           <Sidebar />
-          <div className="flex flex-col w-full bg-gray-2 dark:bg-[#020d1a]">
+          <div className="flex flex-col w-full bg-gray-2">
             <Header />
             <main
-              className="flex-1 overflow-y-auto isolate mx-auto w-full max-w-screen-2xl p-4 md:p-6 2xl:p-10 bg-black text-white"
+              className="flex-1 overflow-y-auto isolate mx-auto w-full max-w-screen-2xl p-4 md:p-6 2xl:p-10 bg-[#1A1B1E] text-[#A0A0A0]"
             >
               {children}
             </main>
