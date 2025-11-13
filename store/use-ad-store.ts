@@ -124,7 +124,6 @@ export const useAdStore = create<AdState>((set, get) => ({
       }
     } catch (error: any) {
       console.error("❌ Fetch error:", error);
-      toast.error("Something went wrong while fetching ad data");
       set({ loading: false, error: error.message });
     }
   },
@@ -142,7 +141,6 @@ export const useAdStore = create<AdState>((set, get) => ({
       }
     } catch (error: any) {
       console.error("❌ User fetch error:", error);
-      toast.error("Something went wrong while fetching user ads");
       set({ loading: false, error: error.message });
     }
   },
@@ -163,7 +161,6 @@ export const useAdStore = create<AdState>((set, get) => ({
       }
     } catch (error: any) {
       console.error("❌ Admin fetch error:", error);
-      toast.error("Something went wrong while fetching admin ads");
       set({ loading: false, error: error.message });
     }
   },
@@ -184,7 +181,7 @@ export const useAdStore = create<AdState>((set, get) => ({
       }
     } catch (error: any) {
       console.error("❌ Save error:", error);
-      toast.error("Something went wrong while saving ad details");
+      toast.error(" wrong while saving ad details");
       set({ loading: false, error: error.message });
       return false;
     }
@@ -216,7 +213,6 @@ export const useAdStore = create<AdState>((set, get) => ({
       }
     } catch (error: any) {
       console.error("❌ Toggle status error:", error);
-      toast.error("Something went wrong while changing ad status");
       set({ loading: false, error: error.message });
       return false;
     }
@@ -246,7 +242,6 @@ export const useAdStore = create<AdState>((set, get) => ({
       }
     } catch (error: any) {
       console.error("❌ Delete error:", error);
-      toast.error("Something went wrong while deleting advertisement");
       set({ loading: false, error: error.message });
       return false;
     }
