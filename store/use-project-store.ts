@@ -21,6 +21,7 @@ export interface ProjectFormData {
 export interface ProjectState {
   formData: ProjectFormData;
   projectList: ProjectFormData[];
+  projectData: any;
 
   loadingFetch: boolean;
   loadingSave: boolean;
@@ -31,6 +32,7 @@ export interface ProjectState {
   resetForm: () => void;
   fetchProjectList: () => Promise<void>;
   fetchProjectByHash: (hash: string) => Promise<void>;
+  fetchProjectById: (hash: string) => Promise<void>;
   saveProject: (
     data: Partial<ProjectFormData>,
     router?: ReturnType<typeof useRouter>
@@ -53,6 +55,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     file: null,
   },
   projectList: [],
+  projectData: {},
 
   loadingFetch: false,
   loadingSave: false,
@@ -106,9 +109,31 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
             proj_id: data.proj_id || "",
             proj_name: data.proj_name || "",
             proj_desc: data.proj_desc || "",
-            file: data.file_url || null, 
+            file: data.file_url || null,
           },
         }));
+      } else {
+        toast.error("Failed to fetch project details!");
+      }
+    } catch (error) {
+      console.error("Error fetching project by hash:", error);
+      toast.error("Error fetching project details!");
+    } finally {
+      set({ loadingFetch: false });
+    }
+  },
+
+  fetchProjectById: async (hash: string) => {
+    set({ loadingFetch: true });
+
+    try {
+      const response = await api.get(`/project/${hash}`);
+
+      if (response.data?.status && response.data?.data) {
+        const data = response.data.data;
+        console.log("data",data)
+
+        set({ projectData: data });
       } else {
         toast.error("Failed to fetch project details!");
       }
