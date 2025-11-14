@@ -44,7 +44,7 @@ const InputGroup: React.FC<InputGroupProps> = ({
 
       <div
         className={cn(
-          "relative mt-1.5 [&_svg]:absolute [&_svg]:top-1/2 [&_svg]:-translate-y-1/2",
+          "relative mt-2 [&_svg]:absolute [&_svg]:top-1/2 [&_svg]:-translate-y-1/2",
           props.iconPosition === "left"
             ? "[&_svg]:left-4.5"
             : "[&_svg]:right-4.5"
@@ -59,16 +59,16 @@ const InputGroup: React.FC<InputGroupProps> = ({
           value={props.value}
           defaultValue={props.defaultValue}
           className={cn(
-            "w-full rounded-lg h-[50px] border-[1.5px] bg-transparent outline-none transition text-white placeholder:text-gray-400",
+            "w-full rounded-lg h-[39px] border bg-[#1A1B1E] text-[#F0F0F0] placeholder:text-gray-400 outline-none transition",
             error
               ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500"
               : "border-gray-700 focus:border-purple-500 focus:ring-1 focus:ring-purple-500",
             "disabled:cursor-not-allowed disabled:bg-gray-800",
             type === "file"
               ? getFileStyles(props.fileStyleVariant!)
-              : "px-5.5 py-3",
-            props.iconPosition === "left" && "pl-12.5",
-            props.height === "sm" && "py-2.5"
+              : "px-4",
+            props.iconPosition === "left" && "pl-11",
+            props.height === "sm" && "h-[38px] py-2.5"
           )}
           required={required}
           disabled={disabled}

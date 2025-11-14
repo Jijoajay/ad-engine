@@ -74,9 +74,7 @@ export function DynamicForm({
 
   // Change handler
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: any
   ) => {
     const { name, value } = e.target;
     setData((prev) => ({ ...prev, [name]: value }));
@@ -90,6 +88,7 @@ export function DynamicForm({
     }
   };
 
+
   // Submit
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -99,16 +98,31 @@ export function DynamicForm({
 
   const setPreview = useCallback((fieldName: string, url: any) => {
     setFilePreviews((prev) => {
-      if (prev[fieldName] === url) return prev; // ✅ prevent redundant updates
+      if (prev[fieldName] === url) return prev;
       return { ...prev, [fieldName]: url || "" };
     });
   }, []);
+
+  const handleCancel = () => {
+    // Reset all form data to initial values (or empty strings)
+    const resetData: Record<string, any> = {};
+    fields.forEach((field) => {
+      resetData[field.name] = field.value ?? ""; // fallback to empty string
+    });
+    setData(resetData);
+
+    // Clear errors
+    setErrors({});
+
+    // Clear file previews
+    setFilePreviews({});
+  };
 
 
   return (
     <ShowcaseSection
       title={title}
-      className="p-6.5 rounded-xl bg-black text-white shadow-lg"
+      className="p-6.5 bg-[#222327] text-[#F0F0F0] shadow-lg"
     >
       <form onSubmit={handleSubmit} noValidate>
         {/* Responsive Grid Layout */}
@@ -133,16 +147,16 @@ export function DynamicForm({
                   {...commonProps}
                   items={field.options ?? []}
                   value={data[field.name] ?? ""}
-                  handleChange={(e) => {
-                    handleChange(e);
+                  handleChange={(value: string) => {
                     setData((prev) => ({
                       ...prev,
-                      [field.name]: e.target.value,
+                      [field.name]: value,
                     }));
                   }}
                 />
               );
             }
+
 
             // File Upload
             if (field.type === "file") {
@@ -187,12 +201,20 @@ export function DynamicForm({
         </div>
 
         {/* Submit Button */}
-        <div className="pt-6">
+        <div className="pt-6 flex justify-end gap-5 items-end w-full">
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="px-10 py-2 h-10 cursor-pointer rounded-lg bg-linear-to-r from-gray-600 to-black-600 text-white hover:from-gray-700 hover:to-black-700"
+          >
+            Cancel
+          </button>
           <ButtonColorful
             type="submit"
             isIcon={false}
             label={loading ? "Submitting..." : "Submit"}
             loading={loading}
+            className="w-28"
           />
         </div>
       </form>

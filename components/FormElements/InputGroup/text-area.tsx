@@ -42,7 +42,7 @@ export const TextAreaGroup: React.FC<TextAreaGroupProps> = ({
         value={value}
         defaultValue={defaultValue}
         className={cn(
-          "mt-3 w-full rounded-lg border-[1.5px] bg-transparent text-white outline-none transition placeholder:text-gray-400",
+          "mt-3 w-full rounded-lg bg-[#1A1B1E] border-[1.5px]  text-white outline-none transition placeholder:text-gray-400",
           error
             ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500"
             : "border-gray-700 focus:border-purple-500",
