@@ -85,7 +85,7 @@ const Page = () => {
   return (
     <MainLayout>
       <div className="min-h-screen bg-[#0f0c18] text-white px-8 py-10 pt-[100px] flex items-center justify-center">
-        <div className="container flex items-center justify-center">
+        <div className="container flex items-center justify-center bg-[#231F29] border border-[#4C4C4C] rounded-xl w-full max-w-7xl min-h-[700px]">
           <div>
             {/* Header Section */}
             <div>
