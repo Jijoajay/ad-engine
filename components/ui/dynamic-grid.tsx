@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { MoreVertical, Eye, MousePointerClick } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -17,11 +18,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MoreVertical, Eye, MousePointerClick, Pencil } from "lucide-react";
 
 interface DynamicGridProps {
-  isAds?: boolean
-  isContain?: boolean
+  isAds?: boolean;
+  isContain?: boolean;
   data: Record<string, any>[];
   onToggle?: (row: Record<string, any>) => Promise<boolean | void> | void;
   onDelete?: (row: Record<string, any>) => Promise<boolean | void> | void;
@@ -56,26 +56,20 @@ export function DynamicGrid({
     currentPage * rowsPerPage
   );
 
-  const getPageNumbers = () => {
-    const pages: (number | string)[] = [];
-    const maxVisible = 5;
-    if (totalPages <= maxVisible) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
-    } else {
-      const startPage = Math.max(2, currentPage - 1);
-      const endPage = Math.min(totalPages - 1, currentPage + 1);
-      pages.push(1);
-      if (startPage > 2) pages.push("…");
-      for (let i = startPage; i <= endPage; i++) pages.push(i);
-      if (endPage < totalPages - 1) pages.push("…");
-      pages.push(totalPages);
-    }
+  const pageNumbers = () => {
+    const siblingCount = 2;
+    const start = Math.max(1, currentPage - siblingCount);
+    const end = Math.min(totalPages, currentPage + siblingCount);
+    const pages: number[] = [];
+    for (let i = start; i <= end; i++) pages.push(i);
     return pages;
   };
 
   const handleDelete = async (ad: any) => {
+    const name = ad.advt_name || ad.proj_name || "this item";
+
     const result = await Swal.fire({
-      title: "Delete this advertisement?",
+      title: `Delete "${name}"?`,
       text: "This action cannot be undone.",
       icon: "warning",
       showCancelButton: true,
@@ -91,7 +85,7 @@ export function DynamicGrid({
       await onDelete?.(ad);
       Swal.fire({
         title: "Deleted!",
-        text: "The advertisement has been deleted.",
+        text: `"${name}" has been deleted.`,
         icon: "success",
         background: "#000000",
         color: "#ffffff",
@@ -100,16 +94,16 @@ export function DynamicGrid({
   };
 
   return (
-    <div className="bg-[#222327] text-white px-4 py-0.5 rounded-xl">
+    <div className="bg-[#222327] text-white px-4 py-4 rounded-xl">
       {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-3 ">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {paginatedData.length > 0 ? (
           paginatedData.map((ad) => (
             <div
               key={ad.advt_id || ad.proj_id}
               className="rounded-2xl border border-gray-800 p-5 bg-[#12101A] hover:bg-[#1C1A25] transition-all duration-300 relative shadow-sm"
             >
-              {/* Dropdown Menu */}
+              {/* Dropdown */}
               <div className="absolute top-4 right-4 z-20">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -117,11 +111,11 @@ export function DynamicGrid({
                       <MoreVertical size={18} className="text-gray-300" />
                     </button>
                   </DropdownMenuTrigger>
+
                   <DropdownMenuContent
                     align="end"
                     className="bg-gray-900 border border-gray-700 text-white rounded-md w-32"
                   >
-                    {/* View Option */}
                     {onView && (
                       <DropdownMenuItem
                         onClick={() => onView(ad)}
@@ -131,18 +125,15 @@ export function DynamicGrid({
                       </DropdownMenuItem>
                     )}
 
-                    {/* Edit Option */}
-                    {
-                      onEdit &&
+                    {onEdit && (
                       <DropdownMenuItem
-                        onClick={() => onEdit?.(ad)}
+                        onClick={() => onEdit(ad)}
                         className="cursor-pointer hover:bg-gray-800 text-blue-400"
                       >
                         Edit
                       </DropdownMenuItem>
-                    }
+                    )}
 
-                    {/* Toggle Status */}
                     <DropdownMenuItem
                       onClick={() => onToggle?.(ad)}
                       className={cn(
@@ -157,11 +148,10 @@ export function DynamicGrid({
                           ? "Stop"
                           : "Start"
                         : ad.advt_status === 1
-                          ? "Active"
-                          : "Inactive"}
+                        ? "Active"
+                        : "Inactive"}
                     </DropdownMenuItem>
 
-                    {/* Delete */}
                     <DropdownMenuItem
                       onClick={() => handleDelete(ad)}
                       className="cursor-pointer hover:bg-gray-800 text-red-400"
@@ -200,17 +190,14 @@ export function DynamicGrid({
                 )}
               </div>
 
-              {/* Project Info */}
-              <div>
-                <h3 className="font-semibold text-base text-white truncate">
-                  {ad.proj_name || ad.advt_name || ad.mddt_name || "Untitled"}
-                </h3>
-                <p className="text-sm text-gray-400 truncate">
-                  {ad.page_name || ad.description}
-                </p>
-              </div>
+              {/* Info */}
+              <h3 className="font-semibold text-base text-white truncate">
+                {ad.proj_name || ad.advt_name || ad.mddt_name || "Untitled"}
+              </h3>
+              <p className="text-sm text-gray-400 truncate">
+                {ad.page_name || ad.description}
+              </p>
 
-              {/* Stats */}
               {(ad.advt_view_count || ad.advt_click_count) && (
                 <div className="flex justify-between items-center mt-3 text-sm text-gray-400">
                   <div className="flex items-center gap-1">
@@ -222,16 +209,23 @@ export function DynamicGrid({
                 </div>
               )}
 
-              {/* Status */}
-              {(ad.advt_status || ad.mddt_status || ad.proj_status) !== undefined && (
+              {(ad.advt_status || ad.mddt_status || ad.proj_status) !==
+                undefined && (
                 <div className="mt-3">
                   <span
-                    className={`inline-block text-xs font-medium px-3 py-1 rounded-full ${(ad.advt_status || ad.mddt_status || ad.proj_status) === 1
-                      ? "bg-green-900 text-green-300"
-                      : "bg-red-900 text-red-300"
-                      }`}
+                    className={`inline-block text-xs font-medium px-3 py-1 rounded-full ${
+                      (ad.advt_status ||
+                        ad.mddt_status ||
+                        ad.proj_status) === 1
+                        ? "bg-green-900 text-green-300"
+                        : "bg-red-900 text-red-300"
+                    }`}
                   >
-                    {(ad.advt_status || ad.mddt_status || ad.proj_status) === 1 ? "Active" : "Inactive"}
+                    {(ad.advt_status ||
+                      ad.mddt_status ||
+                      ad.proj_status) === 1
+                      ? "Active"
+                      : "Inactive"}
                   </span>
                 </div>
               )}
@@ -244,53 +238,79 @@ export function DynamicGrid({
         )}
       </div>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-between mt-5 mb-3">
-        <div className="flex items-center gap-2">
-          <span className="text-gray-400 text-sm">Rows per page:</span>
-          <Select
-            value={String(rowsPerPage)}
-            onValueChange={(value) => setRowsPerPage(Number(value))}
+      {/* --- SAME PAGINATION AS DynamicTable --- */}
+      <div className="mt-5 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+        {/* Rows Per Page */}
+        <div className="flex items-center space-x-2 gap-2 text-sm text-gray-500">
+          <label htmlFor="pageSize">Rows Per Page:</label>
+
+          <select
+            id="pageSize"
+            value={rowsPerPage}
+            onChange={(e) => {
+              setRowsPerPage(Number(e.target.value));
+              setCurrentPage(1);
+            }}
+            className="bg-black text-gray-400 border border-gray-300 rounded-md px-2 w-[60px] py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
           >
-            <SelectTrigger className="w-20 bg-gray-900 border-gray-700 text-white">
-              <SelectValue placeholder={rowsPerPage} />
-            </SelectTrigger>
-            <SelectContent className="bg-gray-900 text-white border-gray-700">
-              {[4, 8, 12, 20].map((num) => (
-                <SelectItem key={num} value={String(num)}>
-                  {num}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            {[4, 8, 12, 20].map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
         </div>
 
-        {totalPages > 1 && (
-          <div className="flex items-center gap-2 ">
-            {getPageNumbers().map((page, idx) =>
-              page === "…" ? (
-                <span key={idx} className="text-gray-500">
-                  …
-                </span>
-              ) : (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentPage(page as number)}
-                  className={cn(
-                    "relative h-10 px-4 rounded-lg overflow-hidden",
-                    "text-white font-medium transition-all duration-200",
-                    "border border-gray-700",
-                    currentPage === page
-                      ? "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
-                      : "bg-gray-900 hover:bg-gray-800"
-                  )}
-                >
-                  {page}
-                </button>
-              )
-            )}
-          </div>
-        )}
+        {/* Pagination Buttons */}
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => setCurrentPage(1)}
+            disabled={currentPage === 1}
+            className="px-2 py-1 text-gray-600 hover:bg-gray-100 rounded disabled:text-gray-400"
+          >
+            «
+          </button>
+
+          <button
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="px-2 py-1 text-gray-600 hover:bg-gray-100 rounded disabled:text-gray-400"
+          >
+            ‹
+          </button>
+
+          {pageNumbers().map((num) => (
+            <button
+              key={num}
+              onClick={() => setCurrentPage(num)}
+              className={`px-3 py-1 rounded-full text-sm transition-all ${
+                currentPage === num
+                  ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white"
+                  : "hover:bg-gray-200 hover:text-purple-500 text-gray-200"
+              }`}
+            >
+              {num}
+            </button>
+          ))}
+
+          <button
+            onClick={() =>
+              setCurrentPage((p) => Math.min(totalPages, p + 1))
+            }
+            disabled={currentPage === totalPages}
+            className="px-2 py-1 text-gray-600 hover:bg-gray-100 rounded disabled:text-gray-400"
+          >
+            ›
+          </button>
+
+          <button
+            onClick={() => setCurrentPage(totalPages)}
+            disabled={currentPage === totalPages}
+            className="px-2 py-1 text-gray-600 hover:bg-gray-100 rounded disabled:text-gray-400"
+          >
+            »
+          </button>
+        </div>
       </div>
     </div>
   );

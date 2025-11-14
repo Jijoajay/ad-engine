@@ -34,7 +34,10 @@ interface DynamicTableProps {
   onView?: (row: Record<string, any>) => void;
   onEdit?: (row: Record<string, any>) => void;
   onDelete?: (row: Record<string, any>) => Promise<void> | void;
-  onChangeStatus?: (row: Record<string, any>, newStatus: number) => Promise<void> | void;
+  onChangeStatus?: (
+    row: Record<string, any>,
+    newStatus: number
+  ) => Promise<void> | void;
   defaultRowsPerPage?: number;
 }
 
@@ -60,7 +63,6 @@ export function DynamicTable({
     }
   }, [rowsPerPage, totalPages]);
 
-  // SweetAlert2 Delete Confirmation
   const handleDelete = async (row: any) => {
     const name = row.dvty_name || "this item";
 
@@ -114,28 +116,21 @@ export function DynamicTable({
     currentPage * rowsPerPage
   );
 
-  const getPageNumbers = () => {
-    const pages: (number | string)[] = [];
-    const maxVisible = 5;
+  const startItem = (currentPage - 1) * rowsPerPage + 1;
 
-    if (totalPages <= maxVisible) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
-    } else {
-      const startPage = Math.max(2, currentPage - 1);
-      const endPage = Math.min(totalPages - 1, currentPage + 1);
-      pages.push(1);
-      if (startPage > 2) pages.push("…");
-      for (let i = startPage; i <= endPage; i++) pages.push(i);
-      if (endPage < totalPages - 1) pages.push("…");
-      pages.push(totalPages);
-    }
-
+  const pageNumbers = () => {
+    const siblingCount = 2;
+    const start = Math.max(1, currentPage - siblingCount);
+    const end = Math.min(totalPages, currentPage + siblingCount);
+    const pages: number[] = [];
+    for (let i = start; i <= end; i++) pages.push(i);
     return pages;
   };
 
   return (
     <>
-      <div className="rounded-xl bg-[#222327]  text-[#F0F0F0] shadow-lg">
+      {/* TABLE */}
+      <div className="rounded-xl bg-[#222327] text-[#F0F0F0] shadow-lg">
         <table className="w-full">
           <thead>
             <tr className="border-b border-[#33353A] text-base">
@@ -156,9 +151,7 @@ export function DynamicTable({
                   key={idx}
                   className="border-t border-[#33353A] transition"
                 >
-                  <td className="px-4 py-3">
-                    {(currentPage - 1) * rowsPerPage + idx + 1}
-                  </td>
+                  <td className="px-4 py-3">{startItem + idx}</td>
 
                   {columns.map((col) => (
                     <td key={col.key} className="px-4 py-3">
@@ -184,10 +177,11 @@ export function DynamicTable({
                         </div>
                       ) : col.label === "Status" ? (
                         <span
-                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${row[col.key] === 1
-                            ? "bg-green-500/20 text-green-400 border border-green-600"
-                            : "bg-red-500/20 text-red-400 border border-red-600"
-                            }`}
+                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                            row[col.key] === 1
+                              ? "bg-green-500/20 text-green-400 border border-green-600"
+                              : "bg-red-500/20 text-red-400 border border-red-600"
+                          }`}
                         >
                           {row[col.key] === 1 ? "Active" : "Inactive"}
                         </span>
@@ -201,7 +195,6 @@ export function DynamicTable({
                     </td>
                   ))}
 
-                  {/* Actions Dropdown */}
                   <td className="text-center px-4 py-3">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -230,31 +223,50 @@ export function DynamicTable({
                           </DropdownMenuItem>
                         )}
 
-                        {onChangeStatus && columns.some(c => c.label === "Status") && (
-                          <DropdownMenuItem
-                            className="flex items-center gap-2 hover:bg-gray-800 cursor-pointer"
-                            onClick={() => {
-                              const statusCol = columns.find(c => c.label === "Status");
-                              if (!statusCol) return;
-                              const currentStatus = row[statusCol.key];
-                              onChangeStatus(row, currentStatus === 1 ? 0 : 1);
-                            }}
-                          >
-                            <RefreshCcw
-                              className={`h-4 w-4 ${row[columns.find(c => c.label === "Status")!.key] === 1
-                                ? "text-yellow-400"
-                                : "text-green-400"
+                        {onChangeStatus &&
+                          columns.some((c) => c.label === "Status") && (
+                            <DropdownMenuItem
+                              className="flex items-center gap-2 hover:bg-gray-800 cursor-pointer"
+                              onClick={() => {
+                                const statusCol = columns.find(
+                                  (c) => c.label === "Status"
+                                );
+                                if (!statusCol) return;
+                                const currentStatus = row[statusCol.key];
+                                onChangeStatus(
+                                  row,
+                                  currentStatus === 1 ? 0 : 1
+                                );
+                              }}
+                            >
+                              <RefreshCcw
+                                className={`h-4 w-4 ${
+                                  row[
+                                    columns.find(
+                                      (c) => c.label === "Status"
+                                    )!.key
+                                  ] === 1
+                                    ? "text-yellow-400"
+                                    : "text-green-400"
                                 }`}
-                            />
-                            {isClientAds
-                              ? row[columns.find(c => c.label === "Status")!.key] === 1
-                                ? "Stop"
-                                : "Start"
-                              : row[columns.find(c => c.label === "Status")!.key] === 1
-                                ? "Deactivate"
-                                : "Activate"}
-                          </DropdownMenuItem>
-                        )}
+                              />
+                              {isClientAds
+                                ? row[
+                                    columns.find(
+                                      (c) => c.label === "Status"
+                                    )!.key
+                                  ] === 1
+                                  ? "Stop"
+                                  : "Start"
+                                : row[
+                                    columns.find(
+                                      (c) => c.label === "Status"
+                                    )!.key
+                                  ] === 1
+                                  ? "Deactivate"
+                                  : "Activate"}
+                            </DropdownMenuItem>
+                          )}
 
                         {onDelete && (
                           <DropdownMenuItem
@@ -283,53 +295,79 @@ export function DynamicTable({
         </table>
       </div>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-between mt-4">
-        <div className="flex items-center gap-2">
-          <span className="text-gray-400 text-sm">Rows per page:</span>
-          <Select
-            value={String(rowsPerPage)}
-            onValueChange={(value) => setRowsPerPage(Number(value))}
+      {/* --- PAGINATION FROM PAGINATEDTABLE --- */}
+      <div className="mt-6 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+        <div className="flex items-center space-x-2 gap-2 text-sm text-gray-500">
+          <label htmlFor="pageSize" className="whitespace-nowrap">
+            Rows Per Page:
+          </label>
+
+          <select
+            id="pageSize"
+            value={rowsPerPage}
+            onChange={(e) => {
+              setRowsPerPage(Number(e.target.value));
+              setCurrentPage(1);
+            }}
+            className="bg-black text-gray-400 border border-gray-300 rounded-md px-2 w-[60px] py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
           >
-            <SelectTrigger className="w-20 bg-gray-900 border-gray-700 text-white">
-              <SelectValue placeholder={rowsPerPage} />
-            </SelectTrigger>
-            <SelectContent className="bg-gray-900 text-white border-gray-700">
-              {[5, 10, 20, 50].map((num) => (
-                <SelectItem key={num} value={String(num)}>
-                  {num}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            {[5, 10, 20, 50].map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
         </div>
 
-        {totalPages > 1 && (
-          <div className="flex items-center gap-2">
-            {getPageNumbers().map((page, idx) =>
-              page === "…" ? (
-                <span key={idx} className="text-gray-500">
-                  …
-                </span>
-              ) : (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentPage(page as number)}
-                  className={cn(
-                    "relative h-10 px-4 rounded-lg overflow-hidden",
-                    "text-white font-medium transition-all duration-200",
-                    "border border-gray-700",
-                    currentPage === page
-                      ? "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
-                      : "bg-gray-900 hover:bg-gray-800"
-                  )}
-                >
-                  {page}
-                </button>
-              )
-            )}
-          </div>
-        )}
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => setCurrentPage(1)}
+            disabled={currentPage === 1}
+            className="px-2 py-1 text-gray-600 hover:bg-gray-100 rounded disabled:text-gray-400"
+          >
+            «
+          </button>
+
+          <button
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="px-2 py-1 text-gray-600 hover:bg-gray-100 rounded disabled:text-gray-400"
+          >
+            ‹
+          </button>
+
+          {pageNumbers().map((num) => (
+            <button
+              key={num}
+              onClick={() => setCurrentPage(num)}
+              className={`px-3 py-1 rounded-full text-sm transition-all ${
+                currentPage === num
+                  ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white"
+                  : "hover:bg-gray-200 hover:text-purple-500 text-gray-200"
+              }`}
+            >
+              {num}
+            </button>
+          ))}
+
+          <button
+            onClick={() =>
+              setCurrentPage((p) => Math.min(totalPages, p + 1))
+            }
+            disabled={currentPage === totalPages}
+            className="px-2 py-1 text-gray-600 hover:bg-gray-100 rounded disabled:text-gray-400"
+          >
+            ›
+          </button>
+
+          <button
+            onClick={() => setCurrentPage(totalPages)}
+            disabled={currentPage === totalPages}
+            className="px-2 py-1 text-gray-600 hover:bg-gray-100 rounded disabled:text-gray-400"
+          >
+            »
+          </button>
+        </div>
       </div>
     </>
   );

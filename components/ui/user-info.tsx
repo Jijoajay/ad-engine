@@ -9,6 +9,7 @@ import {
   CreditCard,
   FileText,
   Loader2,
+  Home,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -67,21 +68,9 @@ export default function Profile01({
 
   const menuItems: MenuItem[] = [
     {
-      label: "Subscription",
-      value: subscription,
-      href: "#",
-      icon: <CreditCard className="w-4 h-4" />,
-    },
-    {
-      label: "Settings",
-      href: "#",
-      icon: <Settings className="w-4 h-4" />,
-    },
-    {
-      label: "Terms & Policies",
-      href: "#",
-      icon: <FileText className="w-4 h-4" />,
-      external: true,
+      label: "Home",
+      href: "/",
+      icon: <Home className="w-4 h-4" />,
     },
   ];
 
@@ -112,13 +101,13 @@ export default function Profile01({
 
           {/* Menu Items */}
           <div className="space-y-2">
-            {/* {menuItems.map((item) => (
+            {menuItems.map((item) => (
               <Link
                 key={item.label}
                 href={item.href}
-                className="flex items-center justify-between p-2 
+                className="flex items-center justify-between p-2 hover:bg-neutral-700 
                            hover:bg-accent rounded-lg 
-                           transition-colors duration-200"
+                           transition-colors duration-300 ease-in-out"
               >
                 <div className="flex items-center gap-2">
                   {item.icon}
@@ -135,7 +124,7 @@ export default function Profile01({
                   {item.external && <MoveUpRight className="w-4 h-4" />}
                 </div>
               </Link>
-            ))} */}
+            ))}
 
             {/* Logout */}
             <button
@@ -143,7 +132,7 @@ export default function Profile01({
               disabled={isLoggingOut}
               type="button"
               className="w-full flex items-center justify-between p-2 
-                         rounded-lg cursor-pointer transition-all duration-200
+                         rounded-lg cursor-pointer transition-all duration-300 ease-in-out
                          hover:bg-red-600 hover:text-white disabled:opacity-60"
             >
               <div className="flex items-center gap-2">
