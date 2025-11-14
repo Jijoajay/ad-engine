@@ -45,7 +45,7 @@ export const useCartStore = create<CartStore>((set, get) => ({
   fetchCart: async () => {
     const user = useAuthStore.getState().user;
     if (!user?.id) {
-      toast.error("You must be logged in to fetch the cart!");
+      // toast.error("You must be logged in to fetch the cart!");
       return;
     }
 
