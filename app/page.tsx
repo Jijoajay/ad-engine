@@ -109,10 +109,10 @@ export default function Home() {
                     visible: { opacity: 1, y: -5, scale: 1 },
                   }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
-                  className={`relative group size-[300px] rounded-xl cursor-pointer transition-all duration-300
+                  className={`relative group size-[300px] rounded-xl p-0.5 cursor-pointer transition-all duration-300 ease-in-out
                     ${selected === project.proj_name
                       ? "bg-[linear-gradient(to_right,#9333ea_70%,#2563eb_100%)]"
-                      : "bg-transparent border border-[#4C4C4C]"
+                      : "bg-[#231F29] border border-[#4C4C4C]"
                     }`}
                 >
                   <div className="flex h-full w-full flex-col items-center justify-center rounded-xl bg-[#231F29] transition-transform duration-300">
