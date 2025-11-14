@@ -76,7 +76,7 @@ export function DynamicTable({
       background: "#000000",
       color: "#ffffff",
       customClass: {
-        popup: "rounded-lg shadow-lg border border-gray-800",
+        popup: "rounded-lg shadow-lg border border-[#33353A]",
         confirmButton:
           "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg px-4 py-2",
         cancelButton:
@@ -135,10 +135,10 @@ export function DynamicTable({
 
   return (
     <>
-      <div className="rounded-[10px] bg-black text-white shadow-lg">
+      <div className="rounded-xl bg-[#222327]  text-[#F0F0F0] shadow-lg">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-gray-800 text-base">
+            <tr className="border-b border-[#33353A] text-base">
               <th className="text-left px-4 py-3">SI No</th>
               {columns.map((col) => (
                 <th key={col.key} className="text-left px-4 py-3">
@@ -154,7 +154,7 @@ export function DynamicTable({
               paginatedData.map((row, idx) => (
                 <tr
                   key={idx}
-                  className="border-t border-gray-800 hover:bg-gray-900 transition"
+                  className="border-t border-[#33353A] transition"
                 >
                   <td className="px-4 py-3">
                     {(currentPage - 1) * rowsPerPage + idx + 1}

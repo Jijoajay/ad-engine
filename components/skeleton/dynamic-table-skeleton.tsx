@@ -20,14 +20,14 @@ export function DynamicTableSkeleton({
   rows = 5,
 }: DynamicTableSkeletonProps) {
   return (
-    <div className="rounded-[10px] bg-black text-white shadow-lg">
+    <div className="rounded-xl bg-[#222327]  text-[#F0F0F0] shadow-lg">
       {/* <h2 className="px-4 py-6 text-2xl font-bold md:px-6 xl:px-9">
         {title}
       </h2> */}
 
       <Table>
         <TableHeader>
-          <TableRow className="border-t border-gray-700 text-base [&>th]:h-auto [&>th]:py-3 sm:[&>th]:py-4.5">
+          <TableRow className="border-t border-[#33353A] text-base [&>th]:h-auto [&>th]:py-3 sm:[&>th]:py-4.5">
             {columns.map((col) => (
               <TableHead
                 key={col.key}
@@ -44,7 +44,7 @@ export function DynamicTableSkeleton({
             <TableRow key={i} className="border-gray-800">
               {columns.map((col) => (
                 <TableCell key={col.key}>
-                  <Skeleton className="h-6 w-full bg-gray-700" />
+                  <Skeleton className="h-6 w-full bg-[#222327] " />
                 </TableCell>
               ))}
             </TableRow>

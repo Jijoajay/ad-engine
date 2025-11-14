@@ -44,7 +44,7 @@ const Page = () => {
   if (!projectList.length)
     return (
       <AdminLayout>
-        <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="min-h-screen bg-[#1A1B1E] text-white flex items-center justify-center">
           <p className="text-center text-gray-400">No projects found.</p>
         </div>
       </AdminLayout>

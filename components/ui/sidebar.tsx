@@ -63,11 +63,15 @@ const Sidebar = () => {
         )}
       >
         <div className="h-full flex flex-col">
-          {/* Header / Brand */}
           <div className="h-15 px-6 flex items-center border-b border-[#33353A]">
-            <Link href="/" className="flex items-center gap-3">
-              <span className="text-lg font-semibold hover:cursor-pointer text-[#F0F0F0]">
-                Ad<span className="text-primary">Engine</span>
+            <Link href="/" className="flex items-center">
+              <span
+                className={`text-xl sm:text-2xl font-bold text-[#F0F0F0]`}
+              >
+                Ad
+                <span className="bg-clip-text text-transparent bg-[linear-gradient(to_right,#9333ea_70%,#2563eb_100%)]">
+                  Engine
+                </span>
               </span>
             </Link>
           </div>

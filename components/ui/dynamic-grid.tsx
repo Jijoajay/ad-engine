@@ -100,9 +100,9 @@ export function DynamicGrid({
   };
 
   return (
-    <div className="bg-black text-white min-h-screen">
+    <div className="bg-[#222327] text-white px-4 py-0.5 rounded-xl">
       {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-3 ">
         {paginatedData.length > 0 ? (
           paginatedData.map((ad) => (
             <div
@@ -245,7 +245,7 @@ export function DynamicGrid({
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between mt-8">
+      <div className="flex items-center justify-between mt-5 mb-3">
         <div className="flex items-center gap-2">
           <span className="text-gray-400 text-sm">Rows per page:</span>
           <Select
@@ -266,7 +266,7 @@ export function DynamicGrid({
         </div>
 
         {totalPages > 1 && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 ">
             {getPageNumbers().map((page, idx) =>
               page === "…" ? (
                 <span key={idx} className="text-gray-500">

@@ -37,7 +37,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     <Suspense fallback={<Loading />}>
       <Providers>
         <NextTopLoader color="#5750F1" showSpinner={false} />
-        <div className="flex h-screen overflow-hidden"> {/* prevent whole page scroll */}
+        <div className="flex h-screen overflow-hidden"> 
           <Sidebar />
           <div className="flex flex-col w-full bg-gray-2">
             <Header />

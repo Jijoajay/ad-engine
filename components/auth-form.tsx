@@ -85,8 +85,8 @@ const Header: React.FC = () => (
 
 const SocialButtons: React.FC = () => (
   <div className="mb-6 space-y-3">
-    <div className="grid grid-cols-2 gap-3">
-      <SocialButton icon={<Mail size={20} className="text-white" />}>Sign in with Google</SocialButton>
+    <div className="grid grid-cols-1 gap-3">
+      {/* <SocialButton icon={<Mail size={20} className="text-white" />}>Sign in with Google</SocialButton> */}
       <Link href="/sign-up" className="w-full">
         <SocialButton icon={<User size={20} className="text-white" />}>Create Account</SocialButton>
       </Link>
