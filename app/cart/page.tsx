@@ -42,20 +42,24 @@ export default function CartPage() {
         className="min-h-screen bg-[#0E0E11] text-white py-10 sm:py-20 px-[5%] flex flex-col justify-center lg:flex-row gap-8 pt-[100px]"
       >
         <div className="container pt-[50px]">
-          {/* ---- Header ---- */}
-          <div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold">Your Cart</h1>
-            <p className="text-gray-400 text-sm mt-1">
-              Review your selected ad placements before checkout
-            </p>
-          </div>
+          {
+            ( cart.length !== 0 || loading ) &&
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-extrabold">Your Cart</h1>
+              <p className="text-gray-400 text-sm mt-1">
+                Review your selected ad placements before checkout
+              </p>
+            </div>
+          }
 
           {loading ? (
             <div className="text-center text-gray-400 py-20 animate-pulse">
               <CartSkeleton />
             </div>
           ) : cart.length === 0 ? (
-            <EmptyCart />
+            <div className="flex flex-col items-center justify-center">
+              <EmptyCart />
+            </div>
           ) : (
             <div className="flex flex-col lg:flex-row gap-10 mt-10">
               {/* ---- Left Section: Cart Items ---- */}
