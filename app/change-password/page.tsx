@@ -1,156 +1,155 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion } from "framer-motion";
-import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
+import MainLayout from "@/layout/MainLayout";
 import { Input } from "@/components/ui/input";
 import { ButtonColorful } from "@/components/ui/button-colorful";
 import { cn } from "@/lib/utils";
-import MainLayout from "@/layout/MainLayout";
-import { toast } from "sonner";
 import { useAuthStore } from "@/lib/auth-store";
-import { useRouter } from "next/navigation";
+import BackButton from "@/components/ui/back-button";
 
 const ChangePasswordPage = () => {
-    const router = useRouter();
   const { changePassword, loadingChangePass, error } = useAuthStore();
 
-  const [formData, setFormData] = useState({
+  const [form, setForm] = useState({
     current_password: "",
     new_password: "",
     confirm_password: "",
   });
 
-  const [errors, setErrors] = useState({
-    current_password: "",
-    new_password: "",
-    confirm_password: "",
-  });
+  const [errors, setErrors] = useState<{
+    current_password?: string;
+    new_password?: string;
+    confirm_password?: string;
+  }>({});
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm((prev) => ({ ...prev, [e.target.id]: e.target.value }));
+    setErrors((prev) => ({ ...prev, [e.target.id]: undefined }));
+  };
+
+  // Validation
   const validate = () => {
-    let newErrors = { current_password: "", new_password: "", confirm_password: "" };
-    let valid = true;
+    const newErrors: typeof errors = {};
 
-    if (!formData.current_password) {
+    if (!form.current_password.trim())
       newErrors.current_password = "Current password is required";
-      valid = false;
-    }
-    if (!formData.new_password) {
+
+    if (!form.new_password.trim())
       newErrors.new_password = "New password is required";
-      valid = false;
-    }
-    if (formData.new_password && formData.new_password.length < 6) {
+
+    if (form.new_password && form.new_password.length < 6)
       newErrors.new_password = "Password must be at least 6 characters";
-      valid = false;
-    }
-    if (formData.new_password !== formData.confirm_password) {
+
+    if (form.new_password !== form.confirm_password)
       newErrors.confirm_password = "Passwords do not match";
-      valid = false;
-    }
 
     setErrors(newErrors);
-    return valid;
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!validate()) return;
 
-    const success = await changePassword(formData);
-
-    if (success) {
-      toast.success("Password changed successfully!");
-      router.push("/");
-      setFormData({ current_password: "", new_password: "", confirm_password: "" });
-    } else {
-      toast.error(error || "Failed to change password.");
-    }
-  };
-
-  const handleChange = (key: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [key]: value }));
+    await changePassword(form);
   };
 
   return (
     <MainLayout>
-      <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 md:pt-[100px] shadow-input bg-black min-h-screen">
-        <BackButton />
-
-        <div className="flex gap-1 items-center mb-3">
-          <h2 className="font-bold text-xl text-neutral-200">Change</h2>
-          <span className="font-bold text-xl text-neutral-200">
-            <span className="bg-clip-text text-transparent bg-[linear-gradient(to_right,#9333ea_70%,#2563eb_100%)]">
-              Password
-            </span>
-          </span>
-        </div>
-
-        <p className="text-sm max-w-sm mb-6 text-neutral-400">
-          Update your account password securely below.
-        </p>
-
-        <form className="space-y-6" onSubmit={handleSubmit}>
-          {/* Current Password */}
-          <LabelInputContainer>
-            <Label htmlFor="current_password">Current Password</Label>
-            <Input
-              id="current_password"
-              type="password"
-              placeholder="••••••••"
-              value={formData.current_password}
-              onChange={(e) => handleChange("current_password", e.target.value)}
-            />
-            {errors.current_password && <ErrorText text={errors.current_password} />}
-          </LabelInputContainer>
-
-          {/* New Password */}
-          <LabelInputContainer>
-            <Label htmlFor="new_password">New Password</Label>
-            <Input
-              id="new_password"
-              type="password"
-              placeholder="••••••••"
-              value={formData.new_password}
-              onChange={(e) => handleChange("new_password", e.target.value)}
-            />
-            {errors.new_password && <ErrorText text={errors.new_password} />}
-          </LabelInputContainer>
-
-          {/* Confirm Password */}
-          <LabelInputContainer>
-            <Label htmlFor="confirm_password">Confirm Password</Label>
-            <Input
-              id="confirm_password"
-              type="password"
-              placeholder="••••••••"
-              value={formData.confirm_password}
-              onChange={(e) => handleChange("confirm_password", e.target.value)}
-            />
-            {errors.confirm_password && <ErrorText text={errors.confirm_password} />}
-          </LabelInputContainer>
-
-          <div className="pt-4">
-            <ButtonColorful
-              isIcon={false}
-              label="Change Password"
-              className="w-full"
-              loading={loadingChangePass}
-            />
+      <div className="min-h-screen bg-[#0f0c18] text-white px-8 py-10 pt-[100px] flex flex-col items-center justify-center">
+        <div className="w-full max-w-7xl">
+          <div className="text-white w-full item-start mb-5">
+            <h1 className="text-2xl font-semibold">Change Password</h1>
+            <p className="text-sm text-gray-400 mt-2">
+              Update your password to keep your account secure
+            </p>
           </div>
-        </form>
+        </div>
+        <div className="container flex items-center justify-center bg-[#231F29] border border-[#4C4C4C] rounded-xl w-full max-w-7xl min-h-[700px]">
+          <div>
+            {/* Form Section */}
+            <div className="mt-10">
+              <BackButton />
+              <form
+                className="grid grid-cols-1 gap-6 max-w-4xl"
+                onSubmit={handleSubmit}
+              >
+                {/* Current Password */}
+                <LabelInputContainer>
+                  <Label htmlFor="current_password">Current Password</Label>
+                  <Input
+                    id="current_password"
+                    type="password"
+                    value={form.current_password}
+                    onChange={handleChange}
+                    placeholder="********"
+                    className="bg-[#1b1625] border-none focus:ring-purple-500"
+                  />
+                  {errors.current_password && (
+                    <ErrorText text={errors.current_password} />
+                  )}
+                </LabelInputContainer>
+
+                {/* New Password */}
+                <LabelInputContainer>
+                  <Label htmlFor="new_password">New Password</Label>
+                  <Input
+                    id="new_password"
+                    type="password"
+                    value={form.new_password}
+                    onChange={handleChange}
+                    placeholder="********"
+                    className="bg-[#1b1625] border-none focus:ring-purple-500"
+                  />
+                  {errors.new_password && (
+                    <ErrorText text={errors.new_password} />
+                  )}
+                </LabelInputContainer>
+
+                {/* Confirm Password */}
+                <LabelInputContainer>
+                  <Label htmlFor="confirm_password">Confirm Password</Label>
+                  <Input
+                    id="confirm_password"
+                    type="password"
+                    value={form.confirm_password}
+                    onChange={handleChange}
+                    placeholder="********"
+                    className="bg-[#1b1625] border-none focus:ring-purple-500"
+                  />
+                  {errors.confirm_password && (
+                    <ErrorText text={errors.confirm_password} />
+                  )}
+                </LabelInputContainer>
+              </form>
+
+              {/* Save Button */}
+              <div className="mt-10 w-full flex justify-end">
+                <button type="submit" disabled={loadingChangePass} onClick={handleSubmit} className="w-32 cursor-pointer">
+                  <ButtonColorful
+                    label={loadingChangePass ? "Saving..." : "Update"}
+                    isIcon={false}
+                  />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </MainLayout>
   );
 };
 
-// 🔹 Reusable Components
-const ErrorText = ({ text }: { text: string }) => (
-  <p className="text-red-400 text-xs mt-1">{text}</p>
-);
+export default ChangePasswordPage;
 
+/* Reusable Components */
 const Label = ({ htmlFor, children }: { htmlFor: string; children: React.ReactNode }) => (
-  <label htmlFor={htmlFor} className="text-sm font-medium leading-none text-neutral-200">
+  <label
+    htmlFor={htmlFor}
+    className="text-sm font-medium leading-none text-gray-300 w-[350px]"
+  >
     {children}
   </label>
 );
@@ -161,20 +160,12 @@ const LabelInputContainer = ({
 }: {
   children: React.ReactNode;
   className?: string;
-}) => <div className={cn("flex flex-col space-y-2 w-full", className)}>{children}</div>;
-
-const BackButton: React.FC = () => (
-  <Link href="/profile" className="inline-block mb-6">
-    <motion.div
-      initial={{ opacity: 0, x: -10 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.5, delay: 0.2 }}
-      className="flex items-center text-sm font-medium text-zinc-400 hover:text-blue-400 transition-colors"
-    >
-      <ChevronLeft size={16} className="mr-1" />
-      Back to Profile
-    </motion.div>
-  </Link>
+}) => (
+  <div className={cn("flex flex-col space-y-2 w-full", className)}>
+    {children}
+  </div>
 );
 
-export default ChangePasswordPage;
+const ErrorText = ({ text }: { text: string }) => (
+  <p className="text-red-400 text-xs mt-1">{text}</p>
+);
