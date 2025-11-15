@@ -16,7 +16,7 @@ type SelectProps = {
   name: string;
   placeholder?: string;
   required?: boolean;
-  value: string;
+  value: string | undefined;
   items: { label: string; value: string }[];
   handleChange: (value: string) => void; // <- changed (shadcn uses onValueChange)
   error?: string;
