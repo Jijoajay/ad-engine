@@ -146,7 +146,7 @@ export function DynamicForm({
                 <Select
                   {...commonProps}
                   items={field.options ?? []}
-                  value={data[field.name] ?? ""}
+                  value={data[field.name] ?? undefined}
                   handleChange={(value: string) => {
                     setData((prev) => ({
                       ...prev,

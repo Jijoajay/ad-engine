@@ -74,7 +74,7 @@ const AdSettingPage = () => {
   };
 
   const fields = useMemo(() => [
-    { label: "Project", name: "setg_proj_id", type: "select", options: projectOptions, placeholder: "Select project", required: true, value: formData.setg_proj_id },
+    { label: "Project", name: "setg_proj_id", type: "select", options: projectOptions, placeholder: "Select project", required: true, value: formData.setg_proj_id.toString() },
     { label: "Page", name: "setg_page_id", type: "select", options: pageOptions, placeholder: "Select page", required: true, value: formData.setg_page_id?.toString() || "" },
     { label: "Target Type", name: "setg_trgt_id", type: "select", options: targetTypeOptions, placeholder: "Select target type", required: true, value: formData.setg_trgt_id?.toString() || "" },
     { label: "Device Type", name: "setg_dvty_id", type: "select", options: deviceTypeLoading ? [{ label: "Loading device types...", value: "" }] : deviceTypeOptions, placeholder: "Select device type", required: true, value: formData.setg_dvty_id?.toString() || "" },
