@@ -86,7 +86,7 @@ export default function Profile01({
                 alt={name}
                 width={72}
                 height={72}
-                className="rounded-full ring-4 ring-background object-cover"
+                className="rounded-full ring-4 bg-[#1A1B1E] object-cover"
               />
               <div className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 ring-2 ring-background" />
             </div>

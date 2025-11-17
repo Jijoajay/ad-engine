@@ -100,7 +100,7 @@ export function Header() {
               alt="User avatar"
               width={28}
               height={28}
-              className="rounded-full ring-2 ring-border sm:w-8 sm:h-8 cursor-pointer"
+              className="rounded-full ring-2 ring-bg-[#33353A] sm:w-8 sm:h-8 cursor-pointer"
             />
           </DropdownMenuTrigger>
           <DropdownMenuContent
