@@ -80,7 +80,7 @@ export default function Profile01({
         <div className="relative px-6 pt-6 pb-6">
           {/* Profile Header */}
           <div className="flex items-center gap-4 mb-2">
-            <div className="relative shrink-0">
+            <div className="relative shrink-0 mb-2">
               <Image
                 src={avatar}
                 alt={name}
@@ -92,7 +92,7 @@ export default function Profile01({
             </div>
 
             <div className="flex-1">
-              <h2 className="text-xl font-semibold text-foreground">{name}</h2>
+              <h2 className="text-xl font-semibold text-[#F0F0F0]">{name}</h2>
               <p className="text-muted-foreground">{role}</p>
             </div>
           </div>
@@ -100,24 +100,24 @@ export default function Profile01({
           <div className="h-px bg-border" />
 
           {/* Menu Items */}
-          <div className="space-y-2">
+          <div className="space-y-2 pt-3 text-[#A0A0A0]">
             {menuItems.map((item) => (
               <Link
                 key={item.label}
                 href={item.href}
                 className="flex items-center justify-between p-2 hover:bg-neutral-700 
-                           hover:bg-accent rounded-lg 
+                            rounded-lg 
                            transition-colors duration-300 ease-in-out"
               >
                 <div className="flex items-center gap-2">
                   {item.icon}
-                  <span className="text-sm font-medium text-foreground">
+                  <span className="text-sm font-medium text-[#A0A0A0]">
                     {item.label}
                   </span>
                 </div>
                 <div className="flex items-center">
                   {item.value && (
-                    <span className="text-sm text-muted-foreground mr-2">
+                    <span className="text-sm text-[#A0A0A0] mr-2">
                       {item.value}
                     </span>
                   )}
@@ -137,7 +137,7 @@ export default function Profile01({
             >
               <div className="flex items-center gap-2">
                 <LogOut className="w-4 h-4" />
-                <span className="text-sm font-medium text-foreground">
+                <span className="text-sm font-medium text-[#A0A0A0]">
                   Logout
                 </span>
               </div>

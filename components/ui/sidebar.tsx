@@ -33,7 +33,7 @@ const Sidebar = () => {
         className={cn(
           "flex items-center px-3 py-2 text-sm rounded-md transition-colors",
           "text-[#A0A0A0] hover:text-[#F0F0F0] hover:bg-[#1E293B]",
-          isActive && "bg-accent text-[#F0F0F0] font-medium"
+          isActive && "bg-[#1E293B] text-[#F0F0F0] font-medium"
         )}
       >
         {Icon && <Icon className="h-4 w-4 mr-3 shrink-0" />}
