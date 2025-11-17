@@ -11,7 +11,7 @@ type InputGroupProps = {
   disabled?: boolean;
   active?: boolean;
   handleChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  value?: string;
+  value?: string | undefined;
   name?: string;
   icon?: React.ReactNode;
   iconPosition?: "left" | "right";

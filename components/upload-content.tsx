@@ -182,7 +182,7 @@ export const UploadContent = ({
                         <div className="mb-4">
                             <label className="text-sm text-gray-400 mb-2">Project</label>
                             <select
-                                className="bg-[#0B0B10] border border-[#2A2A2A] p-3 rounded-md text-white outline-none w-full"
+                                className="bg-[#0B0B10] border mt-2 border-[#2A2A2A] p-3 rounded-md text-white outline-none w-full"
                                 value={selectedProjectId ?? ""}
                                 onChange={(e) => {
                                     const id = Number(e.target.value);
@@ -204,9 +204,9 @@ export const UploadContent = ({
 
                         {/* Page */}
                         <div className="mb-4">
-                            <label className="text-sm text-gray-400 mb-2">Page</label>
+                            <label className="text-sm text-gray-400">Page</label>
                             <select
-                                className="bg-[#0B0B10] border border-[#2A2A2A] p-3 rounded-md text-white outline-none w-full"
+                                className="bg-[#0B0B10] border mt-2 border-[#2A2A2A] p-3 rounded-md text-white outline-none w-full"
                                 value={selectedPageId ?? ""}
                                 onChange={(e) => {
                                     const id = Number(e.target.value);
@@ -229,9 +229,9 @@ export const UploadContent = ({
 
                         {/* Section */}
                         <div className="mb-4">
-                            <label className="text-sm text-gray-400 mb-2">Section</label>
+                            <label className="text-sm text-gray-400">Section</label>
                             <select
-                                className="bg-[#0B0B10] border border-[#2A2A2A] p-3 rounded-md text-white outline-none w-full"
+                                className="bg-[#0B0B10] border border-[#2A2A2A] p-3 mt-2 rounded-md text-white outline-none w-full"
                                 value={selectedAdPosition}
                                 onChange={(e) => {
                                     const selected = filteredAdPositions.find((pos) => pos.setg_ad_position === e.target.value);
@@ -241,6 +241,23 @@ export const UploadContent = ({
                                 <option value="">Select Section</option>
                                 {filteredAdPositions.map((pos) => (<option key={pos.setg_id} value={pos.setg_ad_position}> {pos.setg_ad_position}
                                 </option>))}
+                            </select> 
+                        </div>
+
+                        {/* Title */}
+                        <div className="mb-4">
+                            <label className="text-sm text-gray-400">Title</label>
+                            <select
+                                className="bg-[#0B0B10] border border-[#2A2A2A] p-3 rounded-md mt-2 text-white outline-none w-full"
+                                value={selectedAdPosition}
+                                onChange={(e) => {
+                                    const selected = filteredAdPositions.find((pos) => pos.setg_ad_position === e.target.value);
+                                    setSelectedAdPosition(e.target.value); setSelectedSetgId(selected?.setg_id ?? null); setFiles([]);
+                                }}
+                                disabled={!selectedPageId} >
+                                <option value="">Select Title</option>
+                                {/* {filteredAdPositions.map((pos) => (<option key={pos.setg_id} value={pos.setg_ad_position}> {pos.setg_ad_position} */}
+                                {/* </option>))} */}
                             </select> </div>
 
                         {/* Image Upload */}

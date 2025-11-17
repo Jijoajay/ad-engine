@@ -24,7 +24,7 @@ const PageContent = () => {
   const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
   const { fetchAdSettings, loadingAdSettings, adSettings } = useAdSettingsStore();
   const { projectPageListByHash, fetchProjectPageByHashId, loadingHash } = useProjectPageStore();
-  const [previewImage, setPreviewImage] = useState<string | null>(null); // 👈 For image preview modal
+  const [previewImage, setPreviewImage] = useState<string | null>(null); 
 
   const slugify = (text: string) => text.toLowerCase().replace(/\s+/g, "-");
 
@@ -62,10 +62,10 @@ const PageContent = () => {
 
   return (
     <MainLayout>
-      <section className="flex flex-col justify-start items-center gap-10 pt-[150px] px-[5%] bg-[#18181C]  min-h-screen text-white ">
-        <div className="container flex flex-col gap-10 ">
+      <section className="flex flex-col justify-start items-center gap-10 pt-[150px] pb-10 px-[5%] bg-[#18181C]  min-h-screen text-white ">
+        <div className="container flex flex-col items-center justify-center gap-10 ">
           {/* Tabs */}
-          <div className="w-full items-start">
+          <div className="w-full max-w-7xl items-start">
             <div className="flex flex-wrap justify-start gap-4">
               {loadingHash ? (
                 Array.from({ length: 4 }).map((_, i) => (
@@ -77,8 +77,8 @@ const PageContent = () => {
                     key={dept.page_id}
                     onClick={() => handleTabClick(dept)}
                     className={`flex items-center gap-2 px-6 py-2 sm:py-3 rounded-xl font-thin text-sm sm:text-base transition-all duration-300 capitalize ${activeTab === dept.page_name
-                        ? "bg-linear-to-r from-purple-500 to-blue-500 text-white"
-                        : "bg-gray-800 text-white hover:bg-gray-700"
+                      ? "bg-linear-to-r from-purple-500 to-blue-500 text-white"
+                      : "bg-gray-800 text-white hover:bg-gray-700"
                       }`}
                   >
                     {dept.page_name}
@@ -102,27 +102,35 @@ const PageContent = () => {
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: index * 0.2 }}
-                  className="bg-[#231F29] w-full flex flex-col sm:flex-row border border-[#4C4C4C] rounded-xl overflow-hidden min-h-[300px]"
+                  className="bg-[#231F29] max-w-7xl w-full flex flex-col sm:flex-row border border-[#4C4C4C] rounded-xl overflow-hidden min-h-[300px]"
                 >
                   {/* Left Section */}
                   <div className="flex flex-col gap-6 sm:w-[65%] w-full p-6">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                       <div className="space-y-2">
                         <div>
-                          <h2 className="text-xl text-[#D9D9D9] font-bold">Ad Position:</h2>
-                          <p className="text-white">{ad.setg_ad_position}</p>
+                          <h2 className="text-[20px] text-[#D9D9D9] font-bold">Ad Size:</h2>
+                          <p className="text-[#A1A1A1] text-base">{ad.setg_ad_size}</p>
                         </div>
                         <div>
-                          <h2 className="text-xl text-[#D9D9D9] font-bold">Description:</h2>
-                          <p className="text-white">{ad.setg_ad_desc}</p>
+                          <h2 className="text-[20px] text-[#D9D9D9] font-bold">Ad Position:</h2>
+                          <p className="text-[#A1A1A1] text-base">{ad.setg_ad_position}</p>
                         </div>
                         <div>
-                          <h2 className="text-xl text-[#D9D9D9] font-bold">Ad Size:</h2>
-                          <p className="text-white">{ad.setg_ad_size}</p>
+                          <h2 className="text-[20px] text-[#D9D9D9] font-bold">Ad Impression Count:</h2>
+                          <p className="text-[#A1A1A1] text-base">{ad.setg_view_count}</p>
+                        </div>
+                        <div>
+                          <h2 className="text-[20px] text-[#D9D9D9] font-bold">Ad Click Count:</h2>
+                          <p className="text-[#A1A1A1] text-base">{ad.setg_click_count}</p>
+                        </div>
+                        <div>
+                          <h2 className="text-[20px] text-[#D9D9D9] font-bold">Description:</h2>
+                          <p className="text-[#A1A1A1] text-base">{ad.setg_ad_desc}</p>
                         </div>
                       </div>
                       <div className="flex items-start justify-start h-full">
-                        <p className="text-2xl sm:text-[32px] text-start font-bold text-[#D9D9D9]">${ad.setg_ad_charges}</p>
+                        <p className="text-2xl text-start font-bold text-[#D9D9D9]">${ad.setg_ad_charges}</p>
                       </div>
                     </div>
                     <div className="flex justify-end">
@@ -165,14 +173,15 @@ const PageContent = () => {
                     initial={{ opacity: 0, y: 100 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, ease: "easeOut" }}
-                    className="relative sm:w-[35%] w-full h-[250px] sm:h-auto cursor-pointer"
-                    onClick={() => setPreviewImage(ad.file_url || "/placeholder.svg")} // 👈 open preview
+                    className="relative sm:w-[35%] w-full h-[250px] sm:h-auto cursor-pointer flex items-center justify-center bg-black"
+                    onClick={() => setPreviewImage(ad.file_url || "/placeholder.svg")}
                   >
                     <Image
                       src={ad.file_url || "/placeholder.svg"}
                       alt={ad.project_page_name}
-                      fill
-                      className="transition duration-500 ease-in-out object-cover object-center rounded-b-xl sm:rounded-b-none sm:rounded-r-xl"
+                      width={500}       
+                      height={500}      
+                      className="object-contain rounded-b-xl sm:rounded-b-none sm:rounded-r-xl"
                     />
                   </motion.div>
                 </motion.div>
@@ -201,7 +210,7 @@ const PageContent = () => {
               exit={{ scale: 0.85, opacity: 0 }}
               transition={{ type: "spring", stiffness: 200, damping: 20 }}
               className="relative w-[90vw] h-[80vh] max-w-5xl"
-              onClick={(e) => e.stopPropagation()} 
+              onClick={(e) => e.stopPropagation()}
             >
               <Image
                 src={previewImage}

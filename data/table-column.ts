@@ -56,7 +56,6 @@ export const targetTypeColumns = [
 
 export const adSettingColumns = [
   { key: "setg_ad_position", label: "Ad Position" },
-  { key: "setg_ad_desc", label: "Description" },
   { key: "setg_ad_size", label: "Ad Size" },
   { key: "setg_view_count", label: "Views" },
   { key: "setg_click_count", label: "Clicks" },
