@@ -41,7 +41,7 @@ export function ButtonColorful({
         {loading ? (
           <>
             <Loader2 className="w-4 h-4 animate-spin text-white" />
-            <span>Saving...</span> {/* ✅ Change text */}
+            <span>{label}</span> 
           </>
         ) : (
           <>

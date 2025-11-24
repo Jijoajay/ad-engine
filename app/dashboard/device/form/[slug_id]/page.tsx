@@ -4,6 +4,7 @@ import { useRouter, useParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import AdminLayout from "@/layout/AdminLayout";
 import { useDeviceStore } from "@/store/use-device-store";
+import { useDeviceTypeStore } from "@/store/use-device-type-store";
 import { DynamicForm } from "@/components/ui/dynamic-form";
 import BackButton from "@/components/ui/back-button";
 import { DynamicFormSkeleton } from "@/components/skeleton/dynamic-form-skeleton";
@@ -11,30 +12,53 @@ import { DynamicFormSkeleton } from "@/components/skeleton/dynamic-form-skeleton
 const DevicePage = () => {
   const router = useRouter();
   const { slug_id } = useParams<{ slug_id: string }>();
+
   const {
+    deviceList,
     formData,
     loadingSave,
     loadingFetch,
     saveDevice,
     fetchDeviceByHash,
+    fetchDeviceList,
     resetForm,
   } = useDeviceStore();
+
+  const {
+    deviceTypeList,
+    fetchDeviceTypeList,
+  } = useDeviceTypeStore();
+
+  // Fetch all device types for the select
+  useEffect(() => {
+    fetchDeviceTypeList();
+  }, [fetchDeviceTypeList]);
+
+  // Fetch all devices if needed
+  useEffect(() => {
+    fetchDeviceList();
+  }, [fetchDeviceList]);
 
   // Fetch device data if editing, and clean up on unmount
   useEffect(() => {
     if (slug_id !== "0") {
       fetchDeviceByHash(slug_id);
     }
-
-    return () => {
-      resetForm();
-    };
+    return () => resetForm();
   }, [slug_id, fetchDeviceByHash, resetForm]);
 
   // Handle form submission
   const handleSubmit = (data: Record<string, any>) => {
     saveDevice(data, router);
   };
+
+  // Map deviceTypeList to select options
+  const deviceTypeOptions = useMemo(() => {
+    return deviceTypeList.map((type) => ({
+      label: type.dvty_name,
+      value: type.dvty_id.toString(),
+    }));
+  }, [deviceTypeList]);
 
   // Define form fields dynamically
   const fields = useMemo(() => {
@@ -52,10 +76,7 @@ const DevicePage = () => {
         label: "Device Type",
         name: "device_dvty_id",
         type: "select",
-        options: [
-          { label: "Type 1", value: "1" },
-          { label: "Type 2", value: "2" },
-        ],
+        options: deviceTypeOptions,
         placeholder: "Select device type",
         required: true,
         value: formData.device_dvty_id?.toString() || "",
@@ -71,7 +92,7 @@ const DevicePage = () => {
         className: "col-span-1",
       },
     ];
-  }, [formData]);
+  }, [formData, deviceTypeOptions]);
 
   if (loadingFetch && slug_id !== "0") {
     return <DynamicFormSkeleton title="Loading Device..." fieldCount={3} />;

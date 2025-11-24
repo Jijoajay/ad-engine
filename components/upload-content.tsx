@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { ButtonColorful } from "@/components/ui/button-colorful";
 import { cn } from "@/lib/utils";
+import { useDeviceStore } from "@/store/use-device-store";
+import { useSearchParams } from "next/navigation";
 
 interface UploadContentProps {
     isAdmin?: boolean;
@@ -28,16 +30,23 @@ export const UploadContent = ({
     saveAd,
     loading,
 }: UploadContentProps) => {
+    const searchParams = useSearchParams();
+    const type = searchParams.get("type");
     const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
     const [selectedPageId, setSelectedPageId] = useState<number | null>(null);
     const [selectedSetgId, setSelectedSetgId] = useState<number | null>(null);
     const [selectedAdPosition, setSelectedAdPosition] = useState<string>("");
+    const [selectedDeviceId, setSelectedDeviceId] = useState<number | "">("");
     const [files, setFiles] = useState<File[]>([]);
 
-    // Fetch initial data
+    const { deviceList, fetchDeviceList } = useDeviceStore();
+
     useEffect(() => {
         fetchAdData();
-    }, [fetchAdData]);
+        if (type === "device") {
+            fetchDeviceList();
+        }
+    }, [fetchAdData, type, fetchDeviceList]);
 
     const onDrop = useCallback(
         (acceptedFiles: File[]) => {
@@ -104,6 +113,11 @@ export const UploadContent = ({
             return;
         }
 
+        if (type === "device" && !selectedDeviceId) {
+            toast.error("Please select a device.");
+            return;
+        }
+
         if (files.length === 0) {
             toast.error("Please upload at least one image.");
             return;
@@ -140,15 +154,21 @@ export const UploadContent = ({
             formData.append("isAdminPosted", "1");
         }
 
+        // Append device_id if type is device
+        if (type === "device") {
+            formData.append("device_id", String(selectedDeviceId));
+        }
+
         const success = await saveAd(formData);
 
         if (success) {
             if (isAdmin) {
                 setFiles([]);
-                setSelectedAdPosition("")
-                setSelectedPageId(null)
-                setSelectedSetgId(null)
-                setSelectedProjectId(null)
+                setSelectedAdPosition("");
+                setSelectedPageId(null);
+                setSelectedSetgId(null);
+                setSelectedProjectId(null);
+                setSelectedDeviceId("");
                 toast.success("Advertisement saved successfully!");
             } else {
                 window.location.href = "/";
@@ -178,6 +198,23 @@ export const UploadContent = ({
                         transition={{ delay: 0.2, duration: 0.6 }}
                         className="flex-1 flex flex-col"
                     >
+                        {type === "device" && (
+                            <div className="mb-4">
+                                <label className="text-sm text-gray-400">Device</label>
+                                <select
+                                    className="bg-[#0B0B10] border mt-2 border-[#2A2A2A] p-3 rounded-md text-white outline-none w-full"
+                                    value={selectedDeviceId}
+                                    onChange={(e) => setSelectedDeviceId(Number(e.target.value))}
+                                >
+                                    <option value="">Select Device</option>
+                                    {deviceList.map((device) => (
+                                        <option key={device.device_id} value={device.device_id}>
+                                            {device.device_udid}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
                         {/* Project */}
                         <div className="mb-4">
                             <label className="text-sm text-gray-400 mb-2">Project</label>
@@ -241,7 +278,7 @@ export const UploadContent = ({
                                 <option value="">Select Section</option>
                                 {filteredAdPositions.map((pos) => (<option key={pos.setg_id} value={pos.setg_ad_position}> {pos.setg_ad_position}
                                 </option>))}
-                            </select> 
+                            </select>
                         </div>
 
                         {/* Title */}

@@ -4,7 +4,7 @@ import AdminLayout from "@/layout/AdminLayout";
 
 export const AdCardSkeleton = () => {
   return (
-    <div className="bg-[#231F29] w-full flex flex-col sm:flex-row border border-[#4C4C4C] rounded-xl overflow-hidden animate-pulse">
+    <div className="bg-[#231F29] w-full flex flex-col sm:flex-row border border-[#4C4C4C] rounded-xl overflow-hidden max-w-7xl h-[450px] animate-pulse">
       <div className="flex flex-col justify-between sm:w-[65%] w-full p-6 gap-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="space-y-4 w-full sm:w-auto">

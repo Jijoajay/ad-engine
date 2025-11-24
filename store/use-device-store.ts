@@ -32,7 +32,7 @@ interface DeviceState {
   ) => Promise<void>;
   changeStatus: (device_id: number) => Promise<void>;
   deleteDevice: (device_id: number) => Promise<void>;
-  resetForm: () => void; // ✅ added
+  resetForm: () => void;
 }
 
 export const useDeviceStore = create<DeviceState>((set, get) => ({
@@ -43,7 +43,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
   loadingDelete: false,
   loadingStatus: false,
 
-  // ✅ Reset form data
+  // Reset form data
   resetForm: () => {
     set({
       formData: {},

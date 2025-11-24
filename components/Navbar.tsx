@@ -10,6 +10,7 @@ import {
   X,
   LogOut,
   UserCircle,
+  LayoutDashboard,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
@@ -72,6 +73,7 @@ export default function Navbar() {
   ];
 
   const userMenuItems = [
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/profile", label: "Profile", icon: UserCircle },
     { href: "/my-ads", label: "My ADs", icon: UserCircle },
     { href: "/change-password", label: "Change Password", icon: UserCircle },
