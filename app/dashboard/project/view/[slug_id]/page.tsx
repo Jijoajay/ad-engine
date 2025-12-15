@@ -22,7 +22,7 @@ const ProjectViewPage = () => {
 
   if (!projectData)
     return (
-      <div className="flex items-center justify-center h-[80vh] text-gray-400 bg-black">
+      <div className="flex items-center justify-center h-[80vh] text-gray-400 bg-[#222327]">
         No Project Found
       </div>
     );
@@ -32,7 +32,7 @@ const ProjectViewPage = () => {
   return (
     <AdminLayout>
       <BackButton />
-      <div className="p-6 max-w-4xl mx-auto bg-black min-h-screen text-white">
+      <div className="p-6 max-w-4xl mx-auto bg-[#222327] min-h-screen text-white">
         <div className="bg-neutral-900 rounded-2xl shadow-lg border border-neutral-800 p-8 flex flex-col items-center text-center space-y-6">
           {/* Image */}
           <div className="rounded-xl overflow-hidden shadow-md">

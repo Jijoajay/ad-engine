@@ -52,13 +52,16 @@ function HomeInnerComponent() {
   const handleProjectSelect = (project: any) => {
     if (project.hash_id)
       sessionStorage.setItem("selected_project_hash", project.hash_id);
-
     router.push(`/ad-placement?project=${project.proj_slug_name}&type=website`);
   };
 
   const handlePlatformSelect = (platform: "website" | "device") => {
     setStep(platform);
-    router.push(`/?type=${platform}`);
+    if(platform === "device"){
+      router.push(`/ad-placement?tab=device`);
+    }else{
+      router.push("/?type=website")
+    }
   };
 
   if (!hydrated) {
@@ -190,7 +193,7 @@ function HomeInnerComponent() {
           )}
 
           {/* DEVICE STEP */}
-          {step === "device" && (
+          {/* {step === "device" && (
             <>
               <motion.h2
                 initial={{ opacity: 0, y: -20 }}
@@ -214,7 +217,7 @@ function HomeInnerComponent() {
                 />
               </div>
             </>
-          )}
+          )} */}
         </div>
       </section>
     </MainLayout>

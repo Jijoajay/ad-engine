@@ -35,7 +35,7 @@ const Page = () => {
   if (!adminAdvertisements.length)
     return (
       <AdminLayout>
-        <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="min-h-screen bg-[#222327] text-white flex items-center justify-center">
           <p className="text-center text-gray-400">No advertisements found.</p>
         </div>
       </AdminLayout>

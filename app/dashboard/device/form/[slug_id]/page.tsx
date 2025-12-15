@@ -102,7 +102,7 @@ const DevicePage = () => {
     <AdminLayout>
       <BackButton />
       <section className="flex items-center justify-center">
-        <div className="mt-6 bg-black w-full max-w-3xl">
+        <div className="mt-6 bg-[#222327] w-full max-w-3xl">
           <DynamicForm
             title={formData.device_id ? "Edit Device" : "Add Device"}
             fields={fields}

@@ -8,10 +8,10 @@ interface Device {
   device_udid: string;
   device_dvty_id: number;
   device_position: string;
-  device_created_date: string;
-  device_modified_date: string | null;
-  device_status: number;
-  hash_id: string;
+  device_created_date?: string;
+  device_modified_date?: string | null;
+  device_status?: number;
+  hash_id?: string;
 }
 
 interface DeviceState {
@@ -28,8 +28,9 @@ interface DeviceState {
   setFormByHash: (hash_id: string) => void;
   saveDevice: (
     data: Partial<Device>,
-    router: ReturnType<typeof useRouter>
+    router?: ReturnType<typeof useRouter>
   ) => Promise<void>;
+  saveDeviceAndReturn: (data: Partial<Device>) => Promise<Device | null>;
   changeStatus: (device_id: number) => Promise<void>;
   deleteDevice: (device_id: number) => Promise<void>;
   resetForm: () => void;
@@ -101,7 +102,7 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
   },
 
   // Save device (create or update)
-  saveDevice: async (data: Partial<Device>, router) => {
+  saveDevice: async (data: Partial<Device>, router?: any) => {
     const { formData } = get();
     set({ loadingSave: true });
 
@@ -136,15 +137,68 @@ export const useDeviceStore = create<DeviceState>((set, get) => ({
       if (response?.data?.status) {
         toast.success("Device saved successfully!");
         await get().fetchDeviceList();
-        if (router) router.push("/dashboard/device");
+
+        if (router) {
+          router.push("/dashboard/device");
+        }
+
+        return response.data.data;
       } else {
         toast.error(response?.data?.message || "Failed to save device!");
       }
+
+      return null;
     } catch (error) {
       console.error("Error saving device:", error);
       toast.error("Error saving device!");
+      return null;
     } finally {
       set({ loadingSave: false });
+    }
+  },
+
+  // Save device and return data only
+  saveDeviceAndReturn: async (
+    data: Partial<Device>
+  ): Promise<Device | null> => {
+    const { formData } = get();
+
+    try {
+      const formPayload = new FormData();
+      formPayload.append("device_id", String(formData.device_id || ""));
+      formPayload.append(
+        "device_udid",
+        data.device_udid || formData.device_udid || ""
+      );
+      formPayload.append(
+        "device_dvty_id",
+        String(data.device_dvty_id || formData.device_dvty_id || "")
+      );
+      formPayload.append(
+        "device_position",
+        data.device_position || formData.device_position || ""
+      );
+      formPayload.append(
+        "device_status",
+        String(data.device_status ?? formData.device_status ?? 1)
+      );
+
+      if ((data as any).file) {
+        formPayload.append("file", (data as any).file);
+      }
+
+      const response = await api.post("/device/create-or-update", formPayload, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      if (response?.data?.status) {
+        return response.data.data as Device;
+      }
+
+      return null;
+    } catch (error) {
+      console.error("Error saving device:", error);
+      return null;
     }
   },
 

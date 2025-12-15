@@ -87,16 +87,21 @@ export default function CartPage() {
                       <div className="flex items-center gap-6 sm:w-auto w-[50%] h-full">
                         <div className="h-full flex items-start jusity-start">
                           <div className="bg-[#BFB7CB] rounded-2xl flex items-center justify-center w-[134px] h-[134px] text-black font-medium text-sm shrink-0">
-                            {item.setg_ad_size}
+                            {item.setg_ad_size === "0" ? "Device Ad" : item.setg_ad_size}
                           </div>
                         </div>
 
                         {/* Details */}
-                        <div className="flex flex-col justify-center">
-                          <p className="font-bold text-[#D9D9D9] text-[20px]">
-                            Banner Size:
-                          </p>
-                          <p className="text-[#A1A1A1]">{item.setg_ad_size}</p>
+                        <div className="flex flex-col justify-start items-start h-full">
+                          {
+                            item.setg_ad_size !== "0" && item.setg_ad_size !== "0" &&
+                            <>
+                              <p className="font-bold text-[#D9D9D9] text-[20px]">
+                                Banner Size:
+                              </p>
+                              <p className="text-[#A1A1A1]">{item.setg_ad_size}</p>
+                            </>
+                          }
 
                           <p className="font-bold mt-3 text-[#D9D9D9] text-[20px]">
                             Banner Position:
@@ -105,19 +110,28 @@ export default function CartPage() {
                             {item.setg_ad_position}
                           </p>
 
-                          <p className="font-bold mt-3 text-[#D9D9D9] text-[20px]">
-                            Impression Count:
-                          </p>
-                          <p className="text-[#A1A1A1]">
-                            {item.setg_view_count}
-                          </p>
-
-                          <p className="font-bold mt-3 text-[#D9D9D9] text-[20px]">
-                            Click Count:
-                          </p>
-                          <p className="text-[#A1A1A1]">
-                            {item.setg_click_count}
-                          </p>
+                          {
+                            item.setg_view_count !== 0 &&
+                            <>
+                              <p className="font-bold mt-3 text-[#D9D9D9] text-[20px]">
+                                Impression Count:
+                              </p>
+                              <p className="text-[#A1A1A1]">
+                                {item.setg_view_count}
+                              </p>
+                            </>
+                          }
+                          {
+                            item.setg_click_count !== 0 &&
+                            <>
+                              <p className="font-bold mt-3 text-[#D9D9D9] text-[20px]">
+                                Click Count:
+                              </p>
+                              <p className="text-[#A1A1A1]">
+                                {item.setg_click_count}
+                              </p>
+                            </>
+                          }
                         </div>
                       </div>
 

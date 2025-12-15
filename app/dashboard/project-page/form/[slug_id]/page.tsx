@@ -83,7 +83,7 @@ const ProjectPageForm = () => {
     <AdminLayout>
       <BackButton />
       <section className="flex items-center justify-center">
-        <div className="mt-6 bg-black w-full max-w-3xl">
+        <div className="mt-6 bg-[#222327] w-full max-w-3xl">
           <DynamicForm
             title={formData?.page_id ? "Edit Project Page" : "Add Project Page"}
             fields={fields}

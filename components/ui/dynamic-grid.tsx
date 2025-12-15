@@ -148,8 +148,8 @@ export function DynamicGrid({
                           ? "Stop"
                           : "Start"
                         : ad.advt_status === 1
-                        ? "Active"
-                        : "Inactive"}
+                          ? "Active"
+                          : "Inactive"}
                     </DropdownMenuItem>
 
                     <DropdownMenuItem
@@ -162,10 +162,16 @@ export function DynamicGrid({
                 </DropdownMenu>
               </div>
 
-              {/* Image */}
+              {/* Image / Video */}
               <div className="relative w-full h-44 mb-3 rounded-xl overflow-hidden bg-[#2E2C36]">
                 {ad.file_url ? (
-                  isContain ? (
+                  ad.file_url.toLowerCase().endsWith(".mp4") ? (
+                    <video
+                      src={ad.file_url}
+                      controls
+                      className="w-full h-full object-cover"
+                    />
+                  ) : isContain ? (
                     <div className="flex items-center justify-center h-full w-full">
                       <Image
                         src={ad.file_url}
@@ -190,6 +196,7 @@ export function DynamicGrid({
                 )}
               </div>
 
+
               {/* Info */}
               <h3 className="font-semibold text-base text-white truncate">
                 {ad.proj_name || ad.advt_name || ad.mddt_name || "Untitled"}
@@ -211,24 +218,23 @@ export function DynamicGrid({
 
               {(ad.advt_status || ad.mddt_status || ad.proj_status) !==
                 undefined && (
-                <div className="mt-3">
-                  <span
-                    className={`inline-block text-xs font-medium px-3 py-1 rounded-full ${
-                      (ad.advt_status ||
+                  <div className="mt-3">
+                    <span
+                      className={`inline-block text-xs font-medium px-3 py-1 rounded-full ${(ad.advt_status ||
                         ad.mddt_status ||
                         ad.proj_status) === 1
                         ? "bg-green-900 text-green-300"
                         : "bg-red-900 text-red-300"
-                    }`}
-                  >
-                    {(ad.advt_status ||
-                      ad.mddt_status ||
-                      ad.proj_status) === 1
-                      ? "Active"
-                      : "Inactive"}
-                  </span>
-                </div>
-              )}
+                        }`}
+                    >
+                      {(ad.advt_status ||
+                        ad.mddt_status ||
+                        ad.proj_status) === 1
+                        ? "Active"
+                        : "Inactive"}
+                    </span>
+                  </div>
+                )}
             </div>
           ))
         ) : (
@@ -283,11 +289,10 @@ export function DynamicGrid({
             <button
               key={num}
               onClick={() => setCurrentPage(num)}
-              className={`px-3 py-1 rounded-full text-sm transition-all ${
-                currentPage === num
-                  ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white"
-                  : "hover:bg-gray-200 hover:text-purple-500 text-gray-200"
-              }`}
+              className={`px-3 py-1 rounded-full text-sm transition-all ${currentPage === num
+                ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white"
+                : "hover:bg-gray-200 hover:text-purple-500 text-gray-200"
+                }`}
             >
               {num}
             </button>

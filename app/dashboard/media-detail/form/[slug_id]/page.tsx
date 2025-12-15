@@ -101,7 +101,7 @@ const MediaDetailPage = () => {
     <AdminLayout>
       <BackButton />
       <section className="flex items-center justify-center">
-        <div className="mt-6 bg-black w-full max-w-3xl">
+        <div className="mt-6 bg-[#222327] w-full max-w-3xl">
           <DynamicForm
             title={formData?.mddt_id ? "Edit Media Detail" : "Add Media Detail"}
             fields={fields}

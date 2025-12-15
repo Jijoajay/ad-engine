@@ -49,6 +49,8 @@ const AdminPage = () => {
         fetchAdData={fetchAdSettingList} 
         saveAd={saveAd}
         loading={false}
+        hasWebsiteAds={true}
+        hasDeviceAds={true}
       />
     </AdminLayout>
   );

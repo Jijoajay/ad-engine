@@ -14,6 +14,8 @@ const Page = () => {
     advertisements,
     fetchAdData,
     saveAd,
+    hasWebsiteAds, 
+    hasDeviceAds,
     loading,
   } = useAdStore();
 
@@ -28,6 +30,8 @@ const Page = () => {
         fetchAdData={fetchAdData}
         saveAd={saveAd}
         loading={loading}
+        hasWebsiteAds={hasWebsiteAds}
+        hasDeviceAds={hasDeviceAds}
       />
     </MainLayout>
   );

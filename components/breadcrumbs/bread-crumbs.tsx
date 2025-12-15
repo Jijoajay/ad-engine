@@ -11,7 +11,7 @@ interface BreadcrumbProps {
   createPath?: string;
   isIcon?: boolean;
   viewMode?: string;
-  setViewMode?: (value: string) => void;
+  setViewMode?: React.Dispatch<React.SetStateAction<"grid" | "list">>;
 
   // NEW FILTER PROPS
   filterConfig?: FilterConfig[];

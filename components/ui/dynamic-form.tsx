@@ -26,7 +26,7 @@ interface FormField {
   placeholder?: string;
   required?: boolean;
   className?: string;
-  isContain?: boolean
+  isContain?: boolean;
   options?: { label: string; value: string }[];
   value?: any;
 }
@@ -49,6 +49,9 @@ export function DynamicForm({
   const [data, setData] = useState<Record<string, any>>({});
   const [filePreviews, setFilePreviews] = useState<Record<string, string>>({});
 
+  /**
+   * Initialize values from provided fields
+   */
   useEffect(() => {
     const initialData: Record<string, any> = {};
     fields.forEach((field) => {
@@ -59,7 +62,9 @@ export function DynamicForm({
     setData(initialData);
   }, [fields]);
 
-  // Basic Validation
+  /**
+   * Validation
+   */
   const validateForm = (formData: Record<string, any>) => {
     const newErrors: Record<string, string> = {};
     fields.forEach((field) => {
@@ -72,52 +77,54 @@ export function DynamicForm({
     return Object.keys(newErrors).length === 0;
   };
 
-  // Change handler
-  const handleChange = (
-    e: any
-  ) => {
+  /**
+   * Common input change handler
+   */
+  const handleChange = (e: any) => {
     const { name, value } = e.target;
+
     setData((prev) => ({ ...prev, [name]: value }));
 
     if (errors[name] && value.trim() !== "") {
       setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
+        const updated = { ...prev };
+        delete updated[name];
+        return updated;
       });
     }
   };
 
-
-  // Submit
+  /**
+   * Submit
+   */
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!validateForm(data)) return;
     await onSubmit?.(data);
   };
 
-  const setPreview = useCallback((fieldName: string, url: any) => {
+  /**
+   * File preview setter
+   */
+  const setPreview = useCallback((fieldName: string, url: string) => {
     setFilePreviews((prev) => {
       if (prev[fieldName] === url) return prev;
       return { ...prev, [fieldName]: url || "" };
     });
   }, []);
 
+  /**
+   * Reset Form
+   */
   const handleCancel = () => {
-    // Reset all form data to initial values (or empty strings)
     const resetData: Record<string, any> = {};
     fields.forEach((field) => {
-      resetData[field.name] = field.value ?? ""; // fallback to empty string
+      resetData[field.name] = field.value ?? "";
     });
     setData(resetData);
-
-    // Clear errors
     setErrors({});
-
-    // Clear file previews
     setFilePreviews({});
   };
-
 
   return (
     <ShowcaseSection
@@ -125,28 +132,38 @@ export function DynamicForm({
       className="p-6.5 bg-[#222327] text-[#F0F0F0] shadow-lg"
     >
       <form onSubmit={handleSubmit} noValidate>
-        {/* Responsive Grid Layout */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {fields.map((field) => {
             const error = errors[field.name];
+
+            /**
+             * Remove key from spread props → fix React warning
+             */
             const commonProps = {
-              key: field.name,
               label: field.label,
               placeholder: field.placeholder ?? "",
               className: `text-white ${field.className ?? ""}`,
               name: field.name,
               required: field.required,
               error,
-              handleChange,
             };
 
-            // Select Input
+            /**
+             * SELECT FIELD
+             */
             if (field.type === "select") {
+              const items =
+                (field.options ?? []).map((opt) => ({
+                  label: opt.label,
+                  value: opt.value || "invalid_value", // prevent empty string error
+                })) || [];
+
               return (
                 <Select
+                  key={field.name}
                   {...commonProps}
-                  items={field.options ?? []}
-                  value={data[field.name] ?? undefined}
+                  items={items}
+                  value={data[field.name] ?? ""}
                   handleChange={(value: string) => {
                     setData((prev) => ({
                       ...prev,
@@ -157,26 +174,28 @@ export function DynamicForm({
               );
             }
 
-
-            // File Upload
+            /**
+             * FILE UPLOAD
+             */
             if (field.type === "file") {
               return (
                 <FileUploadField
                   key={field.name}
                   field={field}
                   value={data[field.name]}
-                  isContain={field?.isContain || false}
+                  isContain={field.isContain || false}
                   setData={(name, value) =>
                     setData((prev) => ({ ...prev, [name]: value }))
                   }
                   preview={filePreviews[field.name]}
-                  setPreview={(url) => setPreview(field.name, url)}
+                  setPreview={(url) => setPreview(field.name, url ?? "")}
                 />
               );
             }
 
-
-            // Textarea
+            /**
+             * TEXTAREA FIELD
+             */
             if (field.type === "textarea") {
               return (
                 <div className="col-span-2" key={field.name}>
@@ -189,18 +208,22 @@ export function DynamicForm({
               );
             }
 
-            // Input fields
+            /**
+             * DEFAULT INPUT FIELD
+             */
             return (
               <InputGroup
+                key={field.name}
                 type={field.type}
                 {...commonProps}
                 value={data[field.name] ?? ""}
+                handleChange={handleChange}
               />
             );
           })}
         </div>
 
-        {/* Submit Button */}
+        {/* Submit + Cancel */}
         <div className="pt-6 flex justify-end gap-5 items-end w-full">
           <button
             type="button"
@@ -209,6 +232,7 @@ export function DynamicForm({
           >
             Cancel
           </button>
+
           <ButtonColorful
             type="submit"
             isIcon={false}

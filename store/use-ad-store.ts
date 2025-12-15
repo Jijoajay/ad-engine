@@ -43,9 +43,10 @@ export interface Advertisement {
 
 export interface AdPosition {
   setg_id: number;
-  setg_page_id: number;
+  setg_page_id: number | any;
   setg_ad_position: string;
   setg_ad_desc: string;
+  mddt_mdty_id: number;
   setg_view_count: number | string;
   setg_click_count: number | string;
 }
@@ -59,6 +60,8 @@ export interface AdState {
   pagesByProject: Record<number, ProjectPage[]>;
   adPositionsByPage: Record<number, AdPosition[]>;
   loading: boolean;
+  hasWebsiteAds: boolean;
+  hasDeviceAds: boolean;
   error: string | null;
   fetchAdData: () => Promise<void>;
   fetchAllAdminAd: () => Promise<void>;
@@ -79,6 +82,8 @@ export const useAdStore = create<AdState>((set, get) => ({
   adPositionsByPage: {},
   loading: false,
   error: null,
+  hasWebsiteAds: false,
+  hasDeviceAds: false,
 
   // Fetch All Ad Data
   fetchAdData: async () => {
@@ -98,6 +103,22 @@ export const useAdStore = create<AdState>((set, get) => ({
           pagesByProject[page.page_proj_id].push(page);
         });
 
+        let hasWebsiteAds = false;
+        let hasDeviceAds = false;
+
+        const filteredProjects = projects.filter(
+          (project:Project) => project.proj_name !== null && project.proj_id !== null
+        );
+
+        adPositions.forEach((pos: any) => {
+          if (pos.setg_proj_id && pos.setg_page_id) {
+            hasWebsiteAds = true;
+          }
+          if (!pos.setg_proj_id && !pos.setg_page_id) {
+            hasDeviceAds = true;
+          }
+        });
+
         // Group ad positions by page
         const adPositionsByPage: Record<number, AdPosition[]> = {};
         if (adPositions) {
@@ -112,13 +133,14 @@ export const useAdStore = create<AdState>((set, get) => ({
           projects,
           projectPages: project_pages,
           advertisements,
-          projectList: projects,
+          projectList: filteredProjects,
           pagesByProject,
           adPositionsByPage,
+          hasWebsiteAds,
+          hasDeviceAds,
           loading: false,
         });
       } else {
-        // toast.error(res.data?.message || "Failed to fetch advertisements");
         console.log("error", res.data?.message);
         set({ loading: false });
       }

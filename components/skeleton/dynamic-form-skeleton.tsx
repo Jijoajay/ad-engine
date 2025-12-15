@@ -14,7 +14,7 @@ export const DynamicFormSkeleton: React.FC<DynamicFormSkeletonProps> = ({
 }) => {
   return (
     <AdminLayout>
-      <div className="p-6 max-w-4xl mx-auto bg-black min-h-screen flex justify-center items-start">
+      <div className="p-6 max-w-4xl mx-auto bg-[#222327] min-h-screen flex justify-center items-start">
         <div className="w-full animate-pulse space-y-6">
           {/* Title */}
           <div className="h-8 w-1/3 bg-neutral-800 rounded"></div>
