@@ -37,7 +37,6 @@ export const UploadContent = ({
 }: UploadContentProps) => {
 
     const searchParams = useSearchParams();
-    console.log("adPositionsByPage", adPositionsByPage)
     const type = searchParams.get("type");
     const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
     const [selectedPageId, setSelectedPageId] = useState<number | null>(null);

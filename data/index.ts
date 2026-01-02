@@ -65,6 +65,18 @@ export const NAV_DATA = [
         icon: FaAdversal,
         items: [],
       },
+      {
+        title: "AD Location",
+        url: "/dashboard/ad-location",
+        icon: FaAdversal,
+        items: [],
+      },
+      {
+        title: "AD Area Category",
+        url: "/dashboard/ad-area-category",
+        icon: FaAdversal,
+        items: [],
+      },
     ],
   },
 ];

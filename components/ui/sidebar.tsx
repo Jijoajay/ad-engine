@@ -81,9 +81,9 @@ const Sidebar = () => {
             <div className="space-y-6">
               {NAV_DATA.map((section, sectionIdx) => (
                 <div key={sectionIdx}>
-                  {section.label && (
+                  {section?.label && (
                     <div className="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-muted-[#A0A0A0]">
-                      {section.label}
+                      {section?.label}
                     </div>
                   )}
                   <div className="space-y-1">

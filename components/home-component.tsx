@@ -126,7 +126,7 @@ function HomeInnerComponent() {
                 />
                 <PlatformCard
                   title="Device"
-                  image="/images/device.png"
+                  image="/images/tv.png"
                   onClick={() => handlePlatformSelect("device")}
                 />
               </div>

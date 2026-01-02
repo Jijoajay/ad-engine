@@ -48,6 +48,21 @@ export const deviceColumns = [
   { key: "device_created_date", label: "Created On", isDate: true },
 ];
 
+export const adLocationColums = [
+  { key: "adlc_name", label: "Name" },
+  { key: "adlc_adac_id", label: "Ad Area Category" },
+  { key: "adlc_short_code", label: "Short Code" },
+  { key: "adlc_status", label: "Status" },
+  { key: "adlc_created_date", label: "Created On", isDate: true },
+];
+
+export const adAreaCategoryColums = [
+  { key: "adac_name", label: "Name" },
+  { key: "adac_desc", label: "Description" },
+  { key: "adac_status", label: "Status" },
+  { key: "adac_created_date", label: "Created On", isDate: true },
+];
+
 export const targetTypeColumns = [
   { key: "trgt_name", label: "Target Type Name" },
   { key: "trgt_status", label: "Status" },
