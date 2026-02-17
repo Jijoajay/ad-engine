@@ -1,7 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Swal from "sweetalert2";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Loader2 } from "lucide-react";
 import { Edit, Trash2, RefreshCcw, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -54,6 +64,9 @@ export function DynamicTable({
 }: DynamicTableProps) {
   const [rowsPerPage, setRowsPerPage] = useState(defaultRowsPerPage);
   const [currentPage, setCurrentPage] = useState(1);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState<any>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const totalPages = Math.ceil(data.length / rowsPerPage);
 
@@ -63,58 +76,33 @@ export function DynamicTable({
     }
   }, [rowsPerPage, totalPages]);
 
-  const handleDelete = async (row: any) => {
-    const name = row.dvty_name || "this item";
 
-    const result = await Swal.fire({
-      title: `Delete "${name}"?`,
-      text: "This action cannot be undone!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#7e22ce",
-      cancelButtonColor: "#374151",
-      confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "Cancel",
-      background: "#000000",
-      color: "#ffffff",
-      customClass: {
-        popup: "rounded-lg shadow-lg border border-[#33353A]",
-        confirmButton:
-          "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg px-4 py-2",
-        cancelButton:
-          "bg-gray-800 hover:bg-gray-700 text-white rounded-lg px-4 py-2",
-      },
-      reverseButtons: true,
-    });
-
-    if (result.isConfirmed) {
-      try {
-        await onDelete?.(row);
-        await Swal.fire({
-          title: "Deleted!",
-          text: `"${name}" has been deleted successfully.`,
-          icon: "success",
-          background: "#000000",
-          color: "#ffffff",
-          confirmButtonColor: "#7e22ce",
-        });
-      } catch {
-        Swal.fire({
-          title: "Error!",
-          text: "Failed to delete. Please try again.",
-          icon: "error",
-          background: "#000000",
-          color: "#ffffff",
-          confirmButtonColor: "#7e22ce",
-        });
-      }
-    }
-  };
 
   const paginatedData = data.slice(
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
   );
+
+  const openDeleteDialog = (row: any) => {
+    setSelectedRow(row);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedRow) return;
+
+    try {
+      setIsDeleting(true);
+      await onDelete?.(selectedRow);
+      setDeleteDialogOpen(false);
+    } catch (error) {
+      console.error("Delete failed", error);
+    } finally {
+      setIsDeleting(false);
+      setSelectedRow(null);
+    }
+  };
+
 
   const startItem = (currentPage - 1) * rowsPerPage + 1;
 
@@ -177,11 +165,10 @@ export function DynamicTable({
                         </div>
                       ) : col.label === "Status" ? (
                         <span
-                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                            row[col.key] === 1
+                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${row[col.key] === 1
                               ? "bg-green-500/20 text-green-400 border border-green-600"
                               : "bg-red-500/20 text-red-400 border border-red-600"
-                          }`}
+                            }`}
                         >
                           {row[col.key] === 1 ? "Active" : "Inactive"}
                         </span>
@@ -240,29 +227,28 @@ export function DynamicTable({
                               }}
                             >
                               <RefreshCcw
-                                className={`h-4 w-4 ${
-                                  row[
+                                className={`h-4 w-4 ${row[
                                     columns.find(
                                       (c) => c.label === "Status"
                                     )!.key
                                   ] === 1
                                     ? "text-yellow-400"
                                     : "text-green-400"
-                                }`}
+                                  }`}
                               />
                               {isClientAds
                                 ? row[
-                                    columns.find(
-                                      (c) => c.label === "Status"
-                                    )!.key
-                                  ] === 1
+                                  columns.find(
+                                    (c) => c.label === "Status"
+                                  )!.key
+                                ] === 1
                                   ? "Stop"
                                   : "Start"
                                 : row[
-                                    columns.find(
-                                      (c) => c.label === "Status"
-                                    )!.key
-                                  ] === 1
+                                  columns.find(
+                                    (c) => c.label === "Status"
+                                  )!.key
+                                ] === 1
                                   ? "Deactivate"
                                   : "Activate"}
                             </DropdownMenuItem>
@@ -271,7 +257,7 @@ export function DynamicTable({
                         {onDelete && (
                           <DropdownMenuItem
                             className="flex items-center gap-2 hover:bg-gray-800 cursor-pointer"
-                            onClick={() => handleDelete(row)}
+                            onClick={() => openDeleteDialog(row)}
                           >
                             <Trash2 className="h-4 w-4 text-red-400" /> Delete
                           </DropdownMenuItem>
@@ -340,11 +326,10 @@ export function DynamicTable({
             <button
               key={num}
               onClick={() => setCurrentPage(num)}
-              className={`px-3 py-1 rounded-full text-sm transition-all ${
-                currentPage === num
+              className={`px-3 py-1 rounded-full text-sm transition-all ${currentPage === num
                   ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white"
                   : "hover:bg-gray-200 hover:text-purple-500 text-gray-200"
-              }`}
+                }`}
             >
               {num}
             </button>
@@ -369,6 +354,46 @@ export function DynamicTable({
           </button>
         </div>
       </div>
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className="bg-[#111] border border-gray-800 text-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-red-500">
+              Delete "
+              {selectedRow?.dvty_name ||
+                selectedRow?.advt_name ||
+                selectedRow?.proj_name ||
+                "this item"}
+              "?
+            </AlertDialogTitle>
+
+            <AlertDialogDescription className="text-gray-400">
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-gray-800 text-white hover:bg-gray-700">
+              Cancel
+            </AlertDialogCancel>
+
+            <AlertDialogAction
+              onClick={confirmDelete}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
     </>
   );
 }

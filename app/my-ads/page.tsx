@@ -21,6 +21,10 @@ const Page = () => {
 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
+  const filteredAdvertisements = adminAdvertisements.filter(
+    (ad: any) => ad.advt_id !== null && ad.advt_id !== undefined && ad.advt_id !== ""
+  );
+
   useEffect(() => {
     fetchAllUserAd();
   }, [fetchAllUserAd]);
@@ -49,7 +53,7 @@ const Page = () => {
   }
 
   // Empty state
-  if (!adminAdvertisements.length)
+  if (!filteredAdvertisements.length)
     return (
       <MainLayout>
         <div className="min-h-screen bg-black text-white flex items-center justify-center px-4 sm:px-6 md:px-8">
@@ -70,21 +74,19 @@ const Page = () => {
             <div className="flex gap-2">
               <button
                 onClick={() => setViewMode("grid")}
-                className={`px-3 py-1 rounded-md text-sm sm:text-base transition-colors ${
-                  viewMode === "grid"
+                className={`px-3 py-1 rounded-md text-sm sm:text-base transition-colors ${viewMode === "grid"
                     ? "bg-purple-500 text-white"
                     : "bg-gray-200 text-gray-700"
-                }`}
+                  }`}
               >
                 <LayoutGrid size={18} />
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`px-3 py-1 rounded-md text-sm sm:text-base transition-colors ${
-                  viewMode === "list"
+                className={`px-3 py-1 rounded-md text-sm sm:text-base transition-colors ${viewMode === "list"
                     ? "bg-purple-500 text-white"
                     : "bg-gray-200 text-gray-700"
-                }`}
+                  }`}
               >
                 <List size={18} />
               </button>
@@ -103,7 +105,7 @@ const Page = () => {
             {viewMode === "grid" ? (
               <DynamicGrid
                 isAds={true}
-                data={adminAdvertisements}
+                data={filteredAdvertisements}
                 onToggle={handleToggle}
                 onDelete={handleDelete}
               />
@@ -112,7 +114,7 @@ const Page = () => {
                 <DynamicTable
                   isClientAds={true}
                   columns={adColumns}
-                  data={adminAdvertisements}
+                  data={filteredAdvertisements}
                   onDelete={handleDelete}
                   onChangeStatus={handleToggle}
                 />

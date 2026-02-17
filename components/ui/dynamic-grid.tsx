@@ -3,7 +3,17 @@
 import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import Swal from "sweetalert2";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Loader2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,8 +50,12 @@ export function DynamicGrid({
   isContain = false,
   defaultRowsPerPage = 8,
 }: DynamicGridProps) {
+
   const [rowsPerPage, setRowsPerPage] = useState(defaultRowsPerPage);
   const [currentPage, setCurrentPage] = useState(1);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedAd, setSelectedAd] = useState<any>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const totalPages = Math.ceil(data.length / rowsPerPage);
 
@@ -65,31 +79,49 @@ export function DynamicGrid({
     return pages;
   };
 
-  const handleDelete = async (ad: any) => {
-    const name = ad.advt_name || ad.proj_name || "this item";
+  // const handleDelete = async (ad: any) => {
+  //   const name = ad.advt_name || ad.proj_name || "this item";
 
-    const result = await Swal.fire({
-      title: `Delete "${name}"?`,
-      text: "This action cannot be undone.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#7e22ce",
-      cancelButtonColor: "#374151",
-      confirmButtonText: "Yes, delete it!",
-      background: "#000000",
-      color: "#ffffff",
-      reverseButtons: true,
-    });
+  //   const result = await Swal.fire({
+  //     title: `Delete "${name}"?`,
+  //     text: "This action cannot be undone.",
+  //     icon: "warning",
+  //     showCancelButton: true,
+  //     confirmButtonColor: "#7e22ce",
+  //     cancelButtonColor: "#374151",
+  //     confirmButtonText: "Yes, delete it!",
+  //     background: "#000000",
+  //     color: "#ffffff",
+  //     reverseButtons: true,
+  //   });
 
-    if (result.isConfirmed) {
-      await onDelete?.(ad);
-      Swal.fire({
-        title: "Deleted!",
-        text: `"${name}" has been deleted.`,
-        icon: "success",
-        background: "#000000",
-        color: "#ffffff",
-      });
+  //   if (result.isConfirmed) {
+  //     await onDelete?.(ad);
+  //     Swal.fire({
+  //       title: "Deleted!",
+  //       text: `"${name}" has been deleted.`,
+  //       icon: "success",
+  //       background: "#000000",
+  //       color: "#ffffff",
+  //     });
+  //   }
+  // };
+
+  const openDeleteDialog = (ad: any) => {
+    setSelectedAd(ad);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedAd) return;
+
+    try {
+      setIsDeleting(true);
+      await onDelete?.(selectedAd);
+      setDeleteDialogOpen(false);
+    } finally {
+      setIsDeleting(false);
+      setSelectedAd(null);
     }
   };
 
@@ -153,7 +185,7 @@ export function DynamicGrid({
                     </DropdownMenuItem>
 
                     <DropdownMenuItem
-                      onClick={() => handleDelete(ad)}
+                      onClick={() => openDeleteDialog(ad)}
                       className="cursor-pointer hover:bg-gray-800 text-red-400"
                     >
                       Delete
@@ -317,6 +349,41 @@ export function DynamicGrid({
           </button>
         </div>
       </div>
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className="bg-[#111] border border-gray-800 text-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-red-500">
+              Delete "{selectedAd?.advt_name || selectedAd?.proj_name || "this item"}"?
+            </AlertDialogTitle>
+
+            <AlertDialogDescription className="text-gray-400">
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-gray-800 text-white hover:bg-gray-700">
+              Cancel
+            </AlertDialogCancel>
+
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-red-600 hover:bg-red-700 text-white"
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
     </div>
   );
 }

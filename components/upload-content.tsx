@@ -139,6 +139,8 @@ export const UploadContent = ({
         );
     }, [selectedProjectId, pagesByProject, validPageIds, isAdmin]);
 
+    console.log("filteredPages", filteredPages)
+
     const filteredAdPositions = useMemo(() => {
         const allAdPositions: any[] = Object.values(adPositionsByPage).flat();
 
@@ -149,15 +151,15 @@ export const UploadContent = ({
             );
         }
 
-        if (selectedPageId && !isAdmin ) {
+        if (selectedPageId && !isAdmin) {
             return (adPositionsByPage[selectedPageId] || []).filter(
                 (pos: any) => advtSetgIds.has(pos.setg_id)
             );
         }
 
-        if(selectedPageId && isAdmin ){
-            console.log(" adPositionsByPage[selectedPageId] ",  adPositionsByPage[selectedPageId] )
-            return adPositionsByPage[selectedPageId] 
+        if (selectedPageId && isAdmin) {
+            console.log(" adPositionsByPage[selectedPageId] ", adPositionsByPage[selectedPageId])
+            return adPositionsByPage[selectedPageId]
         }
 
 
@@ -174,9 +176,10 @@ export const UploadContent = ({
         return [];
     }, [activeTab, selectedPageId, adPositionsByPage, advtSetgIds, isAdmin]);
 
-
-
-
+    const handleRemoveFile = (fileName: string) => {
+        setFiles((prev) => prev.filter((file) => file.name !== fileName));
+        toast.success("File removed.");
+    };
 
     const isUploadLimitReached =
         selectedSetgId &&
@@ -227,7 +230,7 @@ export const UploadContent = ({
                 finalDeviceId = String(existingDevice.device_id);
             }
 
-            
+
 
             if (!selectedAd) {
                 toast.error("Selected device advertisement not found.");
@@ -536,8 +539,20 @@ export const UploadContent = ({
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ duration: 0.4 }}
-                                        className="w-[90%] sm:w-[380px] h-[250px] rounded-md overflow-hidden shadow-md"
+                                        className="relative w-[90%] sm:w-[380px] h-[250px] rounded-md overflow-hidden shadow-md"
                                     >
+                                        {/* REMOVE BUTTON */}
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleRemoveFile(file.name);
+                                            }}
+                                            className="absolute top-2 right-2 z-10 bg-black/70 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition"
+                                        >
+                                            ✕
+                                        </button>
+
                                         {selectedSection?.mddt_mdty_id === 1 ? (
                                             <video
                                                 src={URL.createObjectURL(file)}
@@ -555,8 +570,6 @@ export const UploadContent = ({
                                         )}
                                     </motion.div>
                                 ))}
-
-
                                 {!isUploadLimitReached && (
                                     <div className="flex items-center justify-center w-20 h-20 bg-gray-800/50 rounded-md border border-gray-600 text-gray-400 text-3xl font-thin">
                                         +
