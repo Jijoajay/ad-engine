@@ -63,7 +63,7 @@ const Page = () => {
   // Main content
   return (
     <MainLayout>
-      <section className="pt-[100px] w-full flex items-center justify-center px-3 sm:px-6 md:px-8">
+      <section className="pt-[100px] pb-20 w-full flex items-center justify-center px-3 sm:px-6 md:px-8 min-h-screen">
         <div className="w-full max-w-[1400px]">
           {/* Responsive toggle buttons (optional UI control) */}
           <div className="flex justify-end mb-4 sm:mb-6">

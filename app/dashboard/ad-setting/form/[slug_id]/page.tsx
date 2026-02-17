@@ -12,6 +12,7 @@ import { useProjectStore } from "@/store/use-project-store";
 import { useProjectPageStore } from "@/store/use-project-page-store";
 import { useTargetTypeStore } from "@/store/use-target-type-store";
 import { useDeviceTypeStore } from "@/store/use-device-type-store";
+import { useMediaDetailStore } from "@/store/use-media-detail-store";
 
 const AdSettingPage = () => {
   const router = useRouter();
@@ -31,6 +32,7 @@ const AdSettingPage = () => {
   const { projectPageList, fetchProjectPageList, loadingHash } = useProjectPageStore();
   const { targetTypeList, fetchTargetTypeList } = useTargetTypeStore();
   const { fetchDeviceTypeList, deviceTypeList, loading: deviceTypeLoading } = useDeviceTypeStore();
+  const { fetchMediaDetailList, mediaDetailList, loadingFetch: mediaDetailLoading } = useMediaDetailStore();
 
   // Fetch all lists
   useEffect(() => {
@@ -39,7 +41,10 @@ const AdSettingPage = () => {
     fetchProjectPageList();
     fetchDeviceTypeList();
     fetchAdSettingList();
-  }, [fetchProjectList, fetchTargetTypeList, fetchProjectPageList, fetchDeviceTypeList, fetchAdSettingList]);
+    fetchMediaDetailList();
+  }, [fetchProjectList, fetchTargetTypeList, fetchProjectPageList, fetchDeviceTypeList, fetchAdSettingList, fetchMediaDetailList]);
+
+  console.log("mediaDetailList", mediaDetailList)
 
   // Fetch single record if editing & reset on unmount
   useEffect(() => {
@@ -69,6 +74,11 @@ const AdSettingPage = () => {
     [deviceTypeList]
   );
 
+  const mediaDetailsOptions = useMemo(
+    () => mediaDetailList.map((d) => ({ label: d.mddt_desc, value: String(d.mddt_id) })),
+    [deviceTypeList]
+  );
+
   const handleSubmit = (data: Record<string, any>) => {
     saveAdSetting(data, router);
   };
@@ -78,7 +88,7 @@ const AdSettingPage = () => {
     { label: "Page", name: "setg_page_id", type: "select", options: pageOptions, placeholder: "Select page", required: true, value: formData.setg_page_id?.toString() || "" },
     { label: "Target Type", name: "setg_trgt_id", type: "select", options: targetTypeOptions, placeholder: "Select target type", required: true, value: formData.setg_trgt_id?.toString() || "" },
     { label: "Device Type", name: "setg_dvty_id", type: "select", options: deviceTypeLoading ? [{ label: "Loading device types...", value: "" }] : deviceTypeOptions, placeholder: "Select device type", required: true, value: formData.setg_dvty_id?.toString() || "" },
-    { label: "Media Type", name: "setg_mddt_id", type: "select", options: [{ label: "Image", value: "1" }, { label: "Video", value: "2" }], placeholder: "Select media type", required: true, value: formData.setg_mddt_id?.toString() || "" },
+    { label: "Media Details", name: "setg_mddt_id", type: "select", options: mediaDetailLoading ? [{ label: "Loading media details...", value: "" }] : mediaDetailsOptions, placeholder: "Select media detail", required: true, value: formData.setg_mddt_id?.toString() || "" },
     { label: "Ad Position", name: "setg_ad_position", type: "text", placeholder: "Enter ad position", required: true, value: formData.setg_ad_position || "" },
     { label: "Ad Size", name: "setg_ad_size", type: "text", placeholder: "e.g. 10 X 10", required: true, value: formData.setg_ad_size || "" },
     { label: "View Count", name: "setg_view_count", type: "number", placeholder: "Enter view count", required: true, value: formData.setg_view_count || 0 },

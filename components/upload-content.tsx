@@ -195,6 +195,10 @@ export const UploadContent = ({
         let finalDeviceId = selectedDeviceId;
         const formData = new FormData();
 
+        const selectedAd = advertisements.find(
+            (ad) => ad.advt_setg_id === selectedSetgId
+        );
+
 
         if (activeTab.toLowerCase() === "device") {
             if (!selectedDeviceId) {
@@ -223,24 +227,22 @@ export const UploadContent = ({
                 finalDeviceId = String(existingDevice.device_id);
             }
 
-            const selectedAd = advertisements.find(
-                (ad) => ad.advt_setg_id === selectedSetgId
-            );
+            
 
             if (!selectedAd) {
                 toast.error("Selected device advertisement not found.");
                 return;
             }
 
-            formData.append("advt_id", String(selectedAd.advt_id));
-            formData.append(
-                "advt_view_count",
-                String(selectedAd.advt_view_count ?? 0)
-            );
-            formData.append(
-                "advt_click_count",
-                String(selectedAd.advt_click_count ?? 0)
-            );
+            // formData.append("advt_id", String(selectedAd.advt_id));
+            // formData.append(
+            //     "advt_view_count",
+            //     String(selectedAd.advt_view_count ?? 0)
+            // );
+            // formData.append(
+            //     "advt_click_count",
+            //     String(selectedAd.advt_click_count ?? 0)
+            // );
 
             formData.append("advt_device_id", finalDeviceId);
         }
@@ -251,7 +253,18 @@ export const UploadContent = ({
             return;
         }
 
+        // moved the advt_setg_id, advt_view_count, advt_click_count these are common for all ads
+        formData.append("advt_id", String(selectedAd.advt_id));
         formData.append("file", files[0]);
+        formData.append("advt_setg_id", String(selectedSetgId));
+        formData.append(
+            "advt_view_count",
+            String(selectedAd.advt_view_count ?? 0)
+        );
+        formData.append(
+            "advt_click_count",
+            String(selectedAd.advt_click_count ?? 0)
+        );
 
 
         const success = await saveAd(formData);
