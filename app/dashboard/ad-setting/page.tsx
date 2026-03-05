@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Suspense } from "react";
 import { useRouter } from "next/navigation";
 
@@ -10,6 +10,7 @@ import { DynamicTableSkeleton } from "@/components/skeleton/dynamic-table-skelet
 import { DynamicTable } from "@/components/ui/dynamic-table";
 import { adSettingColumns } from "@/data/table-column";
 import { useAdSettingStore } from "@/store/use-ad-setting-store";
+import { useProjectStore } from "@/store/use-project-store";
 
 const Page = () => {
   const router = useRouter();
@@ -21,6 +22,7 @@ const Page = () => {
     deleteAdSetting,
     changeStatus,
   } = useAdSettingStore();
+  const { projectList, fetchProjectList } = useProjectStore();
 
   const [filters, setFilters] = useState<Record<string, any>>({});
   const [filteredData, setFilteredData] = useState<any[]>([]);
@@ -28,6 +30,7 @@ const Page = () => {
   // Fetch data on mount
   useEffect(() => {
     fetchAdSettingList();
+    fetchProjectList();
   }, [fetchAdSettingList]);
 
   // Re-apply filters whenever original list changes
@@ -35,19 +38,18 @@ const Page = () => {
     applyFilter(filters);
   }, [adSettingList]);
 
-  // 🔥 FILTER FUNCTION
+  // FILTER FUNCTION
   const applyFilter = (filters: Record<string, any>) => {
     let result = [...adSettingList];
 
-    // Category filter
-    if (filters.category) {
+    // 🔥 Project filter
+    if (filters.project && filters.project !== "all") {
       result = result.filter(
-        (item) =>
-          item.setg_ad_position?.toLowerCase() === filters.category.toLowerCase()
+        (item) => String(item.setg_proj_id) === String(filters.project)
       );
     }
 
-    // Search filter
+    // 🔥 Search filter
     if (filters.search) {
       const searchText = filters.search.toLowerCase();
 
@@ -76,6 +78,18 @@ const Page = () => {
     await changeStatus(row.hash_id);
   };
 
+  const projectFilterOptions = useMemo(() => {
+    const options = projectList.map((project) => ({
+      label: project.proj_name,
+      value: String(project.proj_id),
+    }));
+
+    return [
+      { label: "All Projects", value: "all" }, // default
+      ...options,
+    ];
+  }, [projectList]);
+
   // Final data to show
   const finalTableData =
     filteredData.length > 0 || Object.keys(filters).length > 0
@@ -85,24 +99,21 @@ const Page = () => {
   return (
     <AdminLayout>
       <section>
-        {/* ⭐ Breadcrumb With Filters */}
+        {/* Breadcrumb With Filters */}
         <Breadcrumb
           pageName="Ad Settings"
           createPath="/dashboard/ad-setting/form/0"
           filterConfig={[
             {
-              name: "category",
+              name: "project",
               type: "select",
-              placeholder: "Select Ad Position",
-              options: [
-                { label: "Electronics", value: "electronics" },
-                { label: "Clothes", value: "clothes" },
-              ],
+              placeholder: "Select Project",
+              options: projectFilterOptions,
             },
             {
               name: "search",
               type: "text",
-              placeholder: "Search Ad Position...",
+              placeholder: "Search...",
             },
           ]}
           onFilterChange={(newFilters) => {
@@ -111,7 +122,7 @@ const Page = () => {
           }}
         />
 
-        {/* ⭐ Table + Loader */}
+        {/* Table + Loader */}
         <Suspense fallback={<DynamicTableSkeleton columns={adSettingColumns} />}>
           {loadingFetch ? (
             <DynamicTableSkeleton columns={adSettingColumns} />

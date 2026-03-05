@@ -71,9 +71,10 @@ export const targetTypeColumns = [
 
 export const adSettingColumns = [
   { key: "setg_ad_position", label: "Ad Position" },
+  { key: "hash_id", label: "Setting Id" },
   { key: "setg_ad_size", label: "Ad Size" },
   { key: "setg_view_count", label: "Views" },
-  { key: "setg_click_count", label: "Clicks" },
+  // { key: "setg_click_count", label: "Clicks" },
   { key: "setg_ad_charges", label: "Charges (₹)" },
   { key: "setg_status", label: "Status" },
 ];

@@ -7,7 +7,7 @@ import { ShowcaseSection } from "./showcase-section";
 import { ButtonColorful } from "./button-colorful";
 import { FileUploadField } from "../FormElements/FileUploadField";
 import Select from "../FormElements/select";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 type FieldType =
   | "text"
@@ -19,7 +19,7 @@ type FieldType =
   | "file"
   | string;
 
-interface FormField {
+export interface FormField {
   label: string;
   name: string;
   type: FieldType;
@@ -29,6 +29,7 @@ interface FormField {
   isContain?: boolean;
   options?: { label: string; value: string }[];
   value?: any;
+  onChange?: (value: any) => void;
 }
 
 interface DynamicFormProps {
@@ -44,6 +45,7 @@ export function DynamicForm({
   loading = false,
   onSubmit,
 }: DynamicFormProps) {
+  const router = useRouter();
   const { slug_id } = useParams<{ slug_id: string }>();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [data, setData] = useState<Record<string, any>>({});
@@ -92,7 +94,7 @@ export function DynamicForm({
         return updated;
       });
     }
-  };
+  }; 
 
   /**
    * Submit
@@ -124,6 +126,7 @@ export function DynamicForm({
     setData(resetData);
     setErrors({});
     setFilePreviews({});
+    router.back();
   };
 
   return (
@@ -169,6 +172,7 @@ export function DynamicForm({
                       ...prev,
                       [field.name]: value,
                     }));
+                    field.onChange?.(value);
                   }}
                 />
               );

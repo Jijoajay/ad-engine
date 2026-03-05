@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,6 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreVertical, Eye, MousePointerClick } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Select,
   SelectContent,
@@ -51,6 +53,8 @@ export function DynamicGrid({
   defaultRowsPerPage = 8,
 }: DynamicGridProps) {
 
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [rowsPerPage, setRowsPerPage] = useState(defaultRowsPerPage);
   const [currentPage, setCurrentPage] = useState(1);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);

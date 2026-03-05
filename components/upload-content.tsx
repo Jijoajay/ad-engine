@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { useDeviceStore } from "@/store/use-device-store";
 import { useSearchParams } from "next/navigation";
 import { useMediaTypeStore } from "@/store/use-media-type-store";
+import { useRouter } from "next/navigation";
 
 interface UploadContentProps {
     isAdmin?: boolean;
@@ -38,6 +39,7 @@ export const UploadContent = ({
 
     const searchParams = useSearchParams();
     const type = searchParams.get("type");
+    const router = useRouter();
     const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
     const [selectedPageId, setSelectedPageId] = useState<number | null>(null);
     const [selectedSetgId, setSelectedSetgId] = useState<number | null>(null);
@@ -132,14 +134,21 @@ export const UploadContent = ({
 
         const pages = pagesByProject[selectedProjectId] || [];
 
-        if (isAdmin) return pages;
+        const filtered = isAdmin
+            ? pages
+            : pages.filter(
+                (page) =>
+                    page.page_id !== null &&
+                    validPageIds.has(page.page_id)
+            );
 
-        return pages.filter(
-            (page) => page.page_id !== null && validPageIds.has(page.page_id)
+        // Remove duplicate page_name
+        const uniquePages = Array.from(
+            new Map(filtered.map(page => [page.page_name, page])).values()
         );
-    }, [selectedProjectId, pagesByProject, validPageIds, isAdmin]);
 
-    console.log("filteredPages", filteredPages)
+        return uniquePages;
+    }, [selectedProjectId, pagesByProject, validPageIds, isAdmin]);
 
     const filteredAdPositions = useMemo(() => {
         const allAdPositions: any[] = Object.values(adPositionsByPage).flat();
@@ -282,7 +291,22 @@ export const UploadContent = ({
                 setSelectedDeviceId("");
                 toast.success("Advertisement saved successfully!");
             } else {
-                window.location.href = "/";
+                const remainingAds = advertisements.filter(
+                    (ad) => ad.advt_setg_id !== selectedSetgId
+                );
+
+                if (remainingAds.length > 0) {
+                    setFiles([]);
+                    setSelectedAdPosition("");
+                    setSelectedPageId(null);
+                    setSelectedSetgId(null);
+                    setSelectedProjectId(null);
+                    toast.success("Advertisement saved successfully!");
+                    fetchAdData();
+                } else {
+                    // No ads left → redirect to my-ads
+                    router.push("/my-ads");
+                }
             }
         }
     };

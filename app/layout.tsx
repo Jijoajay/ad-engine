@@ -23,7 +23,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={poppins.className}>
         {children}
-        <Toaster position="top-right" richColors expand />
+        <Toaster position="bottom-right" />
       </body>
     </html>
   );
