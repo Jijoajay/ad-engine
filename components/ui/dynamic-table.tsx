@@ -12,33 +12,24 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Loader2 } from "lucide-react";
-import { Edit, Trash2, RefreshCcw, MoreHorizontal } from "lucide-react";
-import { cn } from "@/lib/utils";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
+import { Loader2, Edit, Trash2, RefreshCcw, MoreHorizontal } from "lucide-react";
 import Image from "next/image";
 
 interface DynamicTableProps {
-  title?: string;
   data: Record<string, any>[];
   columns: {
     key: string;
     label: string;
     isImage?: boolean;
     isDate?: boolean;
-    align?: "left" | "right" | "center";
   }[];
   isClientAds?: boolean;
   isContain?: boolean;
@@ -63,8 +54,21 @@ export function DynamicTable({
   isContain = false,
   isClientAds = false,
 }: DynamicTableProps) {
-  const [rowsPerPage, setRowsPerPage] = useState(defaultRowsPerPage);
-  const [currentPage, setCurrentPage] = useState(1);
+
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const rowsParam = searchParams.get("rows");
+  const pageParam = searchParams.get("page");
+
+  const [rowsPerPage, setRowsPerPage] = useState(
+    rowsParam ? Number(rowsParam) : defaultRowsPerPage
+  );
+
+  const [currentPage, setCurrentPage] = useState(
+    pageParam ? Number(pageParam) : 1
+  );
+
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState<any>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -77,7 +81,14 @@ export function DynamicTable({
     }
   }, [rowsPerPage, totalPages]);
 
+  const updateURL = (page: number, rows: number) => {
+    const params = new URLSearchParams(searchParams.toString());
 
+    params.set("page", String(page));
+    params.set("rows", String(rows));
+
+    router.push(`?${params.toString()}`);
+  };
 
   const paginatedData = data.slice(
     (currentPage - 1) * rowsPerPage,
@@ -96,14 +107,11 @@ export function DynamicTable({
       setIsDeleting(true);
       await onDelete?.(selectedRow);
       setDeleteDialogOpen(false);
-    } catch (error) {
-      console.error("Delete failed", error);
     } finally {
       setIsDeleting(false);
       setSelectedRow(null);
     }
   };
-
 
   const startItem = (currentPage - 1) * rowsPerPage + 1;
 
@@ -112,23 +120,27 @@ export function DynamicTable({
     const start = Math.max(1, currentPage - siblingCount);
     const end = Math.min(totalPages, currentPage + siblingCount);
     const pages: number[] = [];
+
     for (let i = start; i <= end; i++) pages.push(i);
+
     return pages;
   };
 
   return (
     <>
-      {/* TABLE */}
       <div className="rounded-xl bg-[#222327] text-[#F0F0F0] shadow-lg">
         <table className="w-full">
+
           <thead>
             <tr className="border-b border-[#33353A] text-base">
               <th className="text-left px-4 py-3">SI No</th>
+
               {columns.map((col) => (
                 <th key={col.key} className="text-left px-4 py-3">
                   {col.label}
                 </th>
               ))}
+
               <th className="text-center px-4 py-3">Actions</th>
             </tr>
           </thead>
@@ -136,43 +148,51 @@ export function DynamicTable({
           <tbody>
             {paginatedData.length > 0 ? (
               paginatedData.map((row, idx) => (
-                <tr
-                  key={idx}
-                  className="border-t border-[#33353A] transition"
-                >
+                <tr key={idx} className="border-t border-[#33353A]">
+
                   <td className="px-4 py-3">{startItem + idx}</td>
 
                   {columns.map((col) => (
                     <td key={col.key} className="px-4 py-3">
+
                       {col.isImage ? (
-                        <div className="relative w-[70px] h-12 flex items-center justify-center bg-[#2E2C36] rounded-md overflow-hidden">
+                        <div className="relative w-[70px] h-12 bg-[#2E2C36] rounded-md overflow-hidden">
+
                           {isContain ? (
                             <Image
                               src={row[col.key] || "/images/placeholder.png"}
                               alt={col.label}
                               width={60}
                               height={48}
-                              className="object-contain max-w-full max-h-full"
+                              className="object-contain"
                             />
                           ) : (
                             <Image
                               src={row[col.key] || "/images/placeholder.png"}
                               alt={col.label}
                               fill
-                              className="object-cover rounded-md border border-gray-700"
-                              sizes="70px"
+                              className="object-cover"
                             />
                           )}
+
                         </div>
                       ) : col.label === "Status" ? (
+
                         <span
-                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${row[col.key] === 1
-                              ? "bg-green-500/20 text-green-400 border border-green-600"
-                              : "bg-red-500/20 text-red-400 border border-red-600"
+                          className={`px-3 py-1 rounded-full text-xs ${row[col.key] === 1
+                              ? "bg-green-500/20 text-green-400"
+                              : "bg-red-500/20 text-red-400"
                             }`}
                         >
-                          {row[col.key] === 1 ? "Active" : "Inactive"}
+                          {isClientAds
+                            ? row[col.key] === 1
+                              ? "Running"
+                              : "Stopped"
+                            : row[col.key] === 1
+                              ? "Active"
+                              : "Inactive"}
                         </span>
+
                       ) : col.isDate ? (
                         row[col.key]
                           ? new Date(row[col.key]).toLocaleDateString()
@@ -180,91 +200,69 @@ export function DynamicTable({
                       ) : (
                         row[col.key] ?? "-"
                       )}
+
                     </td>
                   ))}
 
                   <td className="text-center px-4 py-3">
+
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <button className="p-2 rounded-full hover:bg-gray-800 transition">
-                          <MoreHorizontal className="h-5 w-5 text-gray-300" />
+                        <button className="p-2 hover:bg-gray-800 rounded-full">
+                          <MoreHorizontal className="h-5 w-5" />
                         </button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent
-                        align="end"
-                        className="w-48 bg-gray-900 text-white border border-gray-700"
-                      >
+
+                      <DropdownMenuContent className="w-48 bg-gray-900 text-white border border-gray-700">
+
                         {onView && (
-                          <DropdownMenuItem
-                            onClick={() => onView(row)}
-                            className="cursor-pointer hover:bg-gray-800 text-teal-400"
-                          >
+                          <DropdownMenuItem onClick={() => onView(row)}>
                             View
                           </DropdownMenuItem>
                         )}
+
                         {onEdit && (
-                          <DropdownMenuItem
-                            className="flex items-center gap-2 hover:bg-gray-800 cursor-pointer"
-                            onClick={() => onEdit(row)}
-                          >
-                            <Edit className="h-4 w-4 text-blue-400" /> Edit
+                          <DropdownMenuItem onClick={() => onEdit(row)}>
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit
                           </DropdownMenuItem>
                         )}
 
                         {onChangeStatus &&
                           columns.some((c) => c.label === "Status") && (
                             <DropdownMenuItem
-                              className="flex items-center gap-2 hover:bg-gray-800 cursor-pointer"
                               onClick={() => {
                                 const statusCol = columns.find(
                                   (c) => c.label === "Status"
                                 );
+
                                 if (!statusCol) return;
+
                                 const currentStatus = row[statusCol.key];
+
                                 onChangeStatus(
                                   row,
                                   currentStatus === 1 ? 0 : 1
                                 );
                               }}
                             >
-                              <RefreshCcw
-                                className={`h-4 w-4 ${row[
-                                    columns.find(
-                                      (c) => c.label === "Status"
-                                    )!.key
-                                  ] === 1
-                                    ? "text-yellow-400"
-                                    : "text-green-400"
-                                  }`}
-                              />
-                              {isClientAds
-                                ? row[
-                                  columns.find(
-                                    (c) => c.label === "Status"
-                                  )!.key
-                                ] === 1
-                                  ? "Stop"
-                                  : "Start"
-                                : row[
-                                  columns.find(
-                                    (c) => c.label === "Status"
-                                  )!.key
-                                ] === 1
-                                  ? "Deactivate"
-                                  : "Activate"}
+                              <RefreshCcw className="h-4 w-4 mr-2" />
+                              Toggle Status
                             </DropdownMenuItem>
                           )}
 
                         {onDelete && (
                           <DropdownMenuItem
-                            className="flex items-center gap-2 hover:bg-gray-800 cursor-pointer"
                             onClick={() => openDeleteDialog(row)}
                           >
-                            <Trash2 className="h-4 w-4 text-red-400" /> Delete
+                            <Trash2 className="h-4 w-4 mr-2 text-red-400" />
+                            Delete
                           </DropdownMenuItem>
                         )}
+
                       </DropdownMenuContent>
                     </DropdownMenu>
+
                   </td>
                 </tr>
               ))
@@ -282,21 +280,25 @@ export function DynamicTable({
         </table>
       </div>
 
-      {/* --- PAGINATION FROM PAGINATEDTABLE --- */}
-      <div className="mt-6 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-        <div className="flex items-center space-x-2 gap-2 text-sm text-gray-500">
-          <label htmlFor="pageSize" className="whitespace-nowrap">
-            Rows Per Page:
-          </label>
+      {/* PAGINATION */}
+
+      <div className="mt-6 flex justify-between items-center">
+
+        <div className="flex items-center gap-2 text-sm text-gray-500">
+
+          Rows Per Page:
 
           <select
-            id="pageSize"
             value={rowsPerPage}
             onChange={(e) => {
-              setRowsPerPage(Number(e.target.value));
+              const value = Number(e.target.value);
+
+              setRowsPerPage(value);
               setCurrentPage(1);
+
+              updateURL(1, value);
             }}
-            className="bg-black text-gray-400 border border-gray-300 rounded-md px-2 w-[60px] py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+            className="bg-black border rounded px-2 py-1"
           >
             {[5, 10, 20, 50].map((size) => (
               <option key={size} value={size}>
@@ -304,97 +306,69 @@ export function DynamicTable({
               </option>
             ))}
           </select>
+
         </div>
 
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => setCurrentPage(1)}
-            disabled={currentPage === 1}
-            className="px-2 py-1 text-gray-600 hover:bg-gray-100 rounded disabled:text-gray-400"
-          >
-            «
-          </button>
-
-          <button
-            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
-            className="px-2 py-1 text-gray-600 hover:bg-gray-100 rounded disabled:text-gray-400"
-          >
-            ‹
-          </button>
+        <div className="flex items-center gap-2">
 
           {pageNumbers().map((num) => (
             <button
               key={num}
-              onClick={() => setCurrentPage(num)}
-              className={`px-3 py-1 rounded-full text-sm transition-all ${currentPage === num
-                  ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white"
-                  : "hover:bg-gray-200 hover:text-purple-500 text-gray-200"
+              onClick={() => {
+                setCurrentPage(num);
+                updateURL(num, rowsPerPage);
+              }}
+              className={`px-3 py-1 rounded ${currentPage === num
+                  ? "bg-purple-600 text-white"
+                  : "bg-gray-800 text-gray-300"
                 }`}
             >
               {num}
             </button>
           ))}
 
-          <button
-            onClick={() =>
-              setCurrentPage((p) => Math.min(totalPages, p + 1))
-            }
-            disabled={currentPage === totalPages}
-            className="px-2 py-1 text-gray-600 hover:bg-gray-100 rounded disabled:text-gray-400"
-          >
-            ›
-          </button>
-
-          <button
-            onClick={() => setCurrentPage(totalPages)}
-            disabled={currentPage === totalPages}
-            className="px-2 py-1 text-gray-600 hover:bg-gray-100 rounded disabled:text-gray-400"
-          >
-            »
-          </button>
         </div>
+
       </div>
+
+      {/* DELETE DIALOG */}
+
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent className="bg-[#111] border border-gray-800 text-white">
+
           <AlertDialogHeader>
             <AlertDialogTitle className="text-red-500">
-              Delete "
-              {selectedRow?.dvty_name ||
-                selectedRow?.advt_name ||
-                selectedRow?.proj_name ||
-                "this item"}
-              "?
+              Delete "{selectedRow?.proj_name || "this item"}" ?
             </AlertDialogTitle>
 
-            <AlertDialogDescription className="text-gray-400">
+            <AlertDialogDescription>
               This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-gray-800 text-white hover:bg-gray-700">
-              Cancel
-            </AlertDialogCancel>
+
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
 
             <AlertDialogAction
               onClick={confirmDelete}
               disabled={isDeleting}
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className="bg-red-600"
             >
               {isDeleting ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
                   Deleting...
                 </>
               ) : (
                 "Delete"
               )}
             </AlertDialogAction>
+
           </AlertDialogFooter>
+
         </AlertDialogContent>
       </AlertDialog>
-
     </>
   );
 }

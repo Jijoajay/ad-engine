@@ -55,8 +55,16 @@ export function DynamicGrid({
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [rowsPerPage, setRowsPerPage] = useState(defaultRowsPerPage);
-  const [currentPage, setCurrentPage] = useState(1);
+  const rowsParam = searchParams.get("rows");
+  const pageParam = searchParams.get("page");
+
+  const [rowsPerPage, setRowsPerPage] = useState(
+    rowsParam ? Number(rowsParam) : defaultRowsPerPage
+  );
+
+  const [currentPage, setCurrentPage] = useState(
+    pageParam ? Number(pageParam) : 1
+  );
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedAd, setSelectedAd] = useState<any>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -81,6 +89,15 @@ export function DynamicGrid({
     const pages: number[] = [];
     for (let i = start; i <= end; i++) pages.push(i);
     return pages;
+  };
+
+  const updateURL = (page: number, rows: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    params.set("page", String(page));
+    params.set("rows", String(rows));
+
+    router.push(`?${params.toString()}`);
   };
 
   // const handleDelete = async (ad: any) => {
@@ -256,18 +273,18 @@ export function DynamicGrid({
                 undefined && (
                   <div className="mt-3">
                     <span
-                      className={`inline-block text-xs font-medium px-3 py-1 rounded-full ${(ad.advt_status ||
-                        ad.mddt_status ||
-                        ad.proj_status) === 1
-                        ? "bg-green-900 text-green-300"
-                        : "bg-red-900 text-red-300"
+                      className={`inline-block text-xs font-medium px-3 py-1 rounded-full ${(ad.advt_status || ad.mddt_status || ad.proj_status) === 1
+                          ? "bg-green-900 text-green-300"
+                          : "bg-red-900 text-red-300"
                         }`}
                     >
-                      {(ad.advt_status ||
-                        ad.mddt_status ||
-                        ad.proj_status) === 1
-                        ? "Active"
-                        : "Inactive"}
+                      {isAds
+                        ? (ad.advt_status || ad.mddt_status || ad.proj_status) === 1
+                          ? "Running"
+                          : "Stopped"
+                        : (ad.advt_status || ad.mddt_status || ad.proj_status) === 1
+                          ? "Active"
+                          : "Inactive"}
                     </span>
                   </div>
                 )}
@@ -290,8 +307,12 @@ export function DynamicGrid({
             id="pageSize"
             value={rowsPerPage}
             onChange={(e) => {
-              setRowsPerPage(Number(e.target.value));
+              const value = Number(e.target.value);
+
+              setRowsPerPage(value);
               setCurrentPage(1);
+
+              updateURL(1, value);
             }}
             className="bg-black text-gray-400 border border-gray-300 rounded-md px-2 w-[60px] py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
           >
@@ -314,7 +335,11 @@ export function DynamicGrid({
           </button>
 
           <button
-            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            onClick={() => {
+              const newPage = Math.max(1, currentPage - 1);
+              setCurrentPage(newPage);
+              updateURL(newPage, rowsPerPage);
+            }}
             disabled={currentPage === 1}
             className="px-2 py-1 text-gray-600 hover:bg-gray-100 rounded disabled:text-gray-400"
           >
@@ -324,7 +349,10 @@ export function DynamicGrid({
           {pageNumbers().map((num) => (
             <button
               key={num}
-              onClick={() => setCurrentPage(num)}
+              onClick={() => {
+                setCurrentPage(num);
+                updateURL(num, rowsPerPage);
+              }}
               className={`px-3 py-1 rounded-full text-sm transition-all ${currentPage === num
                 ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white"
                 : "hover:bg-gray-200 hover:text-purple-500 text-gray-200"
@@ -335,9 +363,11 @@ export function DynamicGrid({
           ))}
 
           <button
-            onClick={() =>
-              setCurrentPage((p) => Math.min(totalPages, p + 1))
-            }
+            onClick={() => {
+              const newPage = Math.min(totalPages, currentPage + 1);
+              setCurrentPage(newPage);
+              updateURL(newPage, rowsPerPage);
+            }}
             disabled={currentPage === totalPages}
             className="px-2 py-1 text-gray-600 hover:bg-gray-100 rounded disabled:text-gray-400"
           >
@@ -345,7 +375,10 @@ export function DynamicGrid({
           </button>
 
           <button
-            onClick={() => setCurrentPage(totalPages)}
+            onClick={() => {
+              setCurrentPage(totalPages);
+              updateURL(totalPages, rowsPerPage);
+            }}
             disabled={currentPage === totalPages}
             className="px-2 py-1 text-gray-600 hover:bg-gray-100 rounded disabled:text-gray-400"
           >
